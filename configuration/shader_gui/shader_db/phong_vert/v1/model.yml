@@ -1,0 +1,8 @@
+domain: SHADER
+name: phong_vert
+type: vertex
+versions:
+- date: '2018-09-26 14:50:32.272659'
+  interfaces:
+  - {direction: INCOMING, name: worldPos, type: vec4}
+  name: v1

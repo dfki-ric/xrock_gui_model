@@ -1,0 +1,14 @@
+domain: SHADER
+name: pixellight_full_frag
+type: fragment
+versions:
+- date: '2018-09-26 14:50:32.147719'
+  interfaces:
+  - {direction: INCOMING, name: baseColor, type: vec4}
+  - {direction: INCOMING, name: normal, type: vec3}
+  - {direction: OUTGOING, name: shadedColor, type: vec4}
+  name: v1
+  defaultConfiguration:
+    data: "data:\n  inputs:\n    baseColor: vec4(1,1,1,1)\n    normal: vec3(0,0,1)"
+  softwareData:
+    data: "description:\n  markdown: \"# brief\\n\\nThis shader handles the general light handling. It calculates the ambient, diffuse, specular and emission shading. Addtitionally, it applies the shadow texture to the result.\\n \\n# notes\\n\\n- This shader should be splitted into smaller ones.\"\n"

@@ -1,0 +1,13 @@
+domain: SHADER
+name: phong_frag
+type: fragment
+versions:
+- date: '2018-09-26 14:50:31.899137'
+  interfaces:
+  - {direction: INCOMING, name: normal, type: vec3}
+  - {direction: INCOMING, name: ambient_base, type: vec4}
+  - {direction: INCOMING, name: diffuse_base, type: vec4}
+  - {direction: INCOMING, name: specular_base, type: vec4}
+  - {direction: INCOMING, name: Ie, type: vec4}
+  - {direction: OUTGOING, name: If, type: vec4}
+  name: v1

@@ -1,0 +1,4 @@
+Preferences:
+  - name: resources_path
+    type: string
+    value: ../../share

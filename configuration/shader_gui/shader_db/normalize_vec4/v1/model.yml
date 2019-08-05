@@ -1,0 +1,9 @@
+domain: SHADER
+name: normalize_vec4
+type: fragment
+versions:
+- date: '2018-09-26 14:50:31.965208'
+  interfaces:
+  - {direction: INCOMING, name: vector_a, type: vec4}
+  - {direction: OUTGOING, name: vector, type: vec4}
+  name: v1

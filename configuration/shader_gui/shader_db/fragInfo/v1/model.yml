@@ -1,0 +1,12 @@
+domain: SHADER
+name: fragInfo
+type: fragment
+versions:
+- date: '2018-09-26 14:50:31.952594'
+  interfaces:
+  - {direction: OUTGOING, name: ambient, type: vec4}
+  - {direction: OUTGOING, name: diffuse, type: vec4}
+  - {direction: OUTGOING, name: specular, type: vec4}
+  - {direction: OUTGOING, name: emission, type: vec4}
+  - {direction: OUTGOING, name: texCoord, type: vec2}
+  name: v1

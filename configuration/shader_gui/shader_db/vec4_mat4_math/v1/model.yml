@@ -1,0 +1,11 @@
+domain: SHADER
+name: vec4_mat4_math
+type: fragment
+versions:
+- date: '2018-09-26 14:50:31.807348'
+  interfaces:
+  - {direction: INCOMING, name: matrix, type: mat4}
+  - {direction: INCOMING, name: vector, type: vec4}
+  - {direction: INCOMING, name: skalar, type: float}
+  - {direction: OUTGOING, name: vector, type: vec4}
+  name: v1

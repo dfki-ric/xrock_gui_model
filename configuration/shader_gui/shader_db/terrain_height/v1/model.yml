@@ -1,0 +1,13 @@
+domain: SHADER
+name: terrain_height
+type: vertex
+versions:
+- date: '2018-09-26 14:50:32.147719'
+  interfaces:
+  - {direction: INCOMING, name: xy, type: vec2}
+  - {direction: OUTGOING, name: height, type: float}
+  name: v1
+  defaultConfiguration:
+    data: "data:\n  inputs:\n    xy: vec2(0,0)\n    height: 0.0"
+  softwareData:
+    data: "description:\n  markdown: \"# brief\\n\\nThis shader returns the height at a given xy coordinate in worldspace given by a terrainMap.\"\n"

@@ -1,0 +1,10 @@
+domain: SHADER
+name: normalmap_frag
+type: fragment
+versions:
+- date: '2018-09-26 14:50:31.915151'
+  interfaces:
+  - {direction: INCOMING, name: nt, type: vec4}
+  - {direction: INCOMING, name: n, type: vec3}
+  - {direction: OUTGOING, name: n, type: vec3}
+  name: v1

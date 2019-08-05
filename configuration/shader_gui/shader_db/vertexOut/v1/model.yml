@@ -1,0 +1,10 @@
+domain: SHADER
+name: vertexOut
+type: vertex
+versions:
+- date: '2018-09-26 14:50:32.115205'
+  interfaces:
+  - {direction: INCOMING, name: viewPos, type: vec4}
+  - {direction: INCOMING, name: modelPos, type: vec4}
+  - {direction: INCOMING, name: normalVarying, type: vec3}
+  name: v1

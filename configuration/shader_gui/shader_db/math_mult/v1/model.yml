@@ -1,0 +1,26 @@
+domain: SHADER
+name: math_mult
+type: fragment
+versions:
+  - name: v1
+    maturity: INPROGRESS
+    defaultConfiguration:
+      data: "data:\n  inputs:\n    value_b: 0.0\n    value_a: 0.0\n    skalar: 1.0\n"
+    date: 2019-03-29T10:48:10
+    interfaces:
+      - name: value_a
+        direction: INCOMING
+        type: float
+      - name: value_b
+        type: float
+        direction: INCOMING
+      - type: float
+        direction: INCOMING
+        name: skalar
+      - type: float
+        name: value
+        direction: OUTGOING
+    components:
+      {}
+    shaderData:
+      data: "gui:\n  layouts:\n    frag_layout:\n      view:\n        scale: 1\n        x: -960\n        y: -540\n"

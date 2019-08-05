@@ -1,0 +1,11 @@
+domain: SHADER
+name: rnd_from_input
+type: vertex
+versions:
+- date: 2017-06-19 14:50:56.765118
+  interfaces:
+  - {direction: INCOMING, name: r, type: float}
+  - {direction: OUTGOING, name: v_rnd, type: vec4}
+  name: v1
+  softwareData:
+    data: "description:\n  markdown: \"# brief\\n\\nUses the input value to generate a rnd vec4 in a range of [0,1]\\n\"\n"

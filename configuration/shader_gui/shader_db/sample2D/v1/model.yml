@@ -1,0 +1,10 @@
+domain: SHADER
+name: sample2D
+type: fragment
+versions:
+- date: '2018-09-26 14:50:31.927600'
+  interfaces:
+  - {direction: INCOMING, name: texCoord, type: vec2}
+  - {direction: INCOMING, name: texture, type: sampler2D}
+  - {direction: OUTGOING, name: color, type: vec4}
+  name: v1

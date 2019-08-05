@@ -1,0 +1,16 @@
+domain: SHADER
+name: compose_vec4
+type: fragment
+versions:
+- date: '2018-09-26 14:50:32.101328'
+  interfaces:
+  - {direction: INCOMING, name: x, type: float}
+  - {direction: INCOMING, name: y, type: float}
+  - {direction: INCOMING, name: z, type: float}
+  - {direction: INCOMING, name: w, type: float}
+  - {direction: OUTGOING, name: vector, type: vec4}
+  name: v1
+  defaultConfiguration:
+    data: "data:\n  inputs:\n    x: 0.0\n    y: 0.0\n    z: 0.0\n    w: 0.0\n"
+  softwareData:
+    data: "description:\n  markdown: \"# brief\\n\\nCombins two float values to a vector4.\"\n"

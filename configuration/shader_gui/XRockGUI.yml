@@ -1,0 +1,7 @@
+XRockGUI:
+  - name: dbAddress
+    type: string
+    value: shader_db
+  - name: modelPath
+    type: string
+    value: ""

@@ -1,0 +1,15 @@
+domain: SHADER
+name: noise_frag
+type: fragment
+versions:
+- date: '2018-09-26 14:50:32.147719'
+  interfaces:
+  - {direction: INCOMING, name: base, type: vec4}
+  - {direction: INCOMING, name: scale, type: float}
+  - {direction: INCOMING, name: intensity, type: float}
+  - {direction: OUTGOING, name: outcol, type: vec4}
+  name: v1
+  defaultConfiguration:
+    data: "data:\n  inputs:\n    base: vec4(1,1,1,1)\n    scale: 6.0\n    intensity: 0.05"
+  softwareData:
+    data: "description:\n  markdown: \"# brief\\n\\nThis shader adds noise to a input color defined by the screen position of the fragment and if the noise texture is enabled (useNoise configuration).\"\n"

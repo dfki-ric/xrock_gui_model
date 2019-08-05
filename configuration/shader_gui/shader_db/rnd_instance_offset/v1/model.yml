@@ -1,0 +1,10 @@
+domain: SHADER
+name: rnd_instance_offset
+type: vertex
+versions:
+- date: 2017-06-19 14:50:56.765118
+  interfaces:
+  - {direction: OUTGOING, name: offset, type: vec4}
+  name: v1
+  softwareData:
+    data: "description:\n  markdown: \"# brief\\n\\nUses the gl_InstanceIDARB to generate a rnd vec4 in a range of [0,1]\"\n"

@@ -1,0 +1,14 @@
+domain: SHADER
+name: vec4
+type: fragment
+versions:
+- date: 2017-06-19 14:50:56.765118
+  interfaces:
+  - {direction: INCOMING, name: export, type: vec4}
+  - {direction: OUTGOING, name: output, type: vec4}
+  name: v1
+  shaderData: {data: 'type: uniform'}
+  defaultConfiguration:
+    data: "data:\n  type: uniform\n"
+  softwareData:
+    data: "description:\n  markdown: \"# Brief\\n\\nAllows to access opengl variables. Possible types are:\\n\\n - **uniform**\\n  - **varying**\"\n"

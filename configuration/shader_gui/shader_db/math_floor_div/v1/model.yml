@@ -1,0 +1,13 @@
+domain: SHADER
+name: math_floor_div
+type: fragment
+versions:
+  - name: v1
+    maturity: INPROGRESS
+    date: 2018-11-13T10:29:44
+    interfaces:
+      - {type: float, direction: INCOMING, name: value_a}
+      - {type: float, name: value_b, direction: INCOMING}
+      - {direction: OUTGOING, type: float, name: value}
+    defaultConfiguration:
+      data: "data:\n  inputs:\n    value_a: 0.0\n    value_b: 0.0\n"

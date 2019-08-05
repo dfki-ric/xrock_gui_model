@@ -1,0 +1,12 @@
+domain: SHADER
+name: specular_frag
+type: fragment
+versions:
+- date: '2018-09-26 14:50:32.147719'
+  interfaces:
+  - {direction: INCOMING, name: base, type: vec4}
+  - {direction: INCOMING, name: normal, type: vec3}
+  - {direction: OUTGOING, name: outcol, type: vec4}
+  name: v1
+  defaultConfiguration:
+    data: "data:\n  inputs:\n    base: vec4(1,1,1,1)"

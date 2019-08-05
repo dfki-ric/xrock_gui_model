@@ -1,0 +1,8 @@
+domain: SHADER
+name: vertexInfo
+type: vertex
+versions:
+- date: '2018-09-26 14:50:31.975993'
+  interfaces:
+  - {direction: OUTGOING, name: normal, type: vec3}
+  name: v1

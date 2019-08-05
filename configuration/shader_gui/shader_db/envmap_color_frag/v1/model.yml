@@ -1,0 +1,14 @@
+domain: SHADER
+name: envmap_color_frag
+type: fragment
+versions:
+- date: '2018-09-26 14:50:31.872139'
+  interfaces:
+  - {direction: INCOMING, name: texCoord, type: vec2}
+  - {direction: INCOMING, name: envMapCol, type: sampler2D}
+  - {direction: INCOMING, name: RCol, type: sampler2D}
+  - {direction: INCOMING, name: GCol, type: sampler2D}
+  - {direction: INCOMING, name: BCol, type: sampler2D}
+  - {direction: INCOMING, name: ACol, type: sampler2D}
+  - {direction: OUTGOING, name: color, type: vec4}
+  name: v1

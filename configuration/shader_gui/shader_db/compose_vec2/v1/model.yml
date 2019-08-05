@@ -1,0 +1,14 @@
+domain: SHADER
+name: compose_vec2
+type: fragment
+versions:
+- date: '2018-09-26 14:50:32.240649'
+  interfaces:
+  - {direction: INCOMING, name: x, type: float}
+  - {direction: INCOMING, name: y, type: float}
+  - {direction: OUTGOING, name: vector, type: vec2}
+  name: v1
+  defaultConfiguration:
+    data: "data:\n  inputs:\n    x: 0.0\n    y: 0.0\n"
+  softwareData:
+    data: "description:\n  markdown: \"# brief\\n\\nCombins two float values to a vector2.\"\n"

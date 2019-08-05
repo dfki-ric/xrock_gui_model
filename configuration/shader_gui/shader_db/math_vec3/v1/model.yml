@@ -1,0 +1,15 @@
+domain: SHADER
+name: math_vec3
+type: fragment
+versions:
+- date: '2018-09-26 14:50:32.254732'
+  interfaces:
+  - {direction: INCOMING, name: vector_a, type: vec3}
+  - {direction: INCOMING, name: vector_b, type: vec3}
+  - {direction: INCOMING, name: skalar, type: float}
+  - {direction: OUTGOING, name: vector, type: vec3}
+  name: v1
+  defaultConfiguration:
+    data: "data:\n  inputs:\n    vector_a: vec3(0,0,0)\n    vector_b: vec3(0,0,0)\n    skalar: 1.0\n"
+  softwareData:
+    data: "description:\n  markdown: \"# brief\\n\\nCombins *value_a* with *value_b* by:\\n\\n    (vector_a + vector_b)*skalar\\n\"\n"

@@ -1,0 +1,9 @@
+domain: SHADER
+name: vec4_xyz
+type: fragment
+versions:
+- date: '2018-09-26 14:50:32.061995'
+  interfaces:
+  - {direction: INCOMING, name: v_in, type: vec4}
+  - {direction: OUTGOING, name: v_out, type: vec3}
+  name: v1

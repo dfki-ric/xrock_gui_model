@@ -1,0 +1,9 @@
+domain: SHADER
+name: backfaceNormal
+type: fragment
+versions:
+- date: '2018-09-26 14:50:31.939130'
+  interfaces:
+  - {direction: INCOMING, name: n, type: vec3}
+  - {direction: OUTGOING, name: n, type: vec3}
+  name: v1

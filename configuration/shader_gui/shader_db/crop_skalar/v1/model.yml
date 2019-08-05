@@ -1,0 +1,23 @@
+domain: SHADER
+name: crop_skalar
+type: fragment
+versions:
+  - name: v1
+    maturity: INPROGRESS
+    defaultConfiguration:
+      data: "data:\n  inputs:\n    skalar: 1.0\n    value_a: 0.0\n    value_b: 0.0\n"
+    date: 2019-01-29T12:15:12
+    interfaces:
+      - type: vec2
+        direction: INCOMING
+        name: vector_a
+      - direction: INCOMING
+        name: skalar
+        type: float
+      - name: f
+        type: float
+        direction: OUTGOING
+    components:
+      {}
+    shaderData:
+      data: "gui:\n  layouts:\n    frag_layout:\n      view:\n        scale: 1\n        x: -960\n        y: -540\n"

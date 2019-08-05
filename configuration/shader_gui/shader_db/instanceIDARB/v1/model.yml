@@ -1,0 +1,8 @@
+domain: SHADER
+name: instanceIDARB
+type: fragment
+versions:
+- date: '2018-09-26 14:50:32.012494'
+  interfaces:
+  - {direction: OUTGOING, name: id, type: float}
+  name: v1

@@ -1,0 +1,22 @@
+domain: SHADER
+name: sample2D_adv
+type: fragment
+versions:
+  - name: v1
+    maturity: INPROGRESS
+    date: 2019-05-14T13:46:10
+    interfaces:
+      - name: texCoord
+        type: vec2
+        direction: INCOMING
+      - name: texture
+        direction: INCOMING
+        type: sampler2D
+      - name: tex_id
+        type: float
+        direction: INCOMING
+      - type: vec4
+        direction: OUTGOING
+        name: color
+    components:
+      {}

@@ -1,0 +1,15 @@
+domain: SHADER
+name: wave2d
+type: fragment
+versions:
+- date: '2018-09-26 14:50:32.147719'
+  interfaces:
+  - {direction: INCOMING, name: sin, type: float}
+  - {direction: INCOMING, name: cos, type: float}
+  - {direction: INCOMING, name: s, type: vec4}
+  - {direction: OUTGOING, name: v, type: vec4}
+  name: v1
+  defaultConfiguration:
+    data: "data:\n  inputs:\n    sin: 0.0\n    cos: 0.0\n    s: vec4(1, 1, 1, 1)\n"
+  softwareData:
+    data: "description:\n  markdown: \"# Brief\\n\\nThis shader generates a wave movement based on the sin and cos input. The *xy*-axes of the output vector are written.\\n\\n# Parameters\\n\\n - **sin**: sin input; the sinUniform can be used here.\\n - **cos**: cos input; the cosUniform can be used here.\\n - **s**: a vector used to scale the generated wave; one could use the rnd_instance_offset here.\\n\\n# Function\\n\\n    v = vec4(sc.z*(sin*s.x + cos*s.y), s.z*(sin*sc.y + cos*sc.x), 0, 0)\\n\"\n"

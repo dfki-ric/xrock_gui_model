@@ -1,0 +1,20 @@
+domain: SHADER
+name: math_sin
+type: fragment
+versions:
+  - name: v1
+    maturity: INPROGRESS
+    defaultConfiguration:
+      data: "data:\n  inputs:\n    value_a: 0.0\n    value_b: 0.0\n"
+    date: 2018-12-18T11:38:54
+    interfaces:
+      - name: value_a
+        type: float
+        direction: INCOMING
+      - type: float
+        direction: OUTGOING
+        name: output
+    components:
+      {}
+    shaderData:
+      data: "gui:\n  layouts:\n    frag_layout:\n      view:\n        scale: 1\n        x: -960\n        y: -540\n"

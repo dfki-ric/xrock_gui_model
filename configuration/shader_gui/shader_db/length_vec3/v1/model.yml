@@ -1,0 +1,9 @@
+domain: SHADER
+name: length_vec3
+type: fragment
+versions:
+- date: '2018-09-26 14:50:31.819598'
+  interfaces:
+  - {direction: INCOMING, name: vector_a, type: vec3}
+  - {direction: OUTGOING, name: out1, type: float}
+  name: v1

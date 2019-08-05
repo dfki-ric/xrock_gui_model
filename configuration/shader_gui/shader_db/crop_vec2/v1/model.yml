@@ -1,0 +1,9 @@
+domain: SHADER
+name: crop_vec2
+type: fragment
+versions:
+- date: '2018-09-26 14:50:32.213091'
+  interfaces:
+  - {direction: INCOMING, name: vector_a, type: vec2}
+  - {direction: OUTGOING, name: f, type: float}
+  name: v1

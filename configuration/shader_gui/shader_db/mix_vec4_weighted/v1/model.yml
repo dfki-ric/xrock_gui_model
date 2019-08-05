@@ -1,0 +1,29 @@
+domain: SHADER
+name: mix_vec4_weighted
+type: fragment
+versions:
+  - name: v1
+    shaderData:
+      data: "gui:\n  layouts:\n    frag_layout:\n      view:\n        scale: 1\n        x: -960\n        y: -540\n  defaultLayout: frag_layout\n"
+    maturity: INPROGRESS
+    defaultConfiguration:
+      data: "data:\n  inputs:\n    vector_b: vec4(0,0,0,1)\n    vector_a: vec4(0,0,0,1)\n    fac: 1.0\n"
+    date: 2019-04-01T11:39:03
+    interfaces:
+      - name: vector_a
+        direction: INCOMING
+        type: vec4
+      - direction: INCOMING
+        name: vector_b
+        type: vec4
+      - direction: INCOMING
+        type: float
+        name: fac_a
+      - type: float
+        direction: INCOMING
+        name: fac_b
+      - name: vector
+        type: vec4
+        direction: OUTGOING
+    components:
+      {}

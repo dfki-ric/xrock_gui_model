@@ -1,0 +1,8 @@
+domain: SHADER
+name: fragOut
+type: fragment
+versions:
+- date: '2018-09-26 14:50:32.172847'
+  interfaces:
+  - {direction: INCOMING, name: col, type: vec4}
+  name: v1

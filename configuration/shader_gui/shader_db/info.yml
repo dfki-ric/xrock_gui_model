@@ -1,0 +1,261 @@
+models:
+  - versions:
+      - name: v1
+    name: backfaceNormal
+    type: fragment
+  - type: fragment
+    name: compose_vec2
+    versions:
+      - name: v1
+  - name: compose_vec3
+    versions:
+      - name: v1
+    type: fragment
+  - name: compose_vec4
+    versions:
+      - name: v1
+    type: fragment
+  - name: cosUniform
+    type: fragment
+    versions:
+      - name: v1
+  - type: fragment
+    name: crop_vec2
+    versions:
+      - name: v1
+  - name: decompose_vec2
+    versions:
+      - name: v1
+    type: fragment
+  - type: fragment
+    name: decompose_vec3
+    versions:
+      - name: v1
+  - type: fragment
+    name: decompose_vec4
+    versions:
+      - name: v1
+  - versions:
+      - name: v1
+    name: envmap_color_frag
+    type: fragment
+  - type: vertex
+    name: envmap_vert
+    versions:
+      - name: v1
+  - versions:
+      - name: v1
+    type: fragment
+    name: float
+  - type: fragment
+    name: fragInfo
+    versions:
+      - name: v1
+  - versions:
+      - name: v1
+    name: fragOut
+    type: fragment
+  - versions:
+      - name: v1
+    name: instanceIDARB
+    type: fragment
+  - versions:
+      - name: v1
+    name: length_vec3
+    type: fragment
+  - versions:
+      - name: v1
+    type: fragment
+    name: math_float
+  - versions:
+      - name: v1
+    name: math_mod
+    type: fragment
+  - versions:
+      - name: v1
+    name: math_floor_div
+    type: fragment
+  - versions:
+      - name: v1
+    name: math_rotate3d
+    type: fragment
+  - versions:
+      - name: v1
+    type: fragment
+    name: math_vec2
+  - type: fragment
+    name: math_vec3
+    versions:
+      - name: v1
+  - name: math_vec4
+    versions:
+      - name: v1
+    type: fragment
+  - type: fragment
+    name: mix_vec4
+    versions:
+      - name: v1
+  - versions:
+      - name: v1
+    type: fragment
+    name: normalize_vec3
+  - versions:
+      - name: v1
+    name: normalize_vec4
+    type: fragment
+  - name: normalmap_frag
+    versions:
+      - name: v1
+    type: fragment
+  - versions:
+      - name: v1
+    name: normalmap_vert
+    type: vertex
+  - name: phong_frag
+    type: fragment
+    versions:
+      - name: v1
+  - name: phong_vert
+    type: vertex
+    versions:
+      - name: v1
+  - name: pixellight_frag
+    versions:
+      - name: v1
+    type: fragment
+  - name: pixellight_full_frag
+    versions:
+      - name: v1
+    type: fragment
+  - name: noise_frag
+    versions:
+      - name: v1
+    type: fragment
+  - name: specular_frag
+    versions:
+      - name: v1
+    type: fragment
+  - name: pixellight2_frag
+    versions:
+      - name: v1
+    type: fragment
+  - type: vertex
+    name: pixellight_vert
+    versions:
+      - name: v1
+  - type: vertex
+    name: pixellight2_vert
+    versions:
+      - name: v1
+  - type: fragment
+    versions:
+      - name: v1
+    name: ramp
+  - versions:
+      - name: v1
+    name: rnd_instance_offset
+    type: vertex
+  - versions:
+      - name: v1
+    type: vertex
+    name: rnd_instance_offset2
+  - name: sample2D
+    type: fragment
+    versions:
+      - name: v1
+  - name: sampler2D
+    type: fragment
+    versions:
+      - name: v1
+  - versions:
+      - name: v1
+    type: fragment
+    name: sinUniform
+  - type: vertex
+    name: terrain_height
+    versions:
+      - name: v1
+  - name: terrain_map
+    type: vertex
+    versions:
+      - name: v1
+  - versions:
+      - name: v1
+    name: vec2
+    type: fragment
+  - name: vec3
+    type: fragment
+    versions:
+      - name: v1
+  - versions:
+      - name: v1
+    name: vec4
+    type: fragment
+  - name: vec4_mat4_math
+    versions:
+      - name: v1
+    type: fragment
+  - versions:
+      - name: v1
+    name: vec4_xy
+    type: fragment
+  - versions:
+      - name: v1
+    type: fragment
+    name: vec4_xyz
+  - type: vertex
+    name: vertexInfo
+    versions:
+      - name: v1
+  - versions:
+      - name: v1
+    type: vertex
+    name: vertexOut
+  - type: vertex
+    versions:
+      - name: v1
+    name: viewPos
+  - name: wave2d
+    versions:
+      - name: v1
+    type: fragment
+  - versions:
+      - name: v1
+    name: worldPos
+    type: vertex
+  - versions:
+      - name: v1
+    name: math_sin
+    type: fragment
+  - versions:
+      - name: v1
+    name: crop_skalar
+    type: fragment
+  - type: fragment
+    name: mult_vec4
+    versions:
+      - name: v1
+  - name: math_mult
+    versions:
+      - name: v1
+    type: fragment
+  - type: fragment
+    name: ramp_color
+    versions:
+      - name: v1
+  - type: fragment
+    name: rnd_from_input
+    versions:
+      - name: v1
+  - versions:
+      - name: v1
+    name: mix_vec4_weighted
+    type: fragment
+  - type: fragment
+    name: ramp_varying
+    versions:
+      - name: v1
+  - name: sample2D_adv
+    type: fragment
+    versions:
+      - name: v1

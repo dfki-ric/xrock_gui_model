@@ -1,0 +1,14 @@
+domain: SHADER
+name: decompose_vec4
+type: fragment
+versions:
+- date: '2018-09-26 14:50:32.185687'
+  interfaces:
+  - {direction: INCOMING, name: vector, type: vec4}
+  - {direction: OUTGOING, name: x, type: float}
+  - {direction: OUTGOING, name: y, type: float}
+  - {direction: OUTGOING, name: z, type: float}
+  - {direction: OUTGOING, name: w, type: float}
+  name: v1
+  defaultConfiguration:
+    data: "inputs:\n    vector: vec4(0,0,0,0)\n"

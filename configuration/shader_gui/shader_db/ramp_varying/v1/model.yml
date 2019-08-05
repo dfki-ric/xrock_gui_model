@@ -1,0 +1,50 @@
+domain: SHADER
+name: ramp_varying
+type: fragment
+versions:
+  - name: v1
+    shaderData:
+      data: "gui:\n  layouts:\n    frag_layout:\n      ramp_color1:\n        x: 960\n        y: 867\n      view:\n        scale: 3.53988\n        x: -3280.43\n        y: -1658.79\n  defaultLayout: frag_layout\n"
+    maturity: INPROGRESS
+    defaultConfiguration:
+      data: "data:\n  inputs:\n    color_3: vec4(0,0,0,1)\n    color_2: vec4(0,0,0,1)\n    color_1: vec4(0,0,0,1)\n    in: 1.0\n    point3: 1.0\n    point2: 0.5\n    point1: 0\n"
+    date: 2019-04-08T15:16:53
+    interfaces:
+      - name: color_3
+        direction: INCOMING
+        type: vec4
+      - name: color_2
+        type: vec4
+        direction: INCOMING
+      - name: color_1
+        type: vec4
+        direction: INCOMING
+      - type: float
+        direction: INCOMING
+        name: in1
+      - type: float
+        name: point3
+        direction: INCOMING
+      - name: point2
+        type: float
+        direction: INCOMING
+      - type: float
+        direction: INCOMING
+        name: point1
+      - direction: OUTGOING
+        name: out1
+        type: vec4
+    components:
+      nodes:
+        - name: ramp_color1
+          model:
+            domain: SHADER
+            version: v1
+            name: ramp_color
+      configuration:
+        nodes:
+          - name: ramp_color1
+            data: "data:\n  inputs:\n    fac: 1.0\n    vector_b: vec4(0,0,0,1)\n    vector_a: vec4(0,0,0,1)\n"
+            submodel:
+              - name: ramp_color1
+                data: "data:\n  inputs:\n    vector_a: vec4(0,0,0,1)\n    fac: 1.0\n    vector_b: vec4(0,0,0,1)\n"

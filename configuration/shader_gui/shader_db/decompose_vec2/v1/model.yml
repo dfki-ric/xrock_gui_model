@@ -1,0 +1,12 @@
+domain: SHADER
+name: decompose_vec2
+type: fragment
+versions:
+- date: '2018-09-26 14:50:32.061995'
+  interfaces:
+  - {direction: INCOMING, name: vector, type: vec2}
+  - {direction: OUTGOING, name: x, type: float}
+  - {direction: OUTGOING, name: y, type: float}
+  name: v1
+  defaultConfiguration:
+    data: "inputs:\n    vector: vec2(0,0)\n"

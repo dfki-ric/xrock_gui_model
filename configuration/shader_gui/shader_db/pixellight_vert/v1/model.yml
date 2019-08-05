@@ -1,0 +1,10 @@
+domain: SHADER
+name: pixellight_vert
+type: vertex
+versions:
+- date: '2018-09-26 14:50:32.049388'
+  interfaces:
+  - {direction: INCOMING, name: worldPos, type: vec4}
+  - {direction: INCOMING, name: viewPos, type: vec4}
+  - {direction: INCOMING, name: specularColor, type: vec4}
+  name: v1

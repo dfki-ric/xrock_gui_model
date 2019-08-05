@@ -1,0 +1,9 @@
+domain: SHADER
+name: worldPos
+type: vertex
+versions:
+- date: '2018-09-26 14:50:32.199446'
+  interfaces:
+  - {direction: INCOMING, name: viewPos, type: vec4}
+  - {direction: OUTGOING, name: worldPos, type: vec4}
+  name: v1

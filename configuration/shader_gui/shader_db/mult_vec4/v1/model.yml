@@ -1,0 +1,27 @@
+domain: SHADER
+name: mult_vec4
+type: fragment
+versions:
+  - name: v1
+    shaderData:
+      data: "gui:\n  layouts:\n    frag_layout:\n      view:\n        scale: 1\n        x: -960\n        y: -540\n  defaultLayout: frag_layout\n"
+    maturity: INPROGRESS
+    date: 2019-03-29T16:28:59
+    interfaces:
+      - name: vector_a
+        type: vec4
+        direction: INCOMING
+      - direction: INCOMING
+        name: vector_b
+        type: vec4
+      - name: fac_a
+        type: float
+        direction: INCOMING
+      - direction: INCOMING
+        type: float
+        name: fac_b
+      - name: vector
+        direction: OUTGOING
+        type: vec4
+    components:
+      {}

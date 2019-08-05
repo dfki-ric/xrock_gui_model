@@ -1,0 +1,17 @@
+domain: SHADER
+name: ramp
+type: fragment
+versions:
+- date: '2018-09-26 14:50:32.026065'
+  interfaces:
+  - {direction: INCOMING, name: in1, type: float}
+  - {direction: INCOMING, name: start, type: float}
+  - {direction: INCOMING, name: end, type: float}
+  - {direction: INCOMING, name: scale, type: float}
+  - {direction: INCOMING, name: offset, type: float}
+  - {direction: OUTGOING, name: out1, type: float}
+  name: v1
+  defaultConfiguration:
+    data: "data:\n  inputs:\n    in1: 0.0\n    start: 0.0\n    end: 1.0\n    scale: 1.0\n    offset: 0.0\n"
+  softwareData:
+    data: "description:\n  markdown: \"# Brief\\n\\nTranslates a defined input range to a output range of 0-1 which can be further scaled and shifted to any output range.\\n\\n#Parameters:\\n\\n - **x**: input value\\n - **start**: start value for the input range (lower crop value)\\n - **end**: end value for the input range (higher crop value)\\n - **scale**: scaling factor for output range (with 1.0 range is [0,1])\\n - **offset**: shift value added to the scaled output range\\n\\n# Function:\\n\\n    x = max(x, start)\\n    x = min(x, end)\\n    out = offset+scale*(x-start)/(end-start)\\n\"\n"

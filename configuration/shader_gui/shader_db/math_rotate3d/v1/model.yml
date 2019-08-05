@@ -1,0 +1,16 @@
+domain: SHADER
+name: math_rotate3d
+type: fragment
+versions:
+- date: '2018-09-26 14:50:32.254732'
+  interfaces:
+  - {direction: INCOMING, name: v, type: vec4}
+  - {direction: INCOMING, name: alpha, type: float}
+  - {direction: INCOMING, name: beta, type: float}
+  - {direction: INCOMING, name: gamma, type: float}
+  - {direction: OUTGOING, name: o, type: vec4}
+  name: v1
+  defaultConfiguration:
+    data: "data:\n  inputs:\n    vector_a: vec4(0,0,0,0)\n    alpha: 0.0\n    beta: 0.0\n    gamma: 0.0\n"
+  softwareData:
+    data: "description:\n  markdown: \"# brief\\n\\nRotates *v* by *alpha*, *beta*, and *gamma*.\"\n"

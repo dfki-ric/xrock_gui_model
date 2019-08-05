@@ -1,0 +1,15 @@
+domain: SHADER
+name: math_float
+type: fragment
+versions:
+- date: '2018-09-26 14:50:31.988289'
+  interfaces:
+  - {direction: INCOMING, name: value_a, type: float}
+  - {direction: INCOMING, name: value_b, type: float}
+  - {direction: INCOMING, name: skalar, type: float}
+  - {direction: OUTGOING, name: value, type: float}
+  name: v1
+  defaultConfiguration:
+    data: "data:\n  inputs:\n    value_a: 0.0\n    value_b: 0.0\n    skalar: 1.0\n"
+  softwareData:
+    data: "description:\n  markdown: \"# brief\\n\\nCombins *value_a* with *value_b* by:\\n\\n    (value_a + value_b)*skalar\\n\"\n"

@@ -1,0 +1,11 @@
+domain: SHADER
+name: float
+type: fragment
+versions:
+- date: 2017-06-19 14:50:56.765118
+  interfaces:
+  - {direction: INCOMING, name: export, type: float}
+  - {direction: OUTGOING, name: output, type: float}
+  name: v1
+  defaultConfiguration:
+    data: "data:\n  type: uniform\n"

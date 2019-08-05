@@ -1,0 +1,15 @@
+domain: SHADER
+name: mix_vec4
+type: fragment
+versions:
+- date: '2018-09-26 14:50:31.832081'
+  interfaces:
+  - {direction: INCOMING, name: vector_a, type: vec4}
+  - {direction: INCOMING, name: vector_b, type: vec4}
+  - {direction: INCOMING, name: fac, type: float}
+  - {direction: OUTGOING, name: vector, type: vec4}
+  name: v1
+  defaultConfiguration:
+    data: "data:\n  inputs:\n    vector_a: vec4(0,0,0,1)\n    vector_b: vec4(0,0,0,1)\n    fac: 1.0\n"
+  softwareData:
+    data: "description:\n  markdown: \"# brief\\n\\nCombins *vector_a* with *vector_b* by:\\n\\n    vector_a*(1-fac) + vector_b*fac\\n\"\n"

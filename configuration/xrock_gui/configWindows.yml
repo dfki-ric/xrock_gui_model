@@ -1,7 +1,7 @@
 Windows:
   - name: Docks
     type: string
-    value: NodeData%%
+    value: NodeData%%ModelWidget%%NodeTypeWidget%%
   - name: HistoryWidget/Window Top
     type: int
     value: 40
@@ -34,16 +34,16 @@ Windows:
     value: 400
   - name: Main Window/Window Height
     type: int
-    value: 761
+    value: 926
   - name: Main Window/Window Left
     type: int
-    value: 840
+    value: 473
   - name: Main Window/Window Top
     type: int
-    value: 447
+    value: 185
   - name: Main Window/Window Width
     type: int
-    value: 1257
+    value: 1585
   - name: Main Window/docking
     type: bool
     value: true
@@ -53,18 +53,27 @@ Windows:
   - name: ModelWidget/Window Top
     type: int
     value: 40
+  - name: ModelWidget/area
+    type: int
+    value: 2
+  - name: ModelWidget/floating
+    type: bool
+    value: false
   - name: ModelWidget/height
     type: int
-    value: 400
+    value: 882
   - name: ModelWidget/hidden
     type: bool
-    value: true
+    value: false
   - name: ModelWidget/left
     type: int
-    value: 40
+    value: 1219
+  - name: ModelWidget/top
+    type: int
+    value: 44
   - name: ModelWidget/width
     type: int
-    value: 400
+    value: 366
   - name: NodeData/Window Top
     type: int
     value: 40
@@ -76,7 +85,7 @@ Windows:
     value: false
   - name: NodeData/height
     type: int
-    value: 717
+    value: 469
   - name: NodeData/hidden
     type: bool
     value: false
@@ -85,7 +94,7 @@ Windows:
     value: 0
   - name: NodeData/top
     type: int
-    value: 44
+    value: 457
   - name: NodeData/width
     type: int
     value: 317
@@ -107,18 +116,27 @@ Windows:
   - name: NodeTypeWidget/Window Top
     type: int
     value: 40
+  - name: NodeTypeWidget/area
+    type: int
+    value: 1
+  - name: NodeTypeWidget/floating
+    type: bool
+    value: false
   - name: NodeTypeWidget/height
     type: int
-    value: 400
+    value: 412
   - name: NodeTypeWidget/hidden
     type: bool
-    value: true
+    value: false
   - name: NodeTypeWidget/left
     type: int
-    value: 40
+    value: 0
+  - name: NodeTypeWidget/top
+    type: int
+    value: 44
   - name: NodeTypeWidget/width
     type: int
-    value: 400
+    value: 317
   - name: cfg/Window Top
     type: int
     value: 45

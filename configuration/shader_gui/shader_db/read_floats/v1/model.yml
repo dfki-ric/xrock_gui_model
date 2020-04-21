@@ -1,0 +1,17 @@
+domain: SHADER
+name: read_floats
+type: vertex
+versions:
+- date: '2020-04-21 19:14:00.000000'
+  interfaces:
+  - {direction: INCOMING, name: texture, type: sampler2D}
+  - {direction: INCOMING, name: index, type: float}
+  - {direction: INCOMING, name: resolution, type: vec2}
+  - {direction: INCOMING, name: skip, type: float}
+  - {direction: INCOMING, name: offset, type: float}
+  - {direction: OUTGOING, name: values, type: vec2}
+  name: v1
+  defaultConfiguration:
+    data: "data:\n  inputs:\n    index: 0\n    resolution: vec2(256, 256)\n    skip: 1\n    offset: 0"
+  softwareData:
+    data: "description:\n  markdown: \"# brief\\n\\nThis shader interprets the texture data as one-dimensional array where every pixel represents two 16bit values between 0 and 1. These two values are returned. Input parameters are the texture, the index, the image resolution (x and y), a skip value defining how much pixels to skip per index, and an offset value added to the index to identify the pixel of interest. The pixel x and y position are calculated by:\\n\\n    x = mod(index*skip+offset, resolution.x)\\n    y = (index+skip+offset)/resolution.x\"\n"

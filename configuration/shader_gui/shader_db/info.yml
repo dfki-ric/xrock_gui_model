@@ -175,6 +175,10 @@ models:
     name: terrain_height
     versions:
       - name: v1
+  - type: vertex
+    name: read_floats
+    versions:
+      - name: v1
   - name: terrain_map
     type: vertex
     versions:

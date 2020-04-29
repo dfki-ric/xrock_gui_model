@@ -1,0 +1,9 @@
+domain: SHADER
+name: terrain_map_scaled
+type: vertex
+versions:
+- date: '2018-09-26 14:50:32.088723'
+  interfaces:
+  - {direction: OUTGOING, name: vModelPos, type: vec4}
+  - {direction: OUTGOING, name: vModelPosScaled, type: vec4}
+  name: v1

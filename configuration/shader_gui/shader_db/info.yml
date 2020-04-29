@@ -183,6 +183,10 @@ models:
     type: vertex
     versions:
       - name: v1
+  - name: terrain_map_scaled
+    type: vertex
+    versions:
+      - name: v1
   - versions:
       - name: v1
     name: vec2

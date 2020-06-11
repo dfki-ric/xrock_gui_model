@@ -21,6 +21,7 @@
 #include <QMessageBox>
 #include <mars/utils/misc.h>
 
+#include <QWebView>
 
 using namespace lib_manager;
 using namespace bagel_gui;
@@ -28,6 +29,19 @@ using namespace configmaps;
 using namespace mars::utils;
 
 namespace xrock_gui_model {
+
+  std::string getHtml2(const std::string &markdown) {
+    std::string cmd = "echo \""+ markdown + "\" | python -m markdown";
+    std::array<char, 128> buffer;
+    std::string result;
+    std::shared_ptr<FILE> pipe(popen(cmd.c_str(), "r"), pclose);
+    if(!pipe) throw std::runtime_error("popen() failed!");
+    while(!feof(pipe.get())) {
+      if(fgets(buffer.data(), 128, pipe.get()) != nullptr)
+        result += buffer.data();
+    }
+    return result;
+  }
 
   ModelLib::ModelLib(lib_manager::LibManager *theManager) :
     lib_manager::LibInterface(theManager), model(NULL) {
@@ -1013,6 +1027,30 @@ namespace xrock_gui_model {
       std::string name = node["modelName"];
       loadComponent(domain, name, version);
     }
+    else if(name == "show description") {
+      ConfigMap node = *(bagelGui->getNodeMap(contextNodeName));
+      std::string domain = node["domain"];
+      std::string version = node["modelVersion"];
+      std::string name = node["modelName"];
+      QWebView *doc = new QWebView();
+      doc->page()->setLinkDelegationPolicy( QWebPage::DelegateAllLinks );
+      widget->connect(doc, SIGNAL(linkClicked (const QUrl &)), widget, SLOT(openUrl(const QUrl &)));
+      ConfigMap modelMap = XRockDB::requestModel(domain, name, version, true);
+      std::string domainData = domain + "Data";
+      if(modelMap["versions"][0].hasKey(domainData)) {
+        if(modelMap["versions"][0][domainData].hasKey("data")) {
+          ConfigMap dataMap = ConfigMap::fromYamlString(modelMap["versions"][0][domainData]["data"]);
+          if(dataMap.hasKey("description")) {
+            if(dataMap["description"].hasKey("markdown")) {
+              std::string md = dataMap["description"]["markdown"];
+              fprintf(stderr, "convert: %s\n", md.c_str());
+              doc->setHtml(getHtml2(md).c_str());
+            }
+          }
+        }
+      }
+      doc->show();
+    }
   }
 
   void ModelLib::inPortContextClicked(std::string name) {
@@ -1065,6 +1103,7 @@ namespace xrock_gui_model {
     r.push_back("configure components");
     r.push_back("reset configuration");
     r.push_back("open model");
+    r.push_back("show description");
       // }
         //}
     contextNodeName = name;

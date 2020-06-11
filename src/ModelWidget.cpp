@@ -17,6 +17,7 @@
 #include <bagel_gui/BagelGui.hpp>
 #include <bagel_gui/BagelModel.hpp>
 #include <mars/utils/misc.h>
+#include <QDesktopServices>
 
 
 using namespace configmaps;
@@ -1145,6 +1146,10 @@ namespace xrock_gui_model {
       cd.exec();
     }
     localMap["versions"][0][domainData]["data"]["description"]["markdown"] = description;
+  }
+
+  void ModelWidget::openUrl(const QUrl &link) {
+    QDesktopServices::openUrl(link);
   }
 
 } // end of namespace xrock_gui_model

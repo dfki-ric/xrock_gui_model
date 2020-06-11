@@ -69,6 +69,7 @@ namespace xrock_gui_model {
                   const std::string &version);
     void updateModelInfo();
     void getModelInfo(std::string *domain, std::string *name, std::string *verison);
+    void openUrl(const QUrl &);
 
   private:
     bagel_gui::BagelGui *bagelGui;

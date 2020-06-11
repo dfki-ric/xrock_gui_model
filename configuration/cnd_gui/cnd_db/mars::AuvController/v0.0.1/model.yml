@@ -1,0 +1,33 @@
+domain: SOFTWARE
+name: mars::AuvController
+type: system_modelling::task_graph::Task
+versions:
+- date: 2020-05-28 18:08:10.165366
+  defaultConfiguration: {data: "data:\nactivity:\n  type: PERIODIC\n  period: 0.1\n\
+      \  priority: 90\n  realtime: false\nstate: RUNNING\nconfig:\n  # no documentation\
+      \ available for this property\n\n  buoyancy_force: 0.0\n\n  # Point where the\
+      \ Buoyancy should be applied\n\n  cob:\n\n    data:\n\n    - 1.14e-322\n\n \
+      \   - 1.506617012055e-312\n\n    - 1.0e-323\n\n  # no documentation available\
+      \ for this property\n\n  node_name: ''\n\n  # no documentation available for\
+      \ this property\n\n  orientation:\n\n    im:\n\n    - 6.9532954300392e-310\n\
+      \n    - 0.0\n\n    - 0.0\n\n    re: 0.0\n\n  # no documentation available for\
+      \ this property\n\n  position:\n\n    data:\n\n    - 6.95329543003604e-310\n\
+      \n    - 5.4e-323\n\n    - 3.9990929001021016e+252\n"}
+  interfaces:
+  - {direction: OUTGOING, name: state, type: 'boost::int32_t'}
+  name: v0.0.1
+  softwareData: {data: 'framework: Rock
+
+      properties:
+
+      - {Name: node_name, Type: ''::std::string''}
+
+      - {Name: position, Type: ''::base::Vector3d''}
+
+      - {Name: orientation, Type: ''::base::Quaterniond''}
+
+      - {Name: cob, Type: ''::base::Vector3d''}
+
+      - {Name: buoyancy_force, Type: double}
+
+      '}

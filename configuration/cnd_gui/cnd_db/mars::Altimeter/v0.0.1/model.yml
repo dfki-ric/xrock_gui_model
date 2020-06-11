@@ -1,0 +1,19 @@
+domain: SOFTWARE
+name: mars::Altimeter
+type: system_modelling::task_graph::Task
+versions:
+- date: 2020-05-28 18:08:10.165366
+  defaultConfiguration: {data: "data:\nactivity:\n  type: PERIODIC\n  period: 0.1\n\
+      \  priority: 90\n  realtime: false\nstate: RUNNING\nconfig:\n  # no documentation\
+      \ available for this property\n\n  node_name: ''\n"}
+  interfaces:
+  - {direction: OUTGOING, name: state, type: 'boost::int32_t'}
+  - {direction: OUTGOING, name: ground_distance, type: '::base::samples::RigidBodyState'}
+  name: v0.0.1
+  softwareData: {data: 'framework: Rock
+
+      properties:
+
+      - {Name: node_name, Type: ''::std::string''}
+
+      '}

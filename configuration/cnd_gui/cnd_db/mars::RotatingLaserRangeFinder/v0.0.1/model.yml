@@ -1,0 +1,25 @@
+domain: SOFTWARE
+name: mars::RotatingLaserRangeFinder
+type: system_modelling::task_graph::Task
+versions:
+- date: 2020-05-28 18:08:10.165366
+  defaultConfiguration: {data: "data:\nactivity:\n  type: PERIODIC\n  period: 0.1\n\
+      \  priority: 90\n  realtime: false\nstate: RUNNING\nconfig:\n  # Maximum valid\
+      \ range of the laser range finder\n\n  max_range: 20.0\n\n  # Minimum valid\
+      \ range of the laser range finder\n\n  min_range: 0.0\n\n  # Name of the RotatingRaySensor\
+      \ in the scene file\n\n  name: unknown_ray_sensor\n"}
+  interfaces:
+  - {direction: OUTGOING, name: state, type: 'boost::int32_t'}
+  - {direction: OUTGOING, name: pointcloud, type: '::base::samples::Pointcloud'}
+  name: v0.0.1
+  softwareData: {data: 'framework: Rock
+
+      properties:
+
+      - {DefaultVal: unknown_ray_sensor, Name: name, Type: ''::std::string''}
+
+      - {DefaultVal: 0.0, Name: min_range, Type: double}
+
+      - {DefaultVal: 20.0, Name: max_range, Type: double}
+
+      '}

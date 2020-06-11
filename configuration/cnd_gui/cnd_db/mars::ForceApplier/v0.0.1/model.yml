@@ -1,0 +1,36 @@
+domain: SOFTWARE
+name: mars::ForceApplier
+type: system_modelling::task_graph::Task
+versions:
+- date: 2020-05-28 18:08:10.165366
+  defaultConfiguration: {data: "data:\nactivity:\n  type: PERIODIC\n  period: 0.1\n\
+      \  priority: 90\n  realtime: false\nstate: RUNNING\nconfig:\n  # no documentation\
+      \ available for this property\n\n  amount_of_actuators: 0\n\n  # The names of\
+      \ the joints, array indexes must equal to the positions\n\n  joint_names: []\n\
+      \n  # no documentation available for this property\n\n  maximum_thruster_force:\
+      \ []\n\n  # no documentation available for this property\n\n  node_name: ''\n\
+      \n  # no documentation available for this property\n\n  thruster_direction:\
+      \ []\n\n  # no documentation available for this property\n\n  thruster_position:\
+      \ []\n"}
+  interfaces:
+  - {direction: INCOMING, name: command, type: '::base::samples::Joints'}
+  - {direction: OUTGOING, name: state, type: 'boost::int32_t'}
+  - {direction: OUTGOING, name: status, type: '::base::samples::Joints'}
+  name: v0.0.1
+  softwareData: {data: 'framework: Rock
+
+      properties:
+
+      - {Name: node_name, Type: ''::std::string''}
+
+      - {Name: amount_of_actuators, Type: ''boost::int32_t''}
+
+      - {Name: maximum_thruster_force, Type: ''::std::vector< double >''}
+
+      - {Name: thruster_position, Type: ''::std::vector< ::base::Vector3d >''}
+
+      - {Name: joint_names, Type: ''::std::vector< ::std::string >''}
+
+      - {Name: thruster_direction, Type: ''::std::vector< ::base::Vector3d >''}
+
+      '}

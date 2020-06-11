@@ -1,0 +1,30 @@
+domain: SOFTWARE
+name: mars::RobotTeleportation
+type: system_modelling::task_graph::Task
+versions:
+- date: 2020-05-28 18:08:10.165366
+  defaultConfiguration: {data: "data:\nactivity:\n  type: PERIODIC\n  period: 0.1\n\
+      \  priority: 90\n  realtime: false\nstate: RUNNING\nconfig:\n  # 0 for manual:\
+      \ needs coordinates in world frame. 1 for configured: needs id of preconfigured\
+      \ coordinates.\n\n  position_mode: 1\n\n  # Name of the node that has to be\
+      \ resetted additionally.\n\n  reset_node_name: ''\n\n  # Name of the robot.\n\
+      \n  robot_name: ''\n"}
+  interfaces:
+  - {direction: INCOMING, name: position, type: '::base::Vector3d'}
+  - {direction: INCOMING, name: rotation, type: '::base::Quaterniond'}
+  - {direction: INCOMING, name: position_id, type: 'boost::uint16_t'}
+  - {direction: INCOMING, name: anchor, type: bool}
+  - {direction: INCOMING, name: reset_node, type: bool}
+  - {direction: OUTGOING, name: state, type: 'boost::int32_t'}
+  name: v0.0.1
+  softwareData: {data: 'framework: Rock
+
+      properties:
+
+      - {Name: robot_name, Type: ''::std::string''}
+
+      - {Name: reset_node_name, Type: ''::std::string''}
+
+      - {DefaultVal: 1, Name: position_mode, Type: ''boost::uint16_t''}
+
+      '}

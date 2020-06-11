@@ -162,6 +162,10 @@ namespace xrock_gui_model {
     setLayout(vLayout);
     currentLayout = "";
     this->clear();
+    xrockConfigFilter.push_back("activity");
+    xrockConfigFilter.push_back("state");
+    xrockConfigFilter.push_back("config_names");
+    xrockConfigFilter.push_back("parentName");
     //nodeTypeView->setSelectionMode(QAbstractItemView::SingleSelection);
   }
 
@@ -460,7 +464,16 @@ namespace xrock_gui_model {
     // create view; set model
     if(map.hasKey("nodes")) {
       ConfigVector::iterator it = map["nodes"].begin();
+      ConfigVector pending;
       for(; it!=map["nodes"].end(); ++it) {
+        if((*it)["model"]["name"] == "software::Deployment") {
+          loadNode((*it), config);
+        }
+        else {
+          pending.push_back(*it);
+        }
+      }
+      for(it=pending.begin(); it!=pending.end(); ++it) {
         loadNode((*it), config);
       }
     }
@@ -546,7 +559,18 @@ namespace xrock_gui_model {
     ConfigMap nodeMap = *nodeMap_;
 
     bool updateMap = false;
+
     if(data.size() > 0) {
+      if(data.hasKey("configuration")) {
+        if(data["configuration"].hasKey("xrock_config")) {
+          for(auto it2: xrockConfigFilter) {
+            if(data["configuration"]["xrock_config"].hasKey(it2)) {
+              nodeMap[it2] = data["configuration"]["xrock_config"][it2];
+            }
+          }
+          ((ConfigMap&)data["configuration"]).erase("xrock_config");
+        }
+      }
       nodeMap[domain+"Data"]["data"].appendMap(data);
       updateMap = true;
     }
@@ -793,6 +817,11 @@ namespace xrock_gui_model {
       nodeData["name"] = name;
       bool handleNodeConfig = false;
       bool handleEdgeConfig = false;
+      for(auto it2: xrockConfigFilter) {
+        if(it->hasKey(it2)) {
+          (*it)[domain+"Data"]["data"]["configuration"]["xrock_config"][it2] = (*it)[it2];
+        }
+      }
       if(it->hasKey(domain+"Data") &&
          (*it)[domain+"Data"].hasKey("data") &&
          (*it)[domain+"Data"]["data"].hasKey("configuration")) {
@@ -1151,5 +1180,6 @@ namespace xrock_gui_model {
   void ModelWidget::openUrl(const QUrl &link) {
     QDesktopServices::openUrl(link);
   }
+
 
 } // end of namespace xrock_gui_model

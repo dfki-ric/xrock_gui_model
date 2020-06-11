@@ -86,7 +86,7 @@ namespace xrock_gui_model {
     QTextEdit *includes, *data, *interfaces;
     configmaps::ConfigMap interfaceMap;
     bool ignoreUpdate;
- 
+    std::vector<std::string> xrockConfigFilter;
     void handleEditionLayout();
     void updateCurrentLayout();
 

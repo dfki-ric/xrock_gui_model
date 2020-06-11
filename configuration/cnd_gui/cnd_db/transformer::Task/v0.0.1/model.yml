@@ -1,0 +1,16 @@
+domain: SOFTWARE
+name: transformer::Task
+type: system_modelling::task_graph::Task
+versions:
+- date: 2020-05-28 18:08:10.165366
+  defaultConfiguration: {data: "data:\nactivity:\n  type: PERIODIC\n  period: 0.1\n\
+      \  priority: 90\n  realtime: false\nstate: RUNNING\nconfig:\n  \n"}
+  interfaces:
+  - {direction: OUTGOING, name: configuration_state, type: '::transformer::ConfigurationState'}
+  - {direction: OUTGOING, name: state, type: 'boost::int32_t'}
+  name: v0.0.1
+  softwareData: {data: 'framework: Rock
+
+      properties: []
+
+      '}

@@ -1,0 +1,36 @@
+domain: SOFTWARE
+name: mars::ForceTorqueApplier
+type: system_modelling::task_graph::Task
+versions:
+- date: 2020-05-28 18:08:10.165366
+  defaultConfiguration: {data: "data:\nactivity:\n  type: PERIODIC\n  period: 0.1\n\
+      \  priority: 90\n  realtime: false\nstate: RUNNING\nconfig:\n  # no documentation\
+      \ available for this property\n\n  entity: ''\n\n  # no documentation available\
+      \ for this property\n\n  force_display_factor: 0.009999999776482582\n\n  # no\
+      \ documentation available for this property\n\n  norm_length: 1.0\n\n  # no\
+      \ documentation available for this property\n\n  thickness: 5.0\n\n  # no documentation\
+      \ available for this property\n\n  torque_display_factor: 0.009999999776482582\n\
+      \n  # no documentation available for this property\n\n  visualize_wrenches:\
+      \ true\n"}
+  interfaces:
+  - {direction: INCOMING, name: wrenches, type: '::base::samples::Wrenches'}
+  - {direction: OUTGOING, name: state, type: 'boost::int32_t'}
+  - {direction: OUTGOING, name: input_wrenches, type: '::base::samples::Wrenches'}
+  name: v0.0.1
+  softwareData: {data: 'framework: Rock
+
+      properties:
+
+      - {Name: entity, Type: ''::std::string''}
+
+      - {DefaultVal: true, Name: visualize_wrenches, Type: bool}
+
+      - {DefaultVal: 5.0, Name: thickness, Type: float}
+
+      - {DefaultVal: 0.01, Name: force_display_factor, Type: float}
+
+      - {DefaultVal: 0.01, Name: torque_display_factor, Type: float}
+
+      - {DefaultVal: 1, Name: norm_length, Type: float}
+
+      '}

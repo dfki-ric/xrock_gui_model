@@ -1,0 +1,7 @@
+XRockGUI:
+  - name: dbAddress
+    type: string
+    value: cnd_db
+  - name: modelPath
+    type: string
+    value: ""

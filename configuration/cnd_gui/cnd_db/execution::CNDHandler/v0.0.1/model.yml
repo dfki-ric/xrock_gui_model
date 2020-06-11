@@ -1,0 +1,37 @@
+domain: SOFTWARE
+name: execution::CNDHandler
+type: system_modelling::task_graph::Task
+versions:
+- date: 2020-05-28 18:08:10.165366
+  defaultConfiguration: {data: "data:\nactivity:\n  type: PERIODIC\n  period: 0.1\n\
+      \  priority: 90\n  realtime: false\nstate: RUNNING\nconfig:\n  # no documentation\
+      \ available for this property\n\n  config:\n\n    task_managers:\n\n    - type:\
+      \ :RTT\n\n      id: local\n\n    rtt_task_manager_configs:\n\n    - id: local\n\
+      \n      config:\n\n        corba_nameserver: localhost\n\n        process_server_hostname:\
+      \ localhost\n\n        process_server_task_name: process_server_local\n\n  \
+      \      task_retrieval_retrials: 1000\n\n        command_execution_prefix: ''\n\
+      \n        username: ''\n\n    log_config:\n\n      log_all_ports: false\n\n\
+      \      whitelist: []\n\n      blacklist: []\n\n    simulate_execution: false\n\
+      \n    needed_typekits: []\n"}
+  interfaces:
+  - {direction: INCOMING, name: target_cnd, type: '::cnd::model::Network'}
+  - {direction: INCOMING, name: target_cnd_string, type: '::std::string'}
+  - {direction: INCOMING, name: transition, type: '::cnd::transitions::Transition'}
+  - {direction: INCOMING, name: transition_string, type: '::std::string'}
+  - {direction: INCOMING, name: reset_belief, type: '::cnd::model::Network'}
+  - {direction: INCOMING, name: current_cnd, type: '::cnd::model::Network'}
+  - {direction: OUTGOING, name: belief_network, type: '::cnd::model::Network'}
+  - {direction: OUTGOING, name: applied_transition, type: '::cnd::transitions::Transition'}
+  - {direction: OUTGOING, name: applied_transition_timings, type: '::std::vector<
+      double >'}
+  - {direction: OUTGOING, name: transition_error_info, type: '::std::string'}
+  - {direction: OUTGOING, name: trigger, type: float}
+  - {direction: OUTGOING, name: state, type: 'boost::int32_t'}
+  name: v0.0.1
+  softwareData: {data: 'framework: Rock
+
+      properties:
+
+      - {Name: config, Type: ''::cnd::execution::CNDHandlerConfig''}
+
+      '}

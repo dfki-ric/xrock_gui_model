@@ -1,0 +1,44 @@
+domain: SOFTWARE
+name: mars::HighResRangeFinder
+type: system_modelling::task_graph::Task
+versions:
+- date: 2020-05-28 18:08:10.165366
+  defaultConfiguration: {data: "data:\nactivity:\n  type: PERIODIC\n  period: 0.1\n\
+      \  priority: 90\n  realtime: false\nstate: RUNNING\nconfig:\n  # Left limit\
+      \ of the vertical opening angle in radians\n\n  left_limit: -0.7853981633974483\n\
+      \n  # Lower limit of the horizontal opening angle in radians\n\n  lower_limit:\
+      \ -0.7853981633974483\n\n  # Larger distances (meter) are discarded\n\n  maximum_distance:\
+      \ 80.0\n\n  # Smaller distances (meter) are discarded\n\n  minimum_distance:\
+      \ 1.0\n\n  # name of the camera in the scene file\n\n  name: ''\n\n  # Vertical\
+      \ angular resolution in radians\n\n  resolution_horizontal: 0.017453292519943295\n\
+      \n  # Vertical angular resolution in radians\n\n  resolution_vertical: 0.017453292519943295\n\
+      \n  # Right limit of the vertical opening angle in radians\n\n  right_limit:\
+      \ 0.7853981633974483\n\n  # Upper limit of the horizontal opening angle in radians\n\
+      \n  upper_limit: 0.7853981633974483\n"}
+  interfaces:
+  - {direction: OUTGOING, name: state, type: 'boost::int32_t'}
+  - {direction: OUTGOING, name: pointcloud, type: '::base::samples::Pointcloud'}
+  name: v0.0.1
+  softwareData: {data: 'framework: Rock
+
+      properties:
+
+      - {Name: name, Type: ''::std::string''}
+
+      - {DefaultVal: -0.7853981633974483, Name: left_limit, Type: double}
+
+      - {DefaultVal: 0.7853981633974483, Name: right_limit, Type: double}
+
+      - {DefaultVal: 0.017453292519943295, Name: resolution_vertical, Type: double}
+
+      - {DefaultVal: 0.7853981633974483, Name: upper_limit, Type: double}
+
+      - {DefaultVal: -0.7853981633974483, Name: lower_limit, Type: double}
+
+      - {DefaultVal: 0.017453292519943295, Name: resolution_horizontal, Type: double}
+
+      - {DefaultVal: 1.0, Name: minimum_distance, Type: double}
+
+      - {DefaultVal: 80.0, Name: maximum_distance, Type: double}
+
+      '}

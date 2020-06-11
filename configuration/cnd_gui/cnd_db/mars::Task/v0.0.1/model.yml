@@ -1,0 +1,76 @@
+domain: SOFTWARE
+name: mars::Task
+type: system_modelling::task_graph::Task
+versions:
+- date: 2020-05-28 18:08:10.165366
+  defaultConfiguration: {data: "data:\nactivity:\n  type: PERIODIC\n  period: 0.1\n\
+      \  priority: 90\n  realtime: false\nstate: RUNNING\nconfig:\n  # no documentation\
+      \ available for this property\n\n  add_floor: false\n\n  # the full path to\
+      \ the main configuration folder\n\n  config_dir: \"/home/maltel/Development/auto-reference-dev/install/configuration/mars_default\"\
+      \n\n  # set the controller port, e.g. 1600 for communication with monster\n\n\
+      \  controller_port: 0\n\n  # switch to active the distributed simulation if\
+      \ needed\n\n  distributed_simulation: false\n\n  # no documentation available\
+      \ for this property\n\n  gravity:\n\n    data:\n\n    - 0.0\n\n    - 0.0\n\n\
+      \    - -9.81\n\n  # override initial joint positions in the scene (scn) file,\
+      \ i.e. set an initial pose\n\n  initial_pose: []\n\n  # the full path to the\
+      \ initial scene, this is needed because operations are not accessible during\
+      \ configuration within syskit (deadlock)\n\n  initial_scene: ''\n\n  # the full\
+      \ path to the initial scene, this is needed because operations are not accessible\
+      \ during configuration within syskit (deadlock)\n\n  initial_scenes: []\n\n\
+      \  # the full path where the plugins can be found\n\n  plugin_dir: \"/home/maltel/Development/auto-reference-dev/install/lib\"\
+      \n\n  # additional mars plugins to load. This can be a relative path to the\
+      \ plugin_dir, or absolute.\n\n  plugins: []\n\n  # override positions in the\
+      \ scene (scn) file, e.g. move the terrain to create different experiment setups\
+      \ without changing the scene file itself\n\n  positions: []\n\n  # forward the\
+      \ original mars arguments, such as -c 1600 for setting the ode port - option\
+      \ consists of name, here: -c and parameter: here 1600\n\n  raw_options: []\n\
+      \n  # Possible Values: abort (killing sim), reset (ressing scene and simulation),\
+      \ warn (keep simulation running an print warnings), shutdown (stop physics but\
+      \ keep mars-running and set this task to the error state)\n\n  reaction_to_physics_error:\
+      \ shutdown\n\n  # if true, simulation runs in real time or slower, but not faster\n\
+      \n  realtime_calc: false\n\n  # no documentation available for this property\n\
+      \n  show_coordinate_system: false\n\n  # The Step-size that each mars-step calculates\n\
+      \n  sim_step_size: 0.01\n\n  # list of attributes containing plugin and property\
+      \ name as well as the desired value\n\n  simulation_property_list: []\n\n  #\
+      \ starts the simulation after loading the initial scene(s)\n\n  start_sim: false\n\
+      \n  # no documentation available for this property\n\n  use_now_instead_of_sim_time:\
+      \ false\n"}
+  interfaces:
+  - {direction: INCOMING, name: control_action, type: '::mars::Control'}
+  - {direction: OUTGOING, name: time, type: double}
+  - {direction: OUTGOING, name: simulated_time, type: '::base::Time'}
+  - {direction: OUTGOING, name: state, type: 'boost::int32_t'}
+  name: v0.0.1
+  softwareData:
+    data: "description:\n  markdown: \"# Configuration\\nactivity:\\n  type: PERIODIC\\n  period: 0.1\\n\
+      \  priority: 90\\n  realtime: false\\nstate: RUNNING\\nconfig:\\n  // no documentation\
+      \ available for this property\\n  add_floor: false\\n\\n  // the full path to\
+      \ the main configuration folder\\n  config_dir: \\\"/home/maltel/Development/auto-reference-dev/install/configuration/mars_default\\\"\
+      \\n\\n  // set the controller port, e.g. 1600 for communication with monster\\n\
+      \  controller_port: 0\\n  // switch to active the distributed simulation if\
+      \ needed\\n  distributed_simulation: false\\n\\n  // no documentation available\
+      \ for this property\\n  gravity:\\n\\n    data:\\n\\n    - 0.0\\n\\n    - 0.0\\n\\n\
+      \    - -9.81\\n\\n  // override initial joint positions in the scene (scn) file,\
+      \ i.e. set an initial pose\\n  initial_pose: []\\n\\n  // the full path to the\
+      \ initial scene, this is needed because operations are not accessible during\
+      \ configuration within syskit (deadlock)\\n  initial_scene: ''\\n\\n  // the full\
+      \ path to the initial scene, this is needed because operations are not accessible\
+      \ during configuration within syskit (deadlock)\\n\\n  initial_scenes: []\\n\\n\
+      \  // the full path where the plugins can be found\\n  plugin_dir: \\\"/home/maltel/Development/auto-reference-dev/install/lib\\\"\
+      \\n\\n  // additional mars plugins to load. This can be a relative path to the\
+      \ plugin_dir, or absolute.\\n  plugins: []\\n\\n  // override positions in the\
+      \ scene (scn) file, e.g. move the terrain to create different experiment setups\
+      \ without changing the scene file itself\\n  positions: []\\n\\n  // forward the\
+      \ original mars arguments, such as -c 1600 for setting the ode port - option\
+      \ consists of name, here: -c and parameter: here 1600\\n  raw_options: []\\n\
+      \\n  // Possible Values: abort (killing sim), reset (ressing scene and simulation),\
+      \ warn (keep simulation running an print warnings), shutdown (stop physics but\
+      \ keep mars-running and set this task to the error state)\\n  reaction_to_physics_error:\
+      \ shutdown\\n\\n  // if true, simulation runs in real time or slower, but not faster\
+      \\n  realtime_calc: false\\n\\n  // no documentation available for this property\
+      \\n  show_coordinate_system: false\\n\\n  // The Step-size that each mars-step calculates\
+      \\n  sim_step_size: 0.01\\n\\n  // list of attributes containing plugin and property\
+      \ name as well as the desired value\\n  simulation_property_list: []\\n\\n  //\
+      \ starts the simulation after loading the initial scene(s)\\n  start_sim: false\\n\
+      \\n  // no documentation available for this property\\n  use_now_instead_of_sim_time:\
+      \ false\\n\""

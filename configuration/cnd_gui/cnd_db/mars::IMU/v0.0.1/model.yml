@@ -1,0 +1,53 @@
+domain: SOFTWARE
+name: mars::IMU
+type: system_modelling::task_graph::Task
+versions:
+- date: 2020-05-28 18:08:10.165366
+  defaultConfiguration: {data: "data:\nactivity:\n  type: PERIODIC\n  period: 0.1\n\
+      \  priority: 90\n  realtime: false\nstate: RUNNING\nconfig:\n  # Standard deviation\
+      \ of the angular velocity, that will be applied to the measurement.\n\n  angular_velocity_sigma:\
+      \ 0.0\n\n  # The name of the imu frame.\n\n  imu_frame: imu\n\n  # name of the\
+      \ node in the scene file from which to get the imu data\n\n  name: imu\n\n \
+      \ # Standard deviation of the orientation, that will be applied to the measurement.\n\
+      \n  orientation_sigma: 0.0\n\n  # Standard deviation of the position, that will\
+      \ be applied to the measurement.\n\n  position_sigma: 0.0\n\n  # Set to true\
+      \ is this Sensor should output orientation readings\n\n  provide_orientation:\
+      \ true\n\n  # Set to true is this Sensor should output position readings\n\n\
+      \  provide_position: false\n\n  # Set to true is this Sensor should output angular/translational\
+      \ velocities\n\n  provide_velocity: true\n\n  # if the robot is moved my mars\
+      \ (yaml), rotation of the IMU may be wrong and can be set here (in degrees)\n\
+      \n  rotate_node_relative: []\n\n  # Standard deviation of the velocity, that\
+      \ will be applied to the measurement.\n\n  velocity_sigma: 0.0\n\n  # The name\
+      \ of the world frame.\n\n  world_frame: world\n"}
+  interfaces:
+  - {direction: OUTGOING, name: state, type: 'boost::int32_t'}
+  - {direction: OUTGOING, name: orientation_samples, type: '::base::samples::RigidBodyState'}
+  - {direction: OUTGOING, name: calibrated_sensors, type: '::base::samples::IMUSensors'}
+  name: v0.0.1
+  softwareData: {data: 'framework: Rock
+
+      properties:
+
+      - {Name: provide_position, Type: bool}
+
+      - {DefaultVal: true, Name: provide_orientation, Type: bool}
+
+      - {DefaultVal: true, Name: provide_velocity, Type: bool}
+
+      - {DefaultVal: imu, Name: imu_frame, Type: ''::std::string''}
+
+      - {DefaultVal: world, Name: world_frame, Type: ''::std::string''}
+
+      - {Name: rotate_node_relative, Type: ''::std::vector< double >''}
+
+      - {DefaultVal: 0.0, Name: position_sigma, Type: double}
+
+      - {DefaultVal: 0.0, Name: orientation_sigma, Type: double}
+
+      - {DefaultVal: 0.0, Name: velocity_sigma, Type: double}
+
+      - {DefaultVal: 0.0, Name: angular_velocity_sigma, Type: double}
+
+      - {DefaultVal: imu, Name: name, Type: ''::std::string''}
+
+      '}

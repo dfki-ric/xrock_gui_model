@@ -1,0 +1,109 @@
+models:
+- name: Deployment
+  type: software::Deployment
+  versions:
+  - {name: v0.0.1}
+- name: execution::CNDHandler
+  type: system_modelling::task_graph::Task
+  versions:
+  - {name: v0.0.1}
+- name: execution::ProcessServer
+  type: system_modelling::task_graph::Task
+  versions:
+  - {name: v0.0.1}
+- name: logger::Logger
+  type: system_modelling::task_graph::Task
+  versions:
+  - {name: v0.0.1}
+- name: mars::Altimeter
+  type: system_modelling::task_graph::Task
+  versions:
+  - {name: v0.0.1}
+- name: mars::AuvController
+  type: system_modelling::task_graph::Task
+  versions:
+  - {name: v0.0.1}
+- name: mars::AuvMotion
+  type: system_modelling::task_graph::Task
+  versions:
+  - {name: v0.0.1}
+- name: mars::Camera
+  type: system_modelling::task_graph::Task
+  versions:
+  - {name: v0.0.1}
+- name: mars::CameraPlugin
+  type: system_modelling::task_graph::Task
+  versions:
+  - {name: v0.0.1}
+- name: mars::ContactForceSensor
+  type: system_modelling::task_graph::Task
+  versions:
+  - {name: v0.0.1}
+- name: mars::DepthCamera
+  type: system_modelling::task_graph::Task
+  versions:
+  - {name: v0.0.1}
+- name: mars::EntityFakeDetection
+  type: system_modelling::task_graph::Task
+  versions:
+  - {name: v0.0.1}
+- name: mars::ForceApplier
+  type: system_modelling::task_graph::Task
+  versions:
+  - {name: v0.0.1}
+- name: mars::ForceTorque6DOF
+  type: system_modelling::task_graph::Task
+  versions:
+  - {name: v0.0.1}
+- name: mars::ForceTorqueApplier
+  type: system_modelling::task_graph::Task
+  versions:
+  - {name: v0.0.1}
+- name: mars::HighResRangeFinder
+  type: system_modelling::task_graph::Task
+  versions:
+  - {name: v0.0.1}
+- name: mars::IMU
+  type: system_modelling::task_graph::Task
+  versions:
+  - {name: v0.0.1}
+- name: mars::Joints
+  type: system_modelling::task_graph::Task
+  versions:
+  - {name: v0.0.1}
+- name: mars::LaserRangeFinder
+  type: system_modelling::task_graph::Task
+  versions:
+  - {name: v0.0.1}
+- name: mars::ObjectHighlighter
+  type: system_modelling::task_graph::Task
+  versions:
+  - {name: v0.0.1}
+- name: mars::Plugin
+  type: system_modelling::task_graph::Task
+  versions:
+  - {name: v0.0.1}
+- name: mars::RobotTeleportation
+  type: system_modelling::task_graph::Task
+  versions:
+  - {name: v0.0.1}
+- name: mars::RotatingLaserRangeFinder
+  type: system_modelling::task_graph::Task
+  versions:
+  - {name: v0.0.1}
+- name: mars::Sonar
+  type: system_modelling::task_graph::Task
+  versions:
+  - {name: v0.0.1}
+- name: mars::Task
+  type: system_modelling::task_graph::Task
+  versions:
+  - {name: v0.0.1}
+- name: mars::Trigger
+  type: system_modelling::task_graph::Task
+  versions:
+  - {name: v0.0.1}
+- name: transformer::Task
+  type: system_modelling::task_graph::Task
+  versions:
+  - {name: v0.0.1}

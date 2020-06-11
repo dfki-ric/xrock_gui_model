@@ -1,0 +1,46 @@
+domain: SOFTWARE
+name: mars::Joints
+type: system_modelling::task_graph::Task
+versions:
+- date: 2020-05-28 18:08:10.165366
+  defaultConfiguration: {data: "data:\nactivity:\n  type: PERIODIC\n  period: 0.1\n\
+      \  priority: 90\n  realtime: false\nstate: RUNNING\nconfig:\n  # sets the how\
+      \ speed is interpreted in case speed and position is set :MAX_SPEED :IGNORE.\
+      \ unsupported: :SPEED_AT_POS\n\n  controlMode: :IGNORE\n\n  # optional configuration\
+      \ for the rigid_body_states\n\n  # this module will generate on the\n\n  joint_transform:\n\
+      \n    names: []\n\n    elements: []\n\n  # If this array is set the joints will\
+      \ be renamed for the external interface\n\n  name_remap: []\n\n  # Array of\
+      \ names of the motor in the scene file. The names get mapped to motor ids starting\
+      \ from zero\n\n  names: []\n\n  # Optional array of offset values that added\
+      \ to the scaled mars joint values. Needs to be empty or the same size as names.\n\
+      \n  offset: []\n\n  # maps a single joint command to two joints to control parallel\
+      \ kinematics simulated by two joints\n\n  parallel_kinematics: []\n\n  # Optional\
+      \ array of scale values that are applied to the mars joint values. Needs to\
+      \ be empty or the same size as names.\n\n  scaling: []\n"}
+  interfaces:
+  - {direction: INCOMING, name: command, type: '::base::samples::Joints'}
+  - {direction: OUTGOING, name: state, type: 'boost::int32_t'}
+  - {direction: OUTGOING, name: status_samples, type: '::base::samples::Joints'}
+  - {direction: OUTGOING, name: current_values, type: '::mars::JointCurrents'}
+  - {direction: OUTGOING, name: transforms, type: '::base::samples::RigidBodyState'}
+  name: v0.0.1
+  softwareData: {data: 'framework: Rock
+
+      properties:
+
+      - {Name: names, Type: ''::std::vector< ::std::string >''}
+
+      - {Name: name_remap, Type: ''::std::vector< ::std::string >''}
+
+      - {Name: parallel_kinematics, Type: ''::std::vector< ::mars::ParallelKinematic
+      >''}
+
+      - {Name: scaling, Type: ''::std::vector< double >''}
+
+      - {Name: offset, Type: ''::std::vector< double >''}
+
+      - {Name: joint_transform, Type: ''::base::JointTransformVector''}
+
+      - {DefaultVal: '':IGNORE'', Name: controlMode, Type: ''::mars::JointPositionAndSpeedControlMode''}
+
+      '}

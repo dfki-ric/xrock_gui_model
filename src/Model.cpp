@@ -345,6 +345,12 @@ namespace xrock_gui_model {
           map[domainData]["data"]["configuration"] = map["defaultConfiguration"];
         }
       }
+      if(map.hasKey("softwareData") and map["softwareData"].hasKey("data") and
+         map["softwareData"]["data"].hasKey("framework")) {
+        if(map["softwareData"]["data"]["framework"] == "Rock") {
+          map["name"] = mars::utils::replaceString(nodeName, ":", "_");
+        }
+      }
       nodeMap[nodeId] = map;
       return true;
     }

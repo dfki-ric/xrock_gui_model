@@ -64,6 +64,7 @@ namespace xrock_gui_model {
     void configureOutPort(const std::string &nodeName, const std::string &portName);
     void selectVersion(std::string version);
     void exportCnd(const configmaps::ConfigMap &map_, const std::string &filename);
+    void importCND(const std::string &filename);
     void nodeContextClicked(std::string name);
     void inPortContextClicked(std::string name);
     void outPortContextClicked(std::string name);
@@ -77,7 +78,7 @@ namespace xrock_gui_model {
   //public slots:
     void addComponent(std::string domain, std::string modelName, std::string version, std::string nodeName="");
     void loadComponent(std::string domain, std::string modelName, std::string version);
-  
+    void applyConfiguration(configmaps::ConfigMap &map);
 
   private:
     std::map<std::string, configmaps::ConfigMap> modelCache;

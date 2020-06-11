@@ -40,6 +40,7 @@ namespace xrock_gui_model {
     void versionChanged(const QString &versionName);
     void updateFilter(const QString &filter);
     void changeDomain(const QString &domain);
+    void urlClicked(const QUrl &);
 
   signals:
     void sigLoadComponent(std::string domain, std::string model, std::string version);

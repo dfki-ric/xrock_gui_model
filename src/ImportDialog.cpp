@@ -4,6 +4,7 @@
 
 #include <QVBoxLayout>
 #include <QPushButton>
+#include <QDesktopServices>
 #include <array>
 
 using namespace configmaps;
@@ -86,6 +87,8 @@ namespace xrock_gui_model {
     connect(button, SIGNAL(clicked()), this, SLOT(addModel()));
 
     doc = new QWebView();
+    doc->page()->setLinkDelegationPolicy( QWebPage::DelegateAllLinks );
+    connect(doc, SIGNAL(linkClicked (const QUrl &)), this, SLOT(urlClicked(const QUrl &)));
     mainLayout->addLayout(vLayout);
     mainLayout->addWidget(doc);
     setLayout(mainLayout);
@@ -107,6 +110,9 @@ namespace xrock_gui_model {
 
   }
 
+  void ImportDialog::urlClicked(const QUrl &link) {
+    QDesktopServices::openUrl(link);
+  }
 
   void ImportDialog::modelClicked(const QModelIndex &index) {
     ignoreUpdate = true;

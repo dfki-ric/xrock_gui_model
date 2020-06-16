@@ -22,6 +22,7 @@
 #include <mars/utils/misc.h>
 #include <QWebView>
 #include <QUuid>
+#include <QDateTime>
 #include <iostream>
 #include <fstream>
 

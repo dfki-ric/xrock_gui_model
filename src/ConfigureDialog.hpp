@@ -28,7 +28,8 @@ namespace xrock_gui_model {
     ConfigureDialog(configmaps::ConfigMap *configuration,
                     configmaps::ConfigMap &env,
                     const std::string &type, bool onlyMap=false,
-                    bool noTreeEdit=false, configmaps::ConfigMap *dropdown = NULL);
+                    bool noTreeEdit=false, configmaps::ConfigMap *dropdown = NULL,
+                    std::string fileName = "");
     ConfigureDialog(std::string *text);
     ~ConfigureDialog();
 

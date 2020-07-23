@@ -88,7 +88,7 @@ namespace xrock_gui_model {
       bagelGui->addPlugin(this);
     }
     else {
-      fprintf(stderr, "ERROR: ModelLib: was not able to get bagel_gui!");
+      printf("ERROR: ModelLib: was not able to get bagel_gui!");
     }
     gui = libManager->getLibraryAs<mars::main_gui::GuiInterface>("main_gui");
     if(gui) {
@@ -107,6 +107,7 @@ namespace xrock_gui_model {
       gui->addGenericMenuAction("../Expert/Create Bagel Model", 12, this);
       gui->addGenericMenuAction("../Expert/Create Bagel Task", 13, this);
       gui->addGenericMenuAction("../Expert/Launch CND", 15, this);
+      gui->addGenericMenuAction("../Expert/Stop CND", 16, this);
       widget = new ModelWidget(cfg, bagelGui, this);
       if(!widget->getHiddenCloseState()) {
         gui->addDockWidget((void*)widget, 1);
@@ -273,7 +274,7 @@ namespace xrock_gui_model {
     case 5:
       {
         QString fileName = QFileDialog::getSaveFileName(NULL, QObject::tr("Select Model"),
-                                                        ".", QObject::tr("YAML syntax (*.yml)"),0,
+                                                        ".", QObject::tr("YAML syntax (*.cnd)"),0,
                                                         QFileDialog::DontUseNativeDialog);
         if(!fileName.isNull()) {
           ConfigMap map = bagelGui->createConfigMap();
@@ -376,6 +377,7 @@ namespace xrock_gui_model {
         ConfigMap modelInfo = model->getModelInfo();
         std::string uuid = QUuid::createUuid().toString().toStdString();
         std::string path = mars::utils::pathJoin("tmp", uuid);
+        lastExecFolder = path;
         mars::utils::createDirectory(path);
         configmaps::ConfigMap map = bagelGui->createConfigMap();
         std::string name = modelInfo["name"];
@@ -383,6 +385,7 @@ namespace xrock_gui_model {
           name = "tmp_model_name";
         }
         std::string cndName = name+".cnd";
+        std::string cndNamePre = name + "_pre.cnd";
         std::string cndPath = mars::utils::pathJoin(path, cndName);
         exportCnd(map, cndPath);
         if(!mars::utils::pathExists(cndPath)) {
@@ -400,6 +403,7 @@ namespace xrock_gui_model {
         file << "::CndOrogen.load_orogen_project_from_cnd(self, cnd_model)" << std::endl;
         file.close();
 #ifdef __APPLE__
+        std::string rockLaunch = "mac-rock-launch";
         // create pseudo manifest
         file.open("manifest.xml");
         file.close();
@@ -409,18 +413,52 @@ namespace xrock_gui_model {
         cmd = "amake";
         printf("Call %s\n", cmd.c_str());
         system(cmd.c_str());
-        cmd = "mac-rock-launch " + cndName;
-        printf("Call %s\n", cmd.c_str());
-        system(cmd.c_str());
 #else
-        std::string cmd = "cnd-orogen "+cndName;;
-        printf("Call %s\n", cmd.c_str());
-        system(cmd.c_str());
-        cmd = "rock-launch " + cndName;
+        std::string rockLaunch = "rock-launch";
+        std::string cmd = "cnd-orogen "+cndName;
         printf("Call %s\n", cmd.c_str());
         system(cmd.c_str());
 #endif
+        if(mars::utils::pathExists(cndNamePre)) {
+          cmd = rockLaunch + " " + cndNamePre;
+          printf("Call %s\n", cmd.c_str());
+          system(cmd.c_str());
+        }
+        cmd = rockLaunch + " " + cndName;
+        printf("Call %s\n", cmd.c_str());
+        system(cmd.c_str());
         chdir(pwd.c_str());
+        break;
+      }
+    case 16:
+      {
+        ModelInterface *model = bagelGui->getCurrentModel();
+        if(!model) {
+          return;
+        }
+        ConfigMap modelInfo = model->getModelInfo();
+        std::string path = lastExecFolder;
+        std::string name = modelInfo["name"];
+        if(name.size() == 0) {
+          name = "tmp_model_name";
+        }
+        std::string cndNamePre = name + "_pre.cnd";
+        std::string cndPathPre = mars::utils::pathJoin(path, cndNamePre);
+        std::string cndPath = mars::utils::pathJoin(path, "shutdown.cnd");
+        std::string cmd;
+#ifdef __APPLE__
+        std::string rockLaunch = "mac-rock-launch";
+#else
+        std::string rockLaunch = "rock-launch";
+#endif
+        if(mars::utils::pathExists(cndPathPre)) {
+          cmd = rockLaunch + " " + cndPathPre;
+          printf("Call %s\n", cmd.c_str());
+          system(cmd.c_str());
+        }
+        cmd = rockLaunch + " " + cndPath;
+        printf("Call %s\n", cmd.c_str());
+        system(cmd.c_str());
         break;
       }
     case 20:
@@ -739,7 +777,7 @@ namespace xrock_gui_model {
       config = node[domainData]["data"]["configuration"];
     }
     else if(node.hasKey("defaultConfiguration")) {
-      config = node["defaultConfiguration"];
+      config = node["defaultConfiguration"]["data"];
     }
     {
       ConfigureDialog cd(&config, env, node["modelName"], true, true);
@@ -748,6 +786,50 @@ namespace xrock_gui_model {
     }
     node[domainData]["data"]["configuration"] = config;
     bagelGui->updateNodeMap(name, node);
+  }
+
+  void ModelLib::openConfigFile(const std::string &name) {
+    ConfigMap node = *(bagelGui->getNodeMap(name));
+    ConfigMap config;
+    std::string domain = node["domain"];
+    std::string domainData = domain + "Data";
+    // check for selected bundle
+    char *envs = getenv("ROCK_BUNDLE");
+    if(envs) {
+      // check for config file in bundle folder
+      std::string bundleName = envs;
+      envs = getenv("ROCK_BUNDLE_PATH");
+      if(envs) {
+        std::string bundlePath = envs;
+        // only if both is set we continue
+        std::string configFile = node["modelName"];
+        configFile += ".yml";
+        std::string path = mars::utils::pathJoin(bundlePath, bundleName);
+        path = mars::utils::pathJoin(path, "config");
+        path = mars::utils::pathJoin(path, "orogen");
+        path = mars::utils::pathJoin(path, configFile);
+        if(mars::utils::pathExists(path)) {
+          printf("found config file: %s\n", path.c_str());
+          ConfigureDialog cd(NULL, env, node["modelName"], true, true, NULL, path);
+          cd.resize(400, 400);
+          cd.exec();
+        }
+      }
+      else {
+        printf("No bundle path set in env: ROCK_BUNDLE_PATH\n");
+      }
+    }
+    else {
+      printf("No bundle selected in env: ROCK_BUNDLE\n  Use bundle-sel to select one!\n");
+    }
+
+    // open config file
+    // open dialog
+    // {
+    //   ConfigureDialog cd(&config, env, node["modelName"], true, true);
+    //   cd.resize(400, 400);
+    //   cd.exec();
+    // }
   }
 
   void ModelLib::configureComponents(const std::string &name) {
@@ -999,6 +1081,8 @@ namespace xrock_gui_model {
     ConfigMap output;
     ConfigMap nameMap;
     ConfigMap dNameMap;
+    bool haveMarsTask = false;
+    bool compileDeployments = false;
 
     std::list<ConfigMap>::iterator listIt;
     // handle file path and node order
@@ -1050,15 +1134,22 @@ namespace xrock_gui_model {
             m.erase("configuration");
             m.updateMap(m2);
           }
+          if(m.hasKey("description")) {
+            m.erase("description");
+          }
           std::string type = node["modelName"];
+          if(type == "mars::Task") {
+            haveMarsTask = true;
+          }
           output["tasks"][name] = m;
           output["tasks"][name]["type"] = type;
-          if(node.hasKey("parentName")) {
+          if(node.hasKey("parentName") and node["parentName"].getString().size() > 0) {
             std::string parent = node["parentName"];
             std::vector<std::string> arrName = mars::utils::explodeString(':', node["type"]);
             std::string process_name = "orogen_default_"+arrName[0]+"__"+arrName[2];
             output["deployments"][parent]["taskList"][name] = process_name;
             if(output["deployments"][parent]["taskList"].size() > 1) {
+              compileDeployments = true;
               output["deployments"][parent]["process_name"] = dNameMap[parent];
             }
             else {
@@ -1073,15 +1164,19 @@ namespace xrock_gui_model {
             std::string process_name = "orogen_default_"+arrName[0]+"__"+arrName[2];
             output["deployments"][depName]["taskList"][name] = process_name;
             output["deployments"][depName]["process_name"] = process_name;
+            dNameMap[depName] = depName;
           }
         }
       }
     }
-    for(auto it: (ConfigMap)(output["deployments"])) {
-      if(it.second["taskList"].size() > 1) {
-        for(auto nt: (ConfigMap)(it.second["taskList"])) {
-          nt.second = nt.first;
+    if(compileDeployments) {
+      for(ConfigMap::iterator it=output["deployments"].beginMap();
+          it!=output["deployments"].endMap(); ++it) {
+        for(ConfigMap::iterator nt=it->second["taskList"].beginMap();
+            nt!=it->second["taskList"].endMap(); ++nt) {
+          nt->second = nt->first;
         }
+        output["deployments"][it->first]["process_name"] = dNameMap[it->first];
       }
     }
     int i=0;
@@ -1112,6 +1207,27 @@ namespace xrock_gui_model {
       output["connections"][std::string(buffer)] = m;
     }
     output.toYamlFile(filename);
+    if(haveMarsTask) {
+      // generate pre cnd because we have to first load mars::Task then
+      // the plugin tasks
+      for(ConfigMap::iterator it = output["tasks"].beginMap();
+          it != output["tasks"].endMap(); ++it) {
+        if(it->second["type"] != "mars::Task") {
+          it->second["state"] = "PRE_OPERATIONAL";
+        }
+      }
+      std::string preFile = filename;
+      mars::utils::removeFilenameSuffix(&preFile);
+      if(output.hasKey("connections")) {
+        output.erase("connections");
+      }
+      output.toYamlFile(preFile+"_pre.cnd");
+    }
+    // write shutdown cnd
+    std::string shutdownFile = mars::utils::pathJoin(mars::utils::getPathOfFile(filename), "shutdown.cnd");
+    FILE *f = fopen(shutdownFile.c_str(), "w");
+    fprintf(f, "deployments:\n\ntasks:\n\nconnections:\n\n");
+    fclose(f);
   }
 
   void ModelLib::importCND(const std::string &fileName) {
@@ -1166,6 +1282,9 @@ namespace xrock_gui_model {
         model->resetConfig(map);
         bagelGui->updateNodeMap(contextNodeName, map);
       }
+    }
+    else if(name == "open ROCK config file") {
+      openConfigFile(contextNodeName);
     }
     else if(name == "open model") {
       ConfigMap node = *(bagelGui->getNodeMap(contextNodeName));
@@ -1253,6 +1372,7 @@ namespace xrock_gui_model {
     r.push_back("configure node");
     r.push_back("configure components");
     r.push_back("reset configuration");
+    r.push_back("open ROCK config file");
     r.push_back("apply configuration");
     r.push_back("open model");
     r.push_back("show description");
@@ -1304,6 +1424,7 @@ namespace xrock_gui_model {
     std::string modelFile = "temp_task_model.yml";
     // 1. get configuration from map
     // 2. store configuration in temp yaml file
+    std::string cmd = "rock-instantiate";
     if(map.hasKey("softwareData") and map["softwareData"].hasKey("data") and
        map["softwareData"]["data"].hasKey("configuration") and
        map["softwareData"]["data"]["configuration"].hasKey("config")) {
@@ -1312,14 +1433,24 @@ namespace xrock_gui_model {
       file.open(configFile);
       file << yaml;
       file.close();
+      cmd += " -c " + configFile;
+      cmd +=  " -o " + modelFile + " ";
+      cmd += map["modelName"].getString();
+      cmd += " default";
+    }
+    else if(map.hasKey("softwareData") and map["softwareData"].hasKey("data") and
+            map["softwareData"]["data"].hasKey("configuration") and
+            map["softwareData"]["data"]["configuration"].hasKey("config_names")) {
+      cmd +=  " -o " + modelFile + " ";
+      cmd += map["modelName"].getString();
+      for(auto it: map["softwareData"]["data"]["configuration"]["config_names"]) {
+        cmd += " "+(std::string)it;
+      }
     }
     else {
       return;
     }
     // 3. execute rock-instantiate -c temp_file.yml -o temp_model.yml modelname default
-    std::string cmd = "rock-instantiate -c " + configFile + " -o " + modelFile + " ";
-    cmd += map["modelName"].getString();
-    cmd += " default";
     printf("execute: %s\n", cmd.c_str());
     system(cmd.c_str());
     // 4. load orogen model as new version of modelname

@@ -60,6 +60,7 @@ namespace xrock_gui_model {
     void currentModelChanged(bagel_gui::ModelInterface *model);
     void changeNodeVersion(const std::string &name);
     void configureNode(const std::string &name);
+    void openConfigFile(const std::string &name);
     void configureInPort(const std::string &nodeName, const std::string &portName);
     void configureOutPort(const std::string &nodeName, const std::string &portName);
     void selectVersion(std::string version);
@@ -93,7 +94,8 @@ namespace xrock_gui_model {
     mars::cfg_manager::cfgParamId dbAddress_paramId;
     mars::cfg_manager::cfgParamId dbUser_paramId;
     mars::cfg_manager::cfgParamId dbPassword_paramId;
-    
+    std::string lastExecFolder;
+
     void loadStartModel();
     void loadModelFromParameter();
     bool loadCart();

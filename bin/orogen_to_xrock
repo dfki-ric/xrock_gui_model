@@ -70,7 +70,7 @@ for ymlFile in files:
                 with open("export.yml", "r") as f:
                     lines = f.readlines()
                 description = "# "+modelName+"\\n\\nConfiguration documentation:\\n\\n"
-                defaultConfig = "  activity:\n    type: PERIODIC\n    period: 0.1\n    priority: 90\n    realtime: false\n  state: RUNNING\n"
+                defaultConfig = "activity:\n  type: PERIODIC\n  period: 0.1\n  priority: 90\n  realtime: false\nstate: RUNNING\n"
                 description += "    activity:\\n      type: PERIODIC\\n      period: 0.1\\n      priority: 90\\n      realtime: false\\n    state: RUNNING\\n"
                 if len(lines) > 1:
                     defaultConfig +="config:"
@@ -78,7 +78,7 @@ for ymlFile in files:
                     for line in lines[1:]:
                         defaultConfig += "\n  " + line.replace('"', '\\"')
                         description += "\\n      " + line.replace('"', '\\"')
-                exportModel["versions"][0]["defaultConfiguration"] = {"data": "data:\n"+defaultConfig}
+                exportModel["versions"][0]["defaultConfiguration"] = {"data": defaultConfig}
                 exportModel["versions"][0]["softwareData"] = {"data": 'description:\n  markdown: "'+description+'"'}
             os.system("rm export.yml")
             modelPath = os.path.join(dbPath, modelName, versionName)

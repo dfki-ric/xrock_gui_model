@@ -86,7 +86,6 @@ namespace xrock_gui_model {
   }
 
   ModelInterface* Model::clone() {
-    fprintf(stderr, "clone model\n");
     Model *newModel = new Model(this);
     //*newModel = *this;
     return newModel;
@@ -188,9 +187,7 @@ namespace xrock_gui_model {
           else {
             std::string dataString = (*it)["data"];
             if(!dataString.empty()) {
-              fprintf(stderr, "load interface data: %s %s\n", dataString.c_str(), type.c_str());
               dataMap = ConfigMap::fromYamlString(dataString);
-              fprintf(stderr, "got it\n");
             }
           }
           if(dataMap.hasKey("domain")) {
@@ -260,11 +257,11 @@ namespace xrock_gui_model {
     }
     if(model["versions"][versionIndex].hasKey("defaultConfiguration") &&
        model["versions"][versionIndex]["defaultConfiguration"].hasKey("data")) {
-      info.map["defaultConfiguration"] = ConfigMap::fromYamlString(model["versions"][versionIndex]["defaultConfiguration"]["data"]);
+      info.map["defaultConfiguration"]["data"] = ConfigMap::fromYamlString(model["versions"][versionIndex]["defaultConfiguration"]["data"]);
     }
     else if(model["versions"][versionIndex].hasKey("defaultConfig") &&
        model["versions"][versionIndex]["defaultConfig"].hasKey("data")) {
-      info.map["defaultConfiguration"] = ConfigMap::fromYamlString(model["versions"][versionIndex]["defaultConfig"]["data"]);
+      info.map["defaultConfiguration"]["data"] = ConfigMap::fromYamlString(model["versions"][versionIndex]["defaultConfig"]["data"]);
     }
     if(model["versions"][versionIndex].hasKey("components") &&
        model["versions"][versionIndex]["components"].hasKey("configuration") &&
@@ -342,7 +339,7 @@ namespace xrock_gui_model {
         if(!map.hasKey(domainData) ||
            !map[domainData].hasKey("data") ||
            !map[domainData]["data"].hasKey("configuration")) {
-          map[domainData]["data"]["configuration"] = map["defaultConfiguration"];
+          map[domainData]["data"]["configuration"] = map["defaultConfiguration"]["data"];
         }
       }
       if(map.hasKey("softwareData") and map["softwareData"].hasKey("data") and

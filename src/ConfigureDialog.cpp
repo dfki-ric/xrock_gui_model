@@ -18,7 +18,7 @@ namespace xrock_gui_model {
   ConfigureDialog::ConfigureDialog(configmaps::ConfigMap *configuration,
                                    configmaps::ConfigMap &env,
                                    const std::string &type, bool onlyMap,
-                                   bool noTreeEdit, configmaps::ConfigMap *dropdown) :
+                                   bool noTreeEdit, configmaps::ConfigMap *dropdown, std::string fileName) :
     configuration(configuration), textOnly(false)  {
 
     // get data from database
@@ -27,11 +27,23 @@ namespace xrock_gui_model {
     dw = NULL;
     statusLabel = NULL;
     if(noTreeEdit) {
-      configMapEdit = new QTextEdit();
-      configMapEdit->setText(configuration->toYamlString().c_str());
-      connect(configMapEdit, SIGNAL(textChanged()), this, SLOT(textChanged()));
-      statusLabel = new QLabel();
-      statusLabel->setText("valid yaml syntax");
+      if(fileName.size()) {
+        // open file
+        configFile = new QTextEdit();
+        configFileName = fileName;
+        std::ifstream t(configFileName.c_str());
+        std::stringstream buffer;
+        buffer << t.rdbuf();
+        configFileContent = buffer.str();
+        configFile->setText(configFileContent.c_str());
+      }
+      else {
+        configMapEdit = new QTextEdit();
+        configMapEdit->setText(configuration->toYamlString().c_str());
+        connect(configMapEdit, SIGNAL(textChanged()), this, SLOT(textChanged()));
+        statusLabel = new QLabel();
+        statusLabel->setText("valid yaml syntax");
+      }
     }
     else {
       dw = new mars::config_map_gui::DataWidget(NULL, this, true, onlyMap);
@@ -131,6 +143,9 @@ namespace xrock_gui_model {
       if(dw) {
         v->addWidget(dw);
       }
+      else if(configFileName.size()) {
+        v->addWidget(configFile);
+      }
       else {
         v->addWidget(configMapEdit);
       }
@@ -145,6 +160,11 @@ namespace xrock_gui_model {
     QPushButton *button = new QPushButton("close");
     v->addWidget(button);
     connect(button, SIGNAL(clicked()), this, SLOT(close()));
+    // if(configFileName.size()) {
+    //   QPushButton *button = new QPushButton("save");
+    //   v->addWidget(button);
+    //   connect(button, SIGNAL(clicked()), this, SLOT(save()));
+    // }
     setLayout(v);
   }
 
@@ -171,6 +191,14 @@ namespace xrock_gui_model {
     if(dw) {
       *configuration = dw->getConfigMap();
     }
+    else if(!configFileName.empty()) {
+      std::string content = configFile->toPlainText().toStdString();
+      if(content != configFileContent) {
+        FILE *f = fopen(configFileName.c_str(), "w");
+        fprintf(f, "%s", content.c_str());
+        fclose(f);
+      }
+    }
     else {
       if(textOnly) {
         *text = configMapEdit->toPlainText().toStdString();
@@ -182,14 +210,6 @@ namespace xrock_gui_model {
         } catch (...) {
           fprintf(stderr, "Error converting config into yaml map!");
         }
-      }
-    }
-    if(!configFileName.empty()) {
-      std::string content = configFile->toPlainText().toStdString();
-      if(content != configFileContent) {
-        FILE *f = fopen(configFileName.c_str(), "w");
-        fprintf(f, "%s", content.c_str());
-        fclose(f);
       }
     }
   }

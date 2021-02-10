@@ -65,6 +65,10 @@ models:
     type: fragment
   - versions:
       - name: v1
+    name: reflect
+    type: fragment
+  - versions:
+      - name: v1
     type: fragment
     name: math_float
   - versions:
@@ -91,6 +95,10 @@ models:
     versions:
       - name: v1
     type: fragment
+  - type: fragment
+    name: dot_max
+    versions:
+      - name: v1
   - type: fragment
     name: mix_vec4
     versions:
@@ -163,7 +171,15 @@ models:
     type: fragment
     versions:
       - name: v1
+  - name: sampleCubeMap
+    type: fragment
+    versions:
+      - name: v1
   - name: sampler2D
+    type: fragment
+    versions:
+      - name: v1
+  - name: samplerCube
     type: fragment
     versions:
       - name: v1

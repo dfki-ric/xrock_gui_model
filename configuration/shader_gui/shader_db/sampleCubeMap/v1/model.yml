@@ -1,0 +1,10 @@
+domain: SHADER
+name: sampleCubeMap
+type: fragment
+versions:
+- date: '2021-01-09 14:50:31.927600'
+  interfaces:
+  - {direction: INCOMING, name: texDir, type: vec3}
+  - {direction: INCOMING, name: texture, type: samplerCube}
+  - {direction: OUTGOING, name: color, type: vec4}
+  name: v1

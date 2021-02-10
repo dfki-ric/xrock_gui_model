@@ -1,0 +1,11 @@
+domain: SHADER
+name: samplerCube
+type: fragment
+versions:
+- date: 2017-06-19 14:50:56.765118
+  interfaces:
+  - {direction: INCOMING, name: export, type: samplerCube}
+  - {direction: OUTGOING, name: output, type: samplerCube}
+  name: v1
+  defaultConfiguration:
+    data: "data:\n  type: uniform\n"

@@ -1,0 +1,10 @@
+domain: SHADER
+name: reflect
+type: fragment
+versions:
+- date: '2021-01-09 14:50:31.819598'
+  interfaces:
+  - {direction: INCOMING, name: vec_a, type: vec3}
+  - {direction: INCOMING, name: normal, type: vec3}
+  - {direction: OUTGOING, name: vec_out, type: vec3}
+  name: v1

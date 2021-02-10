@@ -1,0 +1,15 @@
+domain: SHADER
+name: dot_max
+type: fragment
+versions:
+- date: '2021-01-09 14:50:32.254732'
+  interfaces:
+  - {direction: INCOMING, name: vector_a, type: vec3}
+  - {direction: INCOMING, name: vector_b, type: vec3}
+  - {direction: INCOMING, name: m, type: float}
+  - {direction: OUTGOING, name: value, type: float}
+  name: v1
+  defaultConfiguration:
+    data: "data:\n  inputs:\n    vector_a: vec3(0,0,0)\n    vector_b: vec3(0,0,0)\n    m: 0.0\n"
+  softwareData:
+    data: "description:\n  markdown: \"# brief\\n\\nCalculates:\\n\\n   max(dot(vector_a, vector_b),m)\\n\"\n"

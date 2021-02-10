@@ -65,7 +65,7 @@ models:
     type: fragment
   - versions:
       - name: v1
-    name: reflect
+    name: reflectNode
     type: fragment
   - versions:
       - name: v1

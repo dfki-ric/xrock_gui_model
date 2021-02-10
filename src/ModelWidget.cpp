@@ -670,6 +670,9 @@ namespace xrock_gui_model {
 
   void ModelWidget::saveModel() {
     std::string suggestion = name->text().toStdString();
+    if(suggestion.size() > 0 and mars::utils::getFilenameSuffix(suggestion) == "") {
+      suggestion += ".yml";
+    }
     mars::utils::handleFilenamePrefix(&suggestion, bagelGui->getLoadPath());
     QString fileName = QFileDialog::getSaveFileName(NULL,
                                                     QObject::tr("Select Model"),

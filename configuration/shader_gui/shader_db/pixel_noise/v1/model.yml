@@ -1,0 +1,15 @@
+domain: SHADER
+name: pixel_noise
+type: fragment
+versions:
+- date: '2021-02-16 14:50:32.075464'
+  interfaces:
+  - {direction: INCOMING, name: in_vec4, type: vec4}
+  - {direction: INCOMING, name: pixel_scale, type: float}
+  - {direction: INCOMING, name: noise_ammount, type: float}
+  - {direction: OUTGOING, name: out_vec4, type: vec4}
+  name: v1
+  defaultConfiguration:
+    data: "data:\n  inputs:\n    in_vec4: vec4(0,0,0,0)\n    pixel_scale: 6.0\n    noise_ammount: 1.0\n"
+  softwareData:
+    data: "description:\n  markdown: \"# brief\\n\\nGenerates noise depending on the screen pixel position.\"\n"

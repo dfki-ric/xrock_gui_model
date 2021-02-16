@@ -95,6 +95,10 @@ models:
     versions:
       - name: v1
     type: fragment
+  - name: pixel_noise
+    versions:
+      - name: v1
+    type: fragment
   - type: fragment
     name: dot_max
     versions:

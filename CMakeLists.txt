@@ -74,12 +74,10 @@ if (${USE_QT5})
 qt5_use_modules(${PROJECT_NAME} Widgets WebKitWidgets)
 endif (${USE_QT5})
 
-find_package(CURL)
 
 target_link_libraries(${PROJECT_NAME}
                       ${PKGCONFIG_LIBRARIES}
                       ${QT_LIBRARIES}
-                      ${CURL_LIBRARIES}
 )
 
 if(WIN32)

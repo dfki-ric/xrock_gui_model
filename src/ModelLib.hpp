@@ -16,7 +16,7 @@
 #include <bagel_gui/BagelGui.hpp>
 #include <bagel_gui/PluginInterface.hpp>
 #include <mars/cfg_manager/CFGManagerInterface.h>
-
+#include "DBInterface.hpp"
 
 namespace bagel_gui {
   class BagelModel;
@@ -80,6 +80,7 @@ namespace xrock_gui_model {
     void addComponent(std::string domain, std::string modelName, std::string version, std::string nodeName="");
     void loadComponent(std::string domain, std::string modelName, std::string version);
     void applyConfiguration(configmaps::ConfigMap &map);
+    DBInterface *db;
 
   private:
     std::map<std::string, configmaps::ConfigMap> modelCache;

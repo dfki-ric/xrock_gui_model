@@ -1,5 +1,4 @@
 #include "ImportDialog.hpp"
-#include "FileDB.hpp"
 #include <mars/config_map_gui/DataWidget.h>
 
 #include <QVBoxLayout>
@@ -123,7 +122,7 @@ namespace xrock_gui_model {
       selectedVersion = std::string("");
       dw->clearGUI();
       versionSelect->clear();
-      std::vector<std::string> versionList = XRockDB::requestVersions(selectedDomain, selectedModel);
+      std::vector<std::string> versionList = modelLib->db->requestVersions(selectedDomain, selectedModel);
       for (std::vector<std::string>::iterator it = versionList.begin(); it != versionList.end(); ++it) {
         if(firstVersion.empty()) {
           firstVersion = (*it);
@@ -142,7 +141,7 @@ namespace xrock_gui_model {
     if(ignoreUpdate) return;
     selectedVersion = versionName.toStdString();
     dw->clearGUI();
-    ConfigMap map = XRockDB::requestModel(selectedDomain, selectedModel, selectedVersion, true);
+    ConfigMap map = modelLib->db->requestModel(selectedDomain, selectedModel, selectedVersion, true);
     //fprintf(stderr, "START ImportDialog::versionChanged()\n\n");
     //fprintf(stderr, "%s\n\n", map.toYamlString().c_str());
     //fprintf(stderr, "END ImportDialog\n\n");
@@ -203,7 +202,7 @@ namespace xrock_gui_model {
     selectedDomain  = domain.toStdString();
     selectedModel   = std::string("");
     selectedVersion = std::string("");
-    modelList = XRockDB::requestModelListByDomain( selectedDomain );
+    modelList = modelLib->db->requestModelListByDomain( selectedDomain );
     for(auto it: modelList) {
       models->addItem(it.first.c_str());
     }

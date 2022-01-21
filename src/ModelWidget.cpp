@@ -1,7 +1,6 @@
 #include "ModelWidget.hpp"
 #include "ModelLib.hpp"
 #include "Model.hpp"
-#include "FileDB.hpp"
 #include "ConfigureDialog.hpp"
 #include "ConfigMapHelper.hpp"
 
@@ -269,7 +268,7 @@ namespace xrock_gui_model {
     updateCurrentLayout();
     ConfigMap map;
     createMap(&map);
-    bool success = XRockDB::storeModel(map);
+    bool success = mainLib->db->storeModel(map);
     bagel_gui::BagelModel *model = dynamic_cast<bagel_gui::BagelModel*>(bagelGui->getCurrentModel());
     if(model) {
       // try to save bagel graph
@@ -661,7 +660,7 @@ namespace xrock_gui_model {
 
   ConfigMap ModelWidget::getDefaultConfig(const std::string &domain, const std::string &name, const std::string &version) {
     ConfigMap defaultConfig;
-    ConfigMap fullMap = XRockDB::requestModel(domain, name, version);
+    ConfigMap fullMap = mainLib->db->requestModel(domain, name, version);
     if(fullMap["versions"][0].hasKey("defaultConfiguration")) {
       defaultConfig = fullMap["versions"][0]["defaultConfiguration"];
     }
@@ -1035,7 +1034,7 @@ namespace xrock_gui_model {
       ConfigMap modelMap, nodeInfo;
       std::string type = name;
       if(!model->hasNodeInfo(type)) {
-        modelMap = XRockDB::requestModel(domain, name, version, !version.empty());
+        modelMap = mainLib->db->requestModel(domain, name, version, !version.empty());
         model->addNodeInfo(modelMap);//, version);
         bagelGui->updateNodeTypes();
         return;
@@ -1044,7 +1043,7 @@ namespace xrock_gui_model {
       if(!version.empty() && nodeInfo["modelVersion"] != version) {
         type += "::" + version;
         if(!model->hasNodeInfo(type)) {
-          modelMap = XRockDB::requestModel(domain, name, version, !version.empty());
+          modelMap = mainLib->db->requestModel(domain, name, version, !version.empty());
           model->addNodeInfo(modelMap, version);
           bagelGui->updateNodeTypes();
         }

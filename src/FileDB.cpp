@@ -11,17 +11,15 @@ using namespace mars::utils;
 
 namespace xrock_gui_model {
 
-  std::string XRockDB::dbAddress = "";
-
-  XRockDB::XRockDB() {
+  FileDB::FileDB() : dbAddress("") {
 
   }
 
-  XRockDB::~XRockDB() {
+  FileDB::~FileDB() {
 
   }
 
-  std::vector<std::pair<std::string, std::string>> XRockDB::requestModelListByDomain(const std::string &domain) {
+  std::vector<std::pair<std::string, std::string>> FileDB::requestModelListByDomain(const std::string &domain) {
     std::vector<std::pair<std::string, std::string>> modelList;
     if(domain != "software") return modelList;
 
@@ -35,7 +33,7 @@ namespace xrock_gui_model {
     return modelList;
   }
 
-  std::vector<std::string> XRockDB::requestVersions(const std::string &domain, const std::string &model) {
+  std::vector<std::string> FileDB::requestVersions(const std::string &domain, const std::string &model) {
     std::vector<std::string> versionList;
     if(domain != "software") return versionList;
 
@@ -54,7 +52,7 @@ namespace xrock_gui_model {
     return versionList;
   }
 
-  ConfigMap XRockDB::requestModel(const std::string &domain,
+  ConfigMap FileDB::requestModel(const std::string &domain,
                                  const std::string &model,
                                  const std::string &version,
                                  const bool limit) {
@@ -97,7 +95,7 @@ namespace xrock_gui_model {
     return result;
   }
 
-  bool XRockDB::storeModel(const ConfigMap &map_) {
+  bool FileDB::storeModel(const ConfigMap &map_) {
     ConfigMap map = map_;
     std::string model = map["name"];
     std::string type = map["type"];
@@ -147,7 +145,7 @@ namespace xrock_gui_model {
     return true;
   }
 
-  void XRockDB::set_dbAddress(const std::string &_db_Address) {
+  void FileDB::set_dbAddress(const std::string &_db_Address) {
     dbAddress = _db_Address;
   }
 

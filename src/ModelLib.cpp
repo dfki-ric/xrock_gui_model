@@ -71,16 +71,23 @@ namespace xrock_gui_model {
       prop_dbAddress = cfg->getOrCreateProperty("XRockGUI", "dbAddress",
                                                 defaultAddress, this);
       prop_dbAddress.sValue = mars::utils::pathJoin(confDir, prop_dbAddress.sValue);
-      XRockDB::set_dbAddress(prop_dbAddress.sValue);
+      db = NULL;
+      if(env.hasKey("io_library")) {
+        db = libManager->getLibraryAs<DBInterface>(env["io_library"], true);
+      }
+      if(!db) {
+        db = new FileDB();
+      }
+      db->set_dbAddress(prop_dbAddress.sValue);
       dbAddress_paramId = prop_dbAddress.paramId;
 
     }
     bagelGui = libManager->getLibraryAs<BagelGui>("bagel_gui");
     if(bagelGui) {
       model = new Model(bagelGui);
-      std::vector<std::pair<std::string, std::string>> models = XRockDB::requestModelListByDomain("software");
+      std::vector<std::pair<std::string, std::string>> models = db->requestModelListByDomain("software");
       for(auto it: models) {
-        ConfigMap modelMap = XRockDB::requestModel("software", it.first, "");
+        ConfigMap modelMap = db->requestModel("software", it.first, "");
         model->addNodeInfo(modelMap);
       }
       bagelGui->addModelInterface("xrock", model);
@@ -487,7 +494,7 @@ namespace xrock_gui_model {
       handleFilenamePrefix(&graphFile, env["wsd"]);
 
       // check if we can load a model as template
-      ConfigMap map = XRockDB::requestModel(domain, name, "template");
+      ConfigMap map = db->requestModel(domain, name, "template");
       // if the map is empty create the model info
       if(map.empty()) {
         message.setText("Unable to load template model for MotionControlTask!");
@@ -502,7 +509,7 @@ namespace xrock_gui_model {
       }
       config["config"]["graphFilename"] = graphFile;
       map["versions"][0]["defaultConfiguration"]["data"] = config.toYamlString();
-      bool success = XRockDB::storeModel(map);
+      bool success = db->storeModel(map);
       if(success) {
         message.setText("The Bagel Task was successfully stored!");
       }
@@ -526,7 +533,7 @@ namespace xrock_gui_model {
       std::string version = localMap["name"];
 
       // check if we can load the model from the database
-      ConfigMap map = XRockDB::requestModel(domain, name, version);
+      ConfigMap map = db->requestModel(domain, name, version);
       // if the map is empty create the model info
       if(map.empty()) {
         map["domain"] = domain;
@@ -631,7 +638,7 @@ namespace xrock_gui_model {
   }
 
   void ModelLib::loadComponent(std::string domain, std::string modelName, std::string version) {
-    ConfigMap map = XRockDB::requestModel(domain, modelName, version, !version.empty());
+    ConfigMap map = db->requestModel(domain, modelName, version, !version.empty());
     std::cout << "loadComponent: " << map.toJsonString() << std::endl;
     if(importToBagel) {
       mechanicsToBagel(map);
@@ -665,7 +672,7 @@ namespace xrock_gui_model {
             map = it->second;
           }
           else {
-            map = XRockDB::requestModel("mechanics", modelName, std::string("v1"));
+            map = db->requestModel("mechanics", modelName, std::string("v1"));
             modelCache[modelName] = map;
           }
           handleModelMap(model, map, name);
@@ -1301,7 +1308,7 @@ namespace xrock_gui_model {
       QWebView *doc = new QWebView();
       doc->page()->setLinkDelegationPolicy( QWebPage::DelegateAllLinks );
       widget->connect(doc, SIGNAL(linkClicked (const QUrl &)), widget, SLOT(openUrl(const QUrl &)));
-      ConfigMap modelMap = XRockDB::requestModel(domain, name, version, true);
+      ConfigMap modelMap = db->requestModel(domain, name, version, true);
       std::string domainData = domain + "Data";
       if(modelMap["versions"][0].hasKey(domainData)) {
         if(modelMap["versions"][0][domainData].hasKey("data")) {
@@ -1471,7 +1478,7 @@ namespace xrock_gui_model {
 
   void ModelLib::cfgUpdateProperty(mars::cfg_manager::cfgPropertyStruct p) {
     if(p.paramId == dbAddress_paramId) {
-      XRockDB::set_dbAddress(p.sValue);
+      db->set_dbAddress(p.sValue);
     } else if(p.paramId == dbUser_paramId) {
     }
   }

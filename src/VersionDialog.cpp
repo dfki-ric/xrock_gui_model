@@ -1,5 +1,4 @@
 #include "VersionDialog.hpp"
-#include "FileDB.hpp"
 #include "ModelLib.hpp"
 #include <mars/config_map_gui/DataWidget.h>
 #include <mars/utils/misc.h>
@@ -47,7 +46,7 @@ namespace xrock_gui_model {
                                        const std::string &name) {
     selectedDomain = domain;
     selectedModel  = name;
-    std::vector<std::string> versionList = XRockDB::requestVersions(domain, name);
+    std::vector<std::string> versionList = modelLib->db->requestVersions(domain, name);
     versions->clear();
     for (std::vector<std::string>::iterator it = versionList.begin(); it != versionList.end(); ++it) {
       versions->addItem( (*it).c_str() );
@@ -59,7 +58,7 @@ namespace xrock_gui_model {
     if(v.isValid()) {
       selectedVersion = v.toString().toStdString();
       dw->clearGUI();
-      ConfigMap map = XRockDB::requestModel(selectedDomain, selectedModel, selectedVersion);
+      ConfigMap map = modelLib->db->requestModel(selectedDomain, selectedModel, selectedVersion);
       dw->setConfigMap("", map);
     }
   }

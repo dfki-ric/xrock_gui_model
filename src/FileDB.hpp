@@ -8,28 +8,29 @@
 #define XROCK_GUI_MODEL_XROCK_DB_HPP
 
 #include <configmaps/ConfigMap.hpp>
+#include "DBInterface.hpp"
 
 
 namespace xrock_gui_model {
 
-  class XRockDB {
+  class FileDB : public DBInterface {
 
   public:
-    XRockDB();
-    ~XRockDB();
+    FileDB();
+    ~FileDB();
 
-    static std::vector<std::pair<std::string, std::string>> requestModelListByDomain(const std::string &domain);
-    static std::vector<std::string> requestVersions(const std::string &domain, const std::string &model);
-    static configmaps::ConfigMap requestModel(const std::string &domain,
+    std::vector<std::pair<std::string, std::string>> requestModelListByDomain(const std::string &domain);
+    std::vector<std::string> requestVersions(const std::string &domain, const std::string &model);
+    configmaps::ConfigMap requestModel(const std::string &domain,
                                               const std::string &model,
                                               const std::string &version,
                                               const bool limit = false);
-    static bool storeModel(const configmaps::ConfigMap &map);
+    bool storeModel(const configmaps::ConfigMap &map);
 
-    static void set_dbAddress(const std::string &_dbAddress);
+    void set_dbAddress(const std::string &_dbAddress);
 
   private:
-    static std::string dbAddress;
+    std::string dbAddress;
 
 
   };

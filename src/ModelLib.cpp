@@ -9,6 +9,7 @@
 #include "ModelWidget.hpp"
 #include "ImportDialog.hpp"
 #include "FileDB.hpp"
+#include "RestDB.hpp"
 #include "VersionDialog.hpp"
 #include "ConfigureDialog.hpp"
 #include "ConfigMapHelper.hpp"
@@ -55,12 +56,18 @@ namespace xrock_gui_model {
     if(cfg) {
       std::string confDir = ".";
       cfg->getPropertyValue("Config", "config_path", "value", &confDir);
+      env = ConfigMap::fromYamlFile(confDir+"/config_default.yml", true);
       // try to load environment
       if(mars::utils::pathExists(confDir + "/config.yml")) {
-        env = ConfigMap::fromYamlFile(confDir + "/config.yml");
+        env.append(ConfigMap::fromYamlFile(confDir + "/config.yml"));
       }
       env["ConfigDir"] = confDir;
       std::string defaultAddress = "../../../bagel/bagel_db";
+      if(env.hasKey("dbType")) {
+        if(env["dbType"] == "RestDB") {
+          defaultAddress = "localhost:8095/db";
+        }
+      }
       mars::utils::handleFilenamePrefix(&defaultAddress, confDir);
       std::string confDir2 = confDir + "/XRockGUI.yml";
       if(mars::utils::pathExists(confDir2)) {
@@ -70,12 +77,13 @@ namespace xrock_gui_model {
       mars::cfg_manager::cfgPropertyStruct prop_dbAddress;
       prop_dbAddress = cfg->getOrCreateProperty("XRockGUI", "dbAddress",
                                                 defaultAddress, this);
-      prop_dbAddress.sValue = mars::utils::pathJoin(confDir, prop_dbAddress.sValue);
       db = NULL;
-      if(env.hasKey("io_library")) {
-        db = libManager->getLibraryAs<DBInterface>(env["io_library"], true);
+      if(env.hasKey("dbType") and env["dbType"] == "RestDB") {
+        db = new RestDB();
+        //db = libManager->getLibraryAs<DBInterface>(env["io_library"], true);
       }
       if(!db) {
+        prop_dbAddress.sValue = mars::utils::pathJoin(confDir, prop_dbAddress.sValue);
         db = new FileDB();
       }
       db->set_dbAddress(prop_dbAddress.sValue);

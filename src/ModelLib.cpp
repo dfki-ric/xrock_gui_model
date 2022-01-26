@@ -65,7 +65,7 @@ namespace xrock_gui_model {
       std::string defaultAddress = "../../../bagel/bagel_db";
       if(env.hasKey("dbType")) {
         if(env["dbType"] == "RestDB") {
-          defaultAddress = "localhost:8095/db";
+          defaultAddress = "http://localhost:8095/db";
         }
       }
       mars::utils::handleFilenamePrefix(&defaultAddress, confDir);

@@ -13,7 +13,7 @@ namespace xrock_gui_model {
 
 
   RestDB::RestDB() {
-    dbAddress = "localhost:8095";
+    dbAddress = "http://localhost:8095";
     dbUser = "";
     dbPassword = "";
   }
@@ -35,7 +35,7 @@ namespace xrock_gui_model {
 
     //fprintf(stderr, "\nSTART requestModelListByDomain: %s\n\n", domain.c_str());
     fprintf(stderr, "request message: %s\n\n", json_string.c_str());
-    fprintf(stderr, "reqest db: %s\n", dbAddress.c_str());
+    fprintf(stderr, "request db: %s\n", dbAddress.c_str());
     auto r = cpr::Post(cpr::Url{dbAddress},
                        cpr::Body{{json_string}},
                        cpr::Header{{"content-type", "application/json"}});

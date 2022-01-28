@@ -750,7 +750,9 @@ namespace xrock_gui_model {
       defMap.erase("data");
       defMap["data"] = localMap["versions"][0]["defaultConfiguration"]["data"].toYamlString();
     }
-    map["versions"][0]["components"] = components;
+    if(components.hasKey("nodes")) {
+      map["versions"][0]["components"] = components;
+    }
     ConfigMap guiMap;
     if(layoutMap.size() > 0) {
       guiMap["layouts"] = layoutMap;

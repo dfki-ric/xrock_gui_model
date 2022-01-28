@@ -63,12 +63,12 @@ namespace xrock_gui_model {
       }
       env["ConfigDir"] = confDir;
       std::string defaultAddress = "../../../bagel/bagel_db";
+      mars::utils::handleFilenamePrefix(&defaultAddress, confDir);
       if(env.hasKey("dbType")) {
         if(env["dbType"] == "RestDB") {
           defaultAddress = "http://localhost:8095/db";
         }
       }
-      mars::utils::handleFilenamePrefix(&defaultAddress, confDir);
       std::string confDir2 = confDir + "/XRockGUI.yml";
       if(mars::utils::pathExists(confDir2)) {
         cfg->loadConfig(confDir2.c_str());

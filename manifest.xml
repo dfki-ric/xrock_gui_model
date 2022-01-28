@@ -9,4 +9,5 @@
   <depend package="bagel/osg_graph_viz" />
   <depend package="simulation/mars/common/utils" />
   <depend package="simulation/mars/common/cfg_manager" />
+  <depend package="python-markdown" />
 </package>

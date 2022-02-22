@@ -103,7 +103,9 @@ namespace xrock_gui_model {
     request["dbRequest2"]["password"] = dbPassword;
     request["dbRequest2"]["domain"] = mars::utils::toupper(domain);
     request["dbRequest2"]["name"] = model;
-    request["dbRequest2"]["version"] = version;
+    if(version.size() > 0) {
+      request["dbRequest2"]["version"] = version;
+    }
 
     std::string json_string = request.toJsonString();
 
@@ -141,7 +143,6 @@ namespace xrock_gui_model {
     for(int i = 0; i < model["versions"].size(); ++i) {
       model["versions"][i]["date"] = date;
     }
-
     ConfigMap request;
     //request["dbInsert"]["id"] = 1;
     request["dbInsert"]["username"] = dbUser;
@@ -151,7 +152,7 @@ namespace xrock_gui_model {
 
     std::string json_string = request.toJsonString();
     //std::cout << "storeModel: " << map.toJsonString() << std::endl;
-    //fprintf(stderr, "request message: %s\n\n", json_string.c_str());
+    fprintf(stderr, "request message: %s\n\n", json_string.c_str());
     try {
       auto r = cpr::Post(cpr::Url{dbAddress},
                          cpr::Body{{json_string}},

@@ -4,6 +4,35 @@ import os
 import sys
 import yaml
 import datetime as dt
+import argparse
+import xdbi.factory
+from xtypes.component_model import ComponentModel
+from xtypes.drock_enums import InterfaceDirection
+
+config = {
+    'backend':'yamldb',
+    'url':'localhost:8183',
+    'graph':'graph_production',
+    'type2uri':{
+        'SOFTWARE':{
+            'system_modelling::task_graph::Task':'https://www.rock-robotics.org/documentation/orogen/task_interface.html'
+        }
+    },
+    'versionName': "v0.0.1"
+}
+
+parser = argparse.ArgumentParser(description='The XDBI Proxy serves as an interface between D-Rock and Q-Rock tools and databases')
+parser.add_argument('--modelname', help="Name of the model to update in the database", default=None)
+parser.add_argument('--backend', help="Backend to be used [%(default)s]", choices=xdbi.factory.get_backends().keys(), default=config['backend'])
+parser.add_argument('--server_url', help="URL to the graph database server", default=config['url'])
+parser.add_argument('--graph_name', help="The name of the graph to import to", default=config['graph'])
+parser.add_argument('--version_name', help="The version name to set by default", default=None)
+parser.add_argument('--auto_increase_version', help="[UNTESTED] Automatically increases the version, if interfaces have been removed", default=False, action="store_true")
+args = None
+try:
+    args = parser.parse_args()
+except SystemExit:
+    sys.exit(1)
 
 def makeDir(path):
     try:
@@ -21,9 +50,12 @@ if "AUTOPROJ_CURRENT_ROOT" in os.environ:
     path = os.path.join(os.environ["AUTOPROJ_CURRENT_ROOT"],
                           "install", "share", "orogen", "models")
 
+if args.auto_increase_version:
+    print("WARNING: The option auto_increase_version is untested and probalby not fully implemented")
+
 files = []
-if len(sys.argv) > 1:
-    modelName = os.path.join(path, sys.argv[1])
+if args.modelname is not None:
+    modelName = os.path.join(path, args.modelname)
     if os.path.exists(modelName):
         files.append(modelName)
     elif os.path.exists(modelName+".yml"):
@@ -38,19 +70,49 @@ else:
             if name[-4:] == ".yml":
                 files.append(os.path.join(filepath,name))
 
-versionName = "v0.0.1"
-if len(sys.argv) > 2:
-    versionName = sys.argv[2]
+if args.version_name is None:
+    versionName = config["versionName"]
+else:
+    versionName = args.version_name
+
+print(f"Connect to server {args.server_url} using graph {args.graph_name} via {args.backend}")
+dbb = xdbi.factory.create_backend(args.backend, server_url=args.server_url, graph_name=args.graph_name)
 
 for ymlFile in files:
     model = {}
     with open(ymlFile, "r") as f:
-        model = yaml.load(f.read())
+        model = yaml.safe_load(f.read())
     for key1,value1 in model.items():
         for key2,value2 in value1.items():
+            modelName = key1+"::"+key2
+            if args.auto_increase_version:
+                if "inputPorts" in value2:
+                    new_inputs = [port["Name"]+"#"+port["Type"] for port in value2["inputPorts"]]
+                else:
+                    new_inputs = []
+                if "outputPorts" in value2:
+                    new_outputs = [port["Name"]+"#"+port["Type"] for port in value2["outputPorts"]]
+                else:
+                    new_outputs = []
+                # To determine the version we compare whether ports have changed respective to the previous version
+                former_models = dbb.find(classname="", properties={'name': modelName})
+                former_models = sorted(former_models, key=lambda x: x.version, reverse=True)
+                latest_version = former_models[0].version
+                former_inputs = []
+                former_outputs = []
+                former_properties = []
+                for _fmi in former_models[0].interfaces:
+                    fmi = _fmi.target
+                    if fmi.direction == InterfaceDirection.INCOMING or fmi.direction == InterfaceDirection.BIDIRECTIONAL:
+                        former_inputs += [fmi.name+"#"+fmi.type]
+                    if fmi.direction == InterfaceDirection.OUTGOING or fmi.direction == InterfaceDirection.BIDIRECTIONAL:
+                        former_outputs += [fmi.name+"#"+fmi.type]
+                if len(set(former_inputs) - set(new_inputs)) > 0 or len(set(former_outputs) - set(new_outputs)) and args.version_name is None:
+                    major, minor, patch = latest_version[1:].split(".")
+                    versionName = "v"+".".join(major, str(int(minor)+1), patch)
+                    print("Setting new version", versionName, "for", modelName)
             exportModel = {"domain": "SOFTWARE", "type": "system_modelling::task_graph::Task", "versions": [{"date": now, "name": versionName, "interfaces": []}]}
             data = {"framework": "Rock"}
-            modelName = key1+"::"+key2
             exportModel["name"] = modelName
             if "inputPorts" in value2:
                 for port in value2["inputPorts"]:
@@ -63,7 +125,8 @@ for ymlFile in files:
             if "properties" in value2:
                 data["properties"] = value2["properties"]
             exportModel["versions"][0]["softwareData"] = {"data": yaml.dump(data)}
-            os.system("rm export.yml")
+            if os.path.isfile("export.yml"):
+                os.system("rm export.yml")
             os.system("oroconf extract " + modelName + " --save=export.yml")
             lines = []
             if os.path.exists("export.yml"):
@@ -80,11 +143,28 @@ for ymlFile in files:
                         description += "\\n      " + line.replace('"', '\\"')
                 exportModel["versions"][0]["defaultConfiguration"] = {"data": defaultConfig}
                 exportModel["versions"][0]["softwareData"] = {"data": 'description:\n  markdown: "'+description+'"'}
-            os.system("rm export.yml")
-            modelPath = os.path.join(dbPath, modelName, versionName)
-            makeDir(modelPath)
-            with open(os.path.join(modelPath, "model.yml"), "w") as f:
-                      f.write(yaml.dump(exportModel))
+                os.system("rm export.yml")
+            # Before we can properly insert/update the (new) model, we have to perform type2uri conversion
+            dom = exportModel['domain']
+            t = exportModel['type']
+            if dom in config['type2uri']:
+                if t in config['type2uri'][dom]:
+                    exportModel['type'] = config['type2uri'][dom][t]
+            # Before we can completely load the given component model, we have to find any part models!
+            serialized_model = yaml.dump(exportModel)
+            needed_part_models = ComponentModel.extract_part_model_info(serialized_model)
+            full_part_models = []
+            for part_model in needed_part_models:
+                # For proper instantation we need at least ComponentModel -> Interface -> InterfaceModel. So this means recursion depth >= 2
+                full_models = dbb.find(classname="", properties={'uuid':part_model.uuid()}, limit_recursion=True, recursion_depth=3)
+                for full_model in full_models:
+                    full_part_models.append(full_model)
+            # import from YAML and export to DB
+            models = ComponentModel.importFromYAML(serialized_model, full_part_models)
+            # 20210113: Use new update method to update component models
+            for model in models:
+                dbb.update(model, recursion_limit=3)
+
 
 if len(files) > 0:
     os.system("recreate_info_yml " + dbPath)

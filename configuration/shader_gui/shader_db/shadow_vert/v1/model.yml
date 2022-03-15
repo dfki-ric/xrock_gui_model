@@ -1,0 +1,10 @@
+domain: SHADER
+name: shadow_vert
+type: vertex
+versions:
+- date: '2021-12-21'
+  name: v1
+  interfaces:
+  - {direction: INCOMING, name: viewPos, type: vec4}
+  softwareData:
+    data: "description:\n  markdown: \"# brief\\n\\nThis shader is a abstract one that is replaced depending on the selected shadow technique.\n"

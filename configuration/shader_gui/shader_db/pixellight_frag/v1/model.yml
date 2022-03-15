@@ -6,6 +6,7 @@ versions:
   interfaces:
   - {direction: INCOMING, name: baseColor, type: vec4}
   - {direction: INCOMING, name: normal, type: vec3}
+  - {direction: INCOMING, name: shadow, type: float}
   - {direction: OUTGOING, name: shadedColor, type: vec4}
   name: v1
   defaultConfiguration:

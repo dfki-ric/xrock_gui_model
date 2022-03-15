@@ -135,6 +135,14 @@ models:
     versions:
       - name: v1
     type: fragment
+  - name: shadow
+    versions:
+      - name: v1
+    type: fragment
+  - name: shadow_vert
+    versions:
+      - name: v1
+    type: vertex
   - name: pixellight_full_frag
     versions:
       - name: v1

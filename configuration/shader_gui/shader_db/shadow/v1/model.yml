@@ -1,0 +1,10 @@
+domain: SHADER
+name: shadow
+type: fragment
+versions:
+- date: '2021-12-21'
+  interfaces:
+  - {direction: OUTGOING, name: shadow, type: float}
+  name: v1
+  softwareData:
+    data: "description:\n  markdown: \"# brief\\n\\nThis shader is a abstract one that is replaced depending on the selected shadow technique.\n"

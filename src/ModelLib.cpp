@@ -1439,7 +1439,7 @@ namespace xrock_gui_model {
     std::string modelFile = "temp_task_model.yml";
     // 1. get configuration from map
     // 2. store configuration in temp yaml file
-    std::string cmd = "rock-instantiate";
+    std::string cmd = "xrock-resolve-ports";
     if(map.hasKey("softwareData") and map["softwareData"].hasKey("data") and
        map["softwareData"]["data"].hasKey("configuration") and
        map["softwareData"]["data"]["configuration"].hasKey("config")) {
@@ -1477,7 +1477,7 @@ namespace xrock_gui_model {
     std::string version = info["name"];
     versionChangeName << map["name"];
     version += "_" + info["versions"][0]["name"].getString() + "_" + versionChangeName;
-    cmd = "orogen_to_xrock " + modelFile + " " + version;
+    cmd = "orogen_to_xrock --backend yamldb --modelname " + modelFile + " --version_name " + version;
     printf("execute: %s\n", cmd.c_str());
     system(cmd.c_str());
     // 5. switch node to new version

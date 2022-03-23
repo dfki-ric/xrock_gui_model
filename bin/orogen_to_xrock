@@ -27,6 +27,7 @@ parser.add_argument('--backend', help="Backend to be used [%(default)s]", choice
 parser.add_argument('--server_url', help="URL to the graph database server", default=config['url'])
 parser.add_argument('--graph_name', help="The name of the graph to import to", default=config['graph'])
 parser.add_argument('--version_name', help="The version name to set by default", default=None)
+parser.add_argument('--model_file', help="The filename containing the orogen model", default=None)
 parser.add_argument('--auto_increase_version', help="[UNTESTED] Automatically increases the version, if interfaces have been removed", default=False, action="store_true")
 args = None
 try:
@@ -54,7 +55,10 @@ if args.auto_increase_version:
     print("WARNING: The option auto_increase_version is untested and probalby not fully implemented")
 
 files = []
-if args.modelname is not None:
+if args.model_file is not None:
+    if os.path.exists(args.model_file):
+        files.append(args.model_file)  
+elif args.modelname is not None:
     modelName = os.path.join(path, args.modelname)
     if os.path.exists(modelName):
         files.append(modelName)
@@ -62,8 +66,6 @@ if args.modelname is not None:
         files.append(modelName+".yml")
     elif os.path.exists(modelName+"::Task.yml"):
         files.append(modelName+"::Task.yml")
-    elif os.path.exists(sys.argv[1]):
-        files.append(sys.argv[1])
 else:
     for (filepath, dirnames, filenames) in os.walk(path):
         for name in filenames:
@@ -77,6 +79,8 @@ else:
 
 print(f"Connect to server {args.server_url} using graph {args.graph_name} via {args.backend}")
 dbb = xdbi.factory.create_backend(args.backend, server_url=args.server_url, graph_name=args.graph_name)
+
+print("Found files to convert: " + str(files))
 
 for ymlFile in files:
     model = {}

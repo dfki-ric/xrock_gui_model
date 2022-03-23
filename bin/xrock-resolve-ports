@@ -1,0 +1,127 @@
+#! /usr/bin/ruby
+
+require 'orogen_model_exporter'
+require 'rock/bundle'
+require 'optparse'
+
+options = {}
+optparse = OptionParser.new do |opts|
+	opts.banner = 
+"""Usage: rock-instantiate [options] <TASK_MODEL_NAME> <CONFIG_SECTIONS>
+
+Instantiates a task model with a configuration and exports its oroGen component
+model after applying the configuration.
+
+    TASK_MODEL_NAME     Name of the model that should be instatiated. e.g. 
+                        'joint_dispatcher::Task'
+    CONFIG_SECTION      Comma-separated list of config sections to apply to the 
+                        task model. It is assumed, that a matching config file
+                        is available in the currently active bundle.
+                        E.g.: 'section1,section2'
+
+Options:
+"""  
+
+	opts.on("-o FILEPATH", "--output_file=FILEPATH", "Specify output file to "+
+		                   "write model to. If not given, the resulting YAML "+
+		                   "string will be writen to STDOUT") do |of|
+	        options[:output_file] = of
+        end
+	opts.on("-c CONFIGFILE", "--config_file=CONFIGFILE", "Specify config file to load.") do |of|
+		options[:config_file] = of
+	end
+end
+
+optparse.parse!
+
+if ARGV.empty?
+	puts "ERROR: Not enough arguments"
+	puts ""
+	puts optparse
+	exit(-1)
+end
+
+begin
+	options[:task_model_name] = ARGV[0]
+	options[:configs] = ARGV[1].split(',')
+
+	if not options[:task_model_name]
+		raise "No task model name given"
+	end
+	if not options[:configs]
+		raise "No configs given"
+	end
+rescue
+	puts optparse
+	exit(-1)
+end
+
+puts "Selected options:"
+puts options
+puts
+
+def update_model(task)
+	model = task.model
+	task.each_port do |p|
+		if p.is_a? Orocos::OutputPort
+			begin
+				model.output_port p.name, p.orocos_type_name
+			rescue ArgumentError => ex
+				next
+			end
+		elsif p.is_a? Orocos::InputPort
+			begin
+				model.input_port p.name, p.orocos_type_name
+
+			rescue ArgumentError => ex
+				next
+			end
+		else
+			throw "Unexpected Error"
+		end
+	end
+	return self
+end
+
+
+Bundles.public_logs = false
+Bundles.initialize
+
+begin
+	cname = options[:task_model_name]+"__"+options[:configs].join
+	Orocos.run options[:task_model_name] => cname, 
+	           :output => '/tmp/rock-instantiate.log',
+	           :oro_logfile => '/tmp/rock-instantiate-oro.log' do
+		inst = Orocos.get cname
+		begin
+	          if options[:config_file]
+		    Orocos.apply_conf(inst, options[:config_file], options[:configs], true)
+                  else 
+		    Orocos.conf.apply(inst, options[:configs], true)
+                  end
+		  inst.configure
+		rescue ArgumentError => err
+			puts "ERROR: Could not configure Task Context with config sections: " +
+			options[:configs].to_s() + ". The following Error was reported: \n"
+			puts err
+			exit(-2)
+		end
+
+		model = update_model(inst)
+		yaml = export_orogen_to_yaml(inst.model)
+
+		if options[:output_file]
+			f = open(options[:output_file], 'w')
+			f.write(yaml)
+			f.close
+		else
+			print yaml
+		end
+	end
+rescue ArgumentError => err
+	puts "ERROR: Could not start Task Context of model " + options[:task_model_name]+
+	". The following Error was reported: \n"
+	puts err
+	exit(-2)
+end
+

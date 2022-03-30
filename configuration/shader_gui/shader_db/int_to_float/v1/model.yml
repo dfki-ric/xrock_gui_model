@@ -1,0 +1,11 @@
+domain: SHADER
+name: int_to_float
+type: fragment
+versions:
+- date: 2017-06-19 14:50:56.765118
+  interfaces:
+  - {direction: INCOMING, name: int_value, type: int}
+  - {direction: OUTGOING, name: value, type: float}
+  name: v1
+  defaultConfiguration:
+    data: "data:\n  inputs:\n    input: 0\n"

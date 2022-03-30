@@ -1,0 +1,20 @@
+domain: SHADER
+name: read_matrix4x4
+type: vertex
+versions:
+  - name: v1
+    shaderData:
+      data: "gui:\n  layouts:\n    frag_layout:\n      view:\n        scale: 1\n        x: -960\n        y: -540\n  defaultLayout: frag_layout\n"
+    maturity: INPROGRESS
+    date: 2019-03-29T16:28:59
+    interfaces:
+      - {direction: INCOMING, name: texture, type: sampler2D}
+      - {direction: INCOMING, name: index, type: float}
+      - {direction: INCOMING, name: resolution, type: vec2}
+      - {direction: INCOMING, name: skip, type: float}
+      - {direction: INCOMING, name: offset, type: float}
+      - {direction: OUTGOING, name: matrix, type: mat4}
+    components:
+      {}
+    defaultConfiguration:
+      data: "data:\n  inputs:\n    index: 0\n    resolution: vec2(256, 256)\n    skip: 1\n    offset: 0"

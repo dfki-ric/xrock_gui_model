@@ -47,6 +47,14 @@ models:
       - name: v1
     type: fragment
     name: float
+  - versions:
+      - name: v1
+    type: fragment
+    name: int
+  - versions:
+      - name: v1
+    type: fragment
+    name: int_to_float
   - type: fragment
     name: fragInfo
     versions:
@@ -269,6 +277,18 @@ models:
     type: fragment
   - type: fragment
     name: mult_vec4
+    versions:
+      - name: v1
+  - name: mult_vec3_mat4
+    type: vertex
+    versions:
+      - name: v1
+  - name: mult_vec4_mat4
+    type: vertex
+    versions:
+      - name: v1
+  - name: read_matrix4x4
+    type: vertex
     versions:
       - name: v1
   - name: math_mult

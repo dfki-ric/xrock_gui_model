@@ -315,3 +315,19 @@ models:
     type: fragment
     versions:
       - name: v1
+  - name: default_vertex_shader
+    type: vertex
+    versions:
+      - name: v0.1
+  - name: default_fragment_shader
+    type: SHADER
+    versions:
+      - name: " "
+  - name: default_diffuseMap_fragment_shader
+    type: SHADER
+    versions:
+      - name: " "
+  - name: heightmap_fragment_shader
+    type: SHADER
+    versions:
+      - name: " "

@@ -1,7 +1,7 @@
 /**
  * \file RestDB.hpp
  * \author Malte Langosz
- * \brief Fuctions to communicate with the database
+ * \brief Functions to communicate with the database
  **/
 
 #ifndef XROCK_GUI_MODEL_REST_DB_HPP

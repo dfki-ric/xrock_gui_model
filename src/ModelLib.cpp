@@ -9,7 +9,7 @@
 #include "ModelWidget.hpp"
 #include "ImportDialog.hpp"
 #include "FileDB.hpp"
-//#include "RestDB.hpp"
+#include "RestDB.hpp"
 #include "VersionDialog.hpp"
 #include "ConfigureDialog.hpp"
 #include "ConfigMapHelper.hpp"
@@ -65,9 +65,9 @@ namespace xrock_gui_model {
       std::string defaultAddress = "../../../bagel/bagel_db";
       mars::utils::handleFilenamePrefix(&defaultAddress, confDir);
       if(env.hasKey("dbType")) {
-        /*if(env["dbType"] == "RestDB") {
+        if(env["dbType"] == "RestDB") {
           defaultAddress = "http://localhost:8095/db";
-          }*/
+        }
       }
       std::string confDir2 = confDir + "/XRockGUI.yml";
       if(mars::utils::pathExists(confDir2)) {
@@ -79,7 +79,7 @@ namespace xrock_gui_model {
                                                 defaultAddress, this);
       db = NULL;
       if(env.hasKey("dbType") and env["dbType"] == "RestDB") {
-        // db = new RestDB();
+        db = new RestDB();
         //db = libManager->getLibraryAs<DBInterface>(env["io_library"], true);
       }
       if(!db) {
@@ -93,11 +93,11 @@ namespace xrock_gui_model {
     bagelGui = libManager->getLibraryAs<BagelGui>("bagel_gui");
     if(bagelGui) {
       model = new Model(bagelGui);
-      std::vector<std::pair<std::string, std::string>> models = db->requestModelListByDomain("software");
-      for(auto it: models) {
-        ConfigMap modelMap = db->requestModel("software", it.first, "");
-        model->addNodeInfo(modelMap);
-      }
+      // std::vector<std::pair<std::string, std::string>> models = db->requestModelListByDomain("software");
+      // for(auto it: models) {
+      //   ConfigMap modelMap = db->requestModel("software", it.first, it.second);
+      //   model->addNodeInfo(modelMap);
+      // }
       bagelGui->addModelInterface("xrock", model);
       bagelGui->createView("xrock", "Model");
       bagelGui->addPlugin(this);
@@ -1477,7 +1477,7 @@ namespace xrock_gui_model {
     std::string version = info["name"];
     versionChangeName << map["name"];
     version += "_" + info["versions"][0]["name"].getString() + "_" + versionChangeName;
-    cmd = "orogen_to_xrock --backend yamldb --modelname " + modelFile + " --version_name " + version;
+    cmd = "orogen_to_xrock --backend yamldb --modelname " + map["modelName"].getString() + " --model_file " + modelFile + " --version_name " + version;
     printf("execute: %s\n", cmd.c_str());
     system(cmd.c_str());
     // 5. switch node to new version

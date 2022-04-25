@@ -23,7 +23,7 @@ pkg_check_modules(PKGCONFIG REQUIRED
           main_gui
           config_map_gui
           cfg_manager
-          #cpr
+          cpr
 )
 
 include_directories(${PKGCONFIG_INCLUDE_DIRS})
@@ -43,7 +43,7 @@ set(SOURCES
   src/ConfigureDialog.cpp
   src/ConfigMapHelper.cpp
   src/FileDB.cpp
-  #src/RestDB.cpp
+  src/RestDB.cpp
 )
 
 set(HEADERS
@@ -55,7 +55,7 @@ set(HEADERS
   src/ConfigureDialog.hpp
   src/ConfigMapHelper.hpp
   src/FileDB.hpp
-  #src/RestDB.hpp
+  src/RestDB.hpp
 )
 
 set (QT_MOC_HEADER

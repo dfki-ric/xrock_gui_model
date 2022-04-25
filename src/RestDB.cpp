@@ -47,7 +47,7 @@ namespace xrock_gui_model {
     if(result["results"].isVector()) {
       for(int i=0; i < result["results"].size(); ++i) {
         std::string modelName = result["results"][i]["name"];
-        std::string type = result["results"][i]["type"];
+        std::string type = result["results"][i]["versions"][0]["name"];
         modelList.push_back(std::make_pair(modelName, type));
         fprintf(stderr, "modelName: %s\n", modelName.c_str());
       }

@@ -44,7 +44,6 @@ set(SOURCES
   src/ConfigMapHelper.cpp
   src/FileDB.cpp
   src/RestDB.cpp
-  src/Api.cpp
 )
 
 set(HEADERS
@@ -57,7 +56,7 @@ set(HEADERS
   src/ConfigMapHelper.hpp
   src/FileDB.hpp
   src/RestDB.hpp
-  src/Api.hpp
+
 )
 
 set (QT_MOC_HEADER

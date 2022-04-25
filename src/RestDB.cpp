@@ -8,7 +8,7 @@
 using namespace configmaps;
 
 #include <nlohmann/json.hpp>
-#define LOG(txt) std::cout << __FILE__ << ": " << __LINE__ << txt << std::endl
+
 
 namespace xrock_gui_model
 {
@@ -35,12 +35,11 @@ namespace xrock_gui_model
     ConfigMap props;
     props["domain"] = mars::utils::toupper(domain);
     dbRequest["properties"] = props;
-    // LOG("dbRequest => " << dbRequest.toJsonString());
+    fprintf(stderr, "request db: %s\n", dbAddress.c_str());
 
     auto r = cpr::Post(cpr::Url{dbAddress},
                        cpr::Body{{dbRequest.toJsonString()}},
                        cpr::Header{{"content-type", "application/json"}});
-    // LOG("response => " << r.text);
 
     ConfigMap response = ConfigMap::fromJsonString(r.text);
     if (response["status"].getString() == "finished")
@@ -53,11 +52,11 @@ namespace xrock_gui_model
         std::string name = model["name"].getString();
         // LOG("name " << name);
         result.push_back(std::make_pair(name, type));
-        // std::cout << name << ", " << type << std::endl;
+                fprintf(stderr, "modelName: %s\n", name.c_str());
       }
     }
     else
-      LOG("response error: => " << response["error"].getString());
+      fprintf(stderr, "response error: => %s", response["error"].getString().c_str());
     return result;
   }
 
@@ -73,21 +72,18 @@ namespace xrock_gui_model
     props["domain"] = mars::utils::toupper(domain);
     dbRequest["properties"] = props;
 
-    LOG("OK");
     auto r = cpr::Post(cpr::Url{dbAddress},
                        cpr::Body{{dbRequest.toJsonString()}},
                        cpr::Header{{"content-type", "application/json"}});
     // LOG("response => " << r.text);
-    LOG("OK");
 
     ConfigMap response = ConfigMap::fromJsonString(r.text);
-    LOG("OK");
     if (response["status"].getString() == "finished")
     {
-      LOG("OK");
+
       for (auto &model_str : response["result"])
       {
-        LOG("OK");
+  
         ConfigMap model = ConfigMap::fromYamlString(model_str.toString());
         for (auto &version_yml : model["versions"])
         {
@@ -98,7 +94,7 @@ namespace xrock_gui_model
       }
     }
     else
-      LOG("response error: => " << response["error"].getString());
+      fprintf(stderr, "response error: => %s", response["error"].getString().c_str());
 
     return result;
   }
@@ -120,14 +116,13 @@ namespace xrock_gui_model
       props["version"] = version;
     }
     dbRequest["properties"] = props;
-
+    fprintf(stderr, "\nSTART requestModel: %s %s %s\n\n", domain.c_str(), model.c_str(), version.c_str());
     auto r = cpr::Post(cpr::Url{dbAddress},
                        cpr::Body{{dbRequest.toJsonString()}},
                        cpr::Header{{"content-type", "application/json"}});
-    LOG("OK");
-
+ 
+     fprintf(stderr, "response: %s\n\n", r.text.c_str());
     ConfigMap response = ConfigMap::fromJsonString(r.text);
-    LOG("OK");
     if (response["status"].getString() == "finished")
     {
 
@@ -135,15 +130,14 @@ namespace xrock_gui_model
       {
         // fprintf(stderr, "error in database result\n");
         // fprintf(stderr, "\nEND requestModel \n\n");
-        LOG("OK");
+  
 
         return ConfigMap();
       }
     }
     else
-      LOG("response error: => " << response["error"].getString());
+      fprintf(stderr, "response error: => %s", response["error"].getString().c_str());
 
-    LOG("OK");
 
     auto result = ConfigMap::fromYamlString(response["result"][0].getString());
     // fprintf(stderr, "\nEND requestModel \n\n");

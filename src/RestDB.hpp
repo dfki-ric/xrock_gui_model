@@ -8,6 +8,8 @@
 #define XROCK_GUI_MODEL_REST_DB_HPP
 
 #include <configmaps/ConfigMap.hpp>
+#include <xdbi/Client.hpp>
+#include <memory>
 #include "DBInterface.hpp"
 
 namespace xrock_gui_model {
@@ -29,13 +31,12 @@ namespace xrock_gui_model {
     virtual void set_dbAddress(const std::string &_dbAddress);
     virtual void set_dbUser(const std::string &_dbUser);
     virtual void set_dbPassword(const std::string &_dbPassword);
+    virtual void set_dbGraph(const std::string &_dbGraph);
 
 
   private:
-    std::string dbAddress;
-    std::string dbUser;
-    std::string dbPassword;
-    
+    std::unique_ptr<xdbi::Client> client;
+
   };
 } // end of namespace xrock_gui_model
 

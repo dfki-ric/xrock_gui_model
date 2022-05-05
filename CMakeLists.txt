@@ -8,7 +8,7 @@ find_package(lib_manager)
 lib_defaults()
 define_module_info()
 
-add_definitions(-std=c++11)
+add_definitions(-std=c++14)
 set(FILE_DB 1)
 
 set(QT_USE_QTWEBKIT 1)
@@ -23,7 +23,7 @@ pkg_check_modules(PKGCONFIG REQUIRED
           main_gui
           config_map_gui
           cfg_manager
-          cpr
+          xdbi
 )
 
 include_directories(${PKGCONFIG_INCLUDE_DIRS})

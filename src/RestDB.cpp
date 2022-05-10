@@ -61,7 +61,7 @@ namespace xrock_gui_model {
 
     std::vector<XTypePtr> xtypes = client->find("ComponentModel", props.toJsonString());
 
-    return ConfigMap::fromJsonString(std::static_pointer_cast<ComponentModel>(xtypes[0])->exportToJson());
+    return ConfigMap::fromJsonString(std::static_pointer_cast<ComponentModel>(xtypes[0])->exportToBasicModelJSON());
   }
 
 

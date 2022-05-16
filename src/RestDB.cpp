@@ -24,27 +24,15 @@ namespace xrock_gui_model {
   RestDB::~RestDB() {
   }
 
-  std::vector<std::pair<std::string, std::string>> RestDB::requestModelListByDomain(const std::string &domain) {
-    // ToDo as soon as modelDeepness is integrated, we can simplify this
-    // request["modelDeepness"] = "versionOnly";
-    std::vector<XTypePtr> xtypes = client->getAllByDomain("ComponentModel", domain);
-
-    std::vector<std::pair<std::string, std::string>> modelList;
-    for(auto xtype : xtypes) {
-      std::string modelName = xtype->get_property("name");
-      std::string type = xtype->get_property("type");
-      modelList.push_back(std::make_pair(modelName, type));
-      fprintf(stderr, "modelName: %s\n", modelName.c_str());
-    }
-    //fprintf(stderr, "\nEND requestModelListByDomain \n\n");
-    return modelList;
+  std::vector<std::pair<std::string, std::string>> RestDB::requestModelListByDomain(const std::string& domain) {
+    return client->requestModelListByDomain("ComponentModel", mars::utils::toupper(domain));
   }
 
 
-  std::vector<std::string> RestDB::requestVersions(const std::string &domain, const std::string &model) {
+  std::vector<std::string> RestDB::requestVersions(const std::string& domain, const std::string &model) {
     // ToDo as soon as modelDeepness is integrated, we can simplify this
     // request["modelDeepness"] = "versionOnly";
-    return client->requestVersions("ComponentModel", domain, model);
+    return client->requestVersions("ComponentModel", mars::utils::toupper(domain), model);
   }
 
 

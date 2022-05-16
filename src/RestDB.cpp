@@ -14,10 +14,10 @@ namespace xrock_gui_model {
 
   RestDB::RestDB() {
     client = std::make_unique<xdbi::Client>();
-    client->setDbAddress("http://localhost:8095");
+    client->setDbAddress("http://localhost:8183");
     client->setDbUser("");
     client->setDbPassword("");
-    client->setDefaultGraph("graph_production");
+    client->setDefaultGraph("graph_test");
   }
 
 

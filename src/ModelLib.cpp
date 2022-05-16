@@ -1477,7 +1477,7 @@ namespace xrock_gui_model {
     std::string version = info["name"];
     versionChangeName << map["name"];
     version += "_" + info["versions"][0]["name"].getString() + "_" + versionChangeName;
-    cmd = "orogen_to_xrock --backend yamldb --modelname " + map["modelName"].getString() + " --model_file " + modelFile + " --version_name " + version;
+    cmd = "orogen_to_xrock --modelname " + map["modelName"].getString() + " --model_file " + modelFile + " --version_name " + version;
     printf("execute: %s\n", cmd.c_str());
     system(cmd.c_str());
     // 5. switch node to new version

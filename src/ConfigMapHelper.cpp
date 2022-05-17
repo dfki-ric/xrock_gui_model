@@ -10,7 +10,7 @@ namespace xrock_gui_model {
       target["submodel"][i]["name"] = it["name"];
       if(it.hasKey("data")) {
         try {
-          target["submodel"][i]["data"] = ConfigMap::fromYamlString(it["data"]);
+          target["submodel"][i]["data"] = it["data"];
         }
         catch (...) {
           fprintf(stderr, "ERROR: unpack submodel\n");

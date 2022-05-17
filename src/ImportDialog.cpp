@@ -149,7 +149,7 @@ namespace xrock_gui_model {
     doc->setHtml("");
     if(map["versions"][0].hasKey(domainData)) {
       if(map["versions"][0][domainData].hasKey("data")) {
-        ConfigMap dataMap = ConfigMap::fromYamlString(map["versions"][0][domainData]["data"]);
+        ConfigMap dataMap = map["versions"][0][domainData]["data"];
         if(dataMap.hasKey("description")) {
           if(dataMap["description"].hasKey("markdown")) {
             std::string md = dataMap["description"]["markdown"];

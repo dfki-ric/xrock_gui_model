@@ -513,7 +513,7 @@ namespace xrock_gui_model {
       map["versions"][0]["maturity"] = "INPROGRESS";
       ConfigMap config;
       if(map["versions"][0]["defaultConfiguration"].hasKey("data")) {
-        config = ConfigMap::fromYamlString(map["versions"][0]["defaultConfiguration"]["data"]);
+        config = map["versions"][0]["defaultConfiguration"]["data"];
       }
       config["config"]["graphFilename"] = graphFile;
       map["versions"][0]["defaultConfiguration"]["data"] = config.toYamlString();
@@ -706,7 +706,7 @@ namespace xrock_gui_model {
     // check if we have links in data
     if(map["versions"][0].hasKey("mechanicsData") &&
        map["versions"][0]["mechanicsData"].hasKey("data")) {
-      ConfigMap data = ConfigMap::fromYamlString(map["versions"][0]["mechanicsData"]["data"]);
+      ConfigMap data = map["versions"][0]["mechanicsData"]["data"];
       if(data.hasKey("bagel_control")) {
         std::string bagelControl = data["bagel_control"];
         if(!model->hasNodeInfo(bagelControl)) {
@@ -1320,7 +1320,7 @@ namespace xrock_gui_model {
       std::string domainData = domain + "Data";
       if(modelMap["versions"][0].hasKey(domainData)) {
         if(modelMap["versions"][0][domainData].hasKey("data")) {
-          ConfigMap dataMap = ConfigMap::fromYamlString(modelMap["versions"][0][domainData]["data"]);
+          ConfigMap dataMap = modelMap["versions"][0][domainData]["data"];
           if(dataMap.hasKey("description")) {
             if(dataMap["description"].hasKey("markdown")) {
               std::string md = dataMap["description"]["markdown"];

@@ -252,16 +252,25 @@ namespace xrock_gui_model {
       if(model["versions"][versionIndex][domain+"Data"].hasKey("data")) {
         info.map[domain+"Data"]= model["versions"][versionIndex][domain+"Data"];
         // unpack the data string for the gui
-        info.map[domain+"Data"]["data"] = model["versions"][versionIndex][domain+"Data"]["data"];
+        if (model["versions"][versionIndex][domain+"Data"]["data"].isMap())
+          info.map[domain+"Data"]["data"] = model["versions"][versionIndex][domain+"Data"]["data"];
+        else
+          info.map[domain+"Data"]["data"] = ConfigMap::fromYamlString(model["versions"][versionIndex][domain+"Data"]["data"]);
       }
     }
     if(model["versions"][versionIndex].hasKey("defaultConfiguration") &&
        model["versions"][versionIndex]["defaultConfiguration"].hasKey("data")) {
-      info.map["defaultConfiguration"]["data"] = model["versions"][versionIndex]["defaultConfiguration"]["data"];
+      if (model["versions"][versionIndex][domain+"Data"]["data"].isMap())
+        info.map["defaultConfiguration"]["data"] = model["versions"][versionIndex]["defaultConfiguration"]["data"];
+      else
+        info.map["defaultConfiguration"]["data"] = ConfigMap::fromYamlString(model["versions"][versionIndex]["defaultConfiguration"]["data"]);
     }
     else if(model["versions"][versionIndex].hasKey("defaultConfig") &&
        model["versions"][versionIndex]["defaultConfig"].hasKey("data")) {
-      info.map["defaultConfiguration"]["data"] = model["versions"][versionIndex]["defaultConfig"]["data"];
+      if (model["versions"][versionIndex][domain+"Data"]["data"].isMap())
+        info.map["defaultConfiguration"]["data"] = model["versions"][versionIndex]["defaultConfig"]["data"];
+      else
+        info.map["defaultConfiguration"]["data"] = ConfigMap::fromYamlString(model["versions"][versionIndex]["defaultConfig"]["data"]);
     }
     if(model["versions"][versionIndex].hasKey("components") &&
        model["versions"][versionIndex]["components"].hasKey("configuration") &&

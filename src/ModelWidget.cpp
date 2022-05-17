@@ -338,7 +338,10 @@ namespace xrock_gui_model {
        map["versions"][0][domainData].hasKey("data"))
     {
       myMap["versions"][0][domainData] = map["versions"][0][domainData];
-      myMap["versions"][0][domainData]["data"] = map["versions"][0][domainData]["data"];
+      if (map["versions"][0][domainData]["data"].isMap())
+        myMap["versions"][0][domainData]["data"] = map["versions"][0][domainData]["data"];
+      else
+        myMap["versions"][0][domainData]["data"] = ConfigMap::fromYamlString(map["versions"][0][domainData]["data"]);
     }
 
     if(map["versions"][0].hasKey("maturity")) {
@@ -362,7 +365,10 @@ namespace xrock_gui_model {
 
     if(map["versions"][0].hasKey("defaultConfiguration")) {
       if(map["versions"][0]["defaultConfiguration"].hasKey("data")) {
-        myMap["versions"][0]["defaultConfiguration"]["data"] = map["versions"][0]["defaultConfiguration"]["data"];
+        if (map["versions"][0]["defaultConfiguration"]["data"].isMap())
+          myMap["versions"][0]["defaultConfiguration"]["data"] = map["versions"][0]["defaultConfiguration"]["data"];
+        else
+          myMap["versions"][0]["defaultConfiguration"]["data"] = ConfigMap::fromYamlString(map["versions"][0]["defaultConfiguration"]["data"]);
       }
     }
 
@@ -531,7 +537,10 @@ namespace xrock_gui_model {
         std::string model = (*itConf)["name"];
         if(model == name) {
           if(itConf->hasKey("data")) {
-            data["configuration"] = (*itConf)["data"];
+            if ((*itConf)["data"].isMap())
+              data["configuration"] = (*itConf)["data"];
+            else
+              data["configuration"] = ConfigMap::fromYamlString((*itConf)["data"].getString());
           }
           if(itConf->hasKey("submodel")) {
             ConfigMapHelper::unpackSubmodel(data, (*itConf)["submodel"]);
@@ -587,7 +596,11 @@ namespace xrock_gui_model {
           (*itNodeMap)["interface"] = 1;
           (*itNodeMap)["interfaceExportName"] = (*it2)["name"];
           if(it2->hasKey("data")) {
-            ConfigMap data = (*it2)["data"];
+            ConfigMap data;
+            if ((*it2)["data"].isMap())
+              data = (*it2)["data"];
+            else
+              data = ConfigMap::fromYamlString((*it2)["data"]);
             if(data.hasKey("initValue")) {
               (*itNodeMap)["initValue"] = data["initValue"];
             }
@@ -767,7 +780,10 @@ namespace xrock_gui_model {
     ConfigMap dataMap;
     if(map["versions"][0].hasKey(domainData) &&
        map["versions"][0][domainData].hasKey("data")) {
-      dataMap = map["versions"][0][domainData]["data"];
+      if (map["versions"][0][domainData]["data"].isMap())
+        dataMap = map["versions"][0][domainData]["data"];
+      else
+        dataMap = ConfigMap::fromYamlString(map["versions"][0][domainData]["data"]);
       if(dataMap.hasKey("gui")) {
         dataMap.erase("gui");
         map["versions"][0][domainData]["data"] = dataMap.toYamlString();

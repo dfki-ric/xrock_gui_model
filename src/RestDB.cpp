@@ -69,8 +69,26 @@ namespace xrock_gui_model {
       model["versions"][(int)i]["date"] = date;
     }
 
+    // In xdbi-proxy we set the type property of model via type2uri here
+    // Before we can completely load the given component model, we have to find any part models!
+    std::string serialized_model = model.toJsonString();
+    std::vector<ComponentModelPtr> needed_part_models = ComponentModel::extract_part_model_info(serialized_model);
+    std::vector<ComponentModelPtr> full_part_models{};
+    for (const auto& part_model : needed_part_models) {
+        // For proper instantation we need at least ComponentModel -> Interface -> InterfaceModel. So this means recursion depth >= 2
+        std::vector<XTypePtr> full_models = client->find("ComponentModel", nl::json{{"uuid", std::to_string(part_model->uuid())}});//, limit_recursion=True, recursion_depth=3)
+        for (const auto& full_model : full_models){
+            full_part_models.push_back(std::static_pointer_cast<ComponentModel>(full_model));
+          }
+    }
+    // # import from JSON and export to DB
+    std::vector<ComponentModelPtr> models = ComponentModel::importFromBasicModelJSON(serialized_model, full_part_models);
+    std::vector<XTypePtr> db_models{};
+    for (const auto& m : models)
+      db_models.push_back(std::static_pointer_cast<XType>(m));
+
     try {
-      client->update(nl::json::parse(model.toJsonString()));
+      client->update(db_models);
     } catch (...) {
         fprintf(stderr, "ERROR: Problem with database communication\n");
         return false;

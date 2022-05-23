@@ -13,6 +13,7 @@
 #include <QFileDialog>
 #include <QDateTime>
 #include <QMessageBox>
+#include <QDebug>
 #include <bagel_gui/BagelGui.hpp>
 #include <bagel_gui/BagelModel.hpp>
 #include <mars/utils/misc.h>
@@ -28,7 +29,7 @@ namespace xrock_gui_model {
                            QWidget *parent) :
     mars::main_gui::BaseWidget(parent, cfg, "ModelWidget"), bagelGui(bagelGui),
     mainLib(mainLib) {
-
+    try{
     ignoreUpdate = false;
     QGridLayout *layout = new QGridLayout();
     QVBoxLayout *vLayout = new QVBoxLayout();
@@ -91,7 +92,16 @@ namespace xrock_gui_model {
     layout->addWidget(l, i, 0);
     data = new QTextEdit();
     layout->addWidget(data, i++, 1);
-    connect(data, SIGNAL(textChanged()), this, SLOT(updateModelInfo()));
+
+    dataStatusLabel = new QLabel();
+    dataStatusLabel->setText("valid Yaml syntax");
+    dataStatusLabel->setAlignment(Qt::AlignCenter);
+    if(data)
+    {
+      dataStatusLabel->setStyleSheet("QLabel { background-color: #128260; color: white; }");
+      layout->addWidget(dataStatusLabel, i++, 1);
+      connect(data, SIGNAL(textChanged()), this, SLOT(validateYamlSyntax()));
+    }
 
     l = new QLabel("interfaces");
     layout->addWidget(l, i, 0);
@@ -100,6 +110,7 @@ namespace xrock_gui_model {
     connect(interfaces, SIGNAL(textChanged()), this, SLOT(updateModelInfo()));
     layout->addWidget(interfaces, i++, 1);
     vLayout->addLayout(layout);
+
     vLayout->addStretch();
 
     QGridLayout *gridLayout = new QGridLayout();
@@ -166,6 +177,11 @@ namespace xrock_gui_model {
     xrockConfigFilter.push_back("config_names");
     xrockConfigFilter.push_back("parentName");
     //nodeTypeView->setSelectionMode(QAbstractItemView::SingleSelection);
+    }
+    catch(const std::exception& e)
+    {
+      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+    }
   }
 
   ModelWidget::~ModelWidget(void) {
@@ -208,7 +224,9 @@ namespace xrock_gui_model {
     handleEditionLayout();
   }
 
-  void ModelWidget::layoutsClicked(const QModelIndex &index) {
+  void ModelWidget::layoutsClicked(const QModelIndex &index){
+    
+    try{
     QVariant v = layouts->model()->data(index, 0);
     if(v.isValid()) {
       std::string layout = v.toString().toStdString();
@@ -220,9 +238,17 @@ namespace xrock_gui_model {
       //bagelGui->loadLayout(layout);
       bagelGui->applyLayout(layoutMap[currentLayout]);
     }
+    }
+    catch(const std::exception& e)
+    {
+      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+    }
   }
 
-  void ModelWidget::addRemoveLayout() {
+
+
+  void ModelWidget::addRemoveLayout(){
+    try{
     std::string name = layoutName->text().toStdString();
     for(int i=0; i<layouts->count(); ++i) {
       QVariant v = layouts->item(i)->data(0);
@@ -256,6 +282,13 @@ namespace xrock_gui_model {
     //bagelGui->saveLayout(currentLayout + ".yml");
     updateModelInfo();
   }
+  
+    catch(const std::exception& e)
+    {
+      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+    }
+  }
+
 
   void ModelWidget::updateCurrentLayout() {
     if(!currentLayout.empty()) {
@@ -264,7 +297,19 @@ namespace xrock_gui_model {
     }
   }
 
-  void ModelWidget::storeModel() {
+  void ModelWidget::storeModel(){
+    // Validate fields
+    //- validate for emptiness for name,domain..etc
+    if(name->text().isEmpty())        { QMessageBox::warning(this, "Warning", "name is empty!",  QMessageBox::Ok); return; };
+    if(type->text().isEmpty())        { QMessageBox::warning(this, "Warning", "type is empty!",  QMessageBox::Ok); return; };
+    if(version->text().isEmpty())     { QMessageBox::warning(this, "Warning", "version is empty!",  QMessageBox::Ok); return; };
+    if(domain->text().isEmpty())      { QMessageBox::warning(this, "Warning", "domain is empty!",  QMessageBox::Ok); return; };
+    if(projectName->text().isEmpty()) { QMessageBox::warning(this, "Warning", "projectName is empty!",  QMessageBox::Ok); return;  }; 
+    if(designedBy->text().isEmpty())  { QMessageBox::warning(this, "Warning", "designedBy is empty!",  QMessageBox::Ok); return;  }; 
+    //- validate data yaml syntax
+    if(dataStatusLabel->text() == "invalid Yaml syntax")  { QMessageBox::warning(this, "Warning", "invalid data yaml syntax!", QMessageBox::Ok); return; }; 
+
+    try {
     updateCurrentLayout();
     ConfigMap map;
     createMap(&map);
@@ -283,21 +328,39 @@ namespace xrock_gui_model {
       message.setText("The model could not be stored!");
     }
     message.exec();
+    }
+    catch(const std::exception& e)
+    {
+      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+    }
   }
 
-  void ModelWidget::requestModel() {
+  void ModelWidget::requestModel(){
+  try{
     mainLib->requestModel();
+    }
+    catch(const std::exception& e)
+    {
+      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+    }
   }
 
-  void ModelWidget::loadModel() {
+
+  void ModelWidget::loadModel(){
+    try{
     QString fileName = QFileDialog::getOpenFileName(NULL,
                                                     QObject::tr("Select Model"),
                                                     bagelGui->getLoadPath().c_str(),
                                                     QObject::tr("Model Files (*.yml)"),0);
     loadModel(fileName.toStdString());
+    }
+    catch(const std::exception& e)
+    {
+      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+    }
   }
-
-  void ModelWidget::loadModel(const std::string &file) {
+  void ModelWidget::loadModel(const std::string &file){
+    try{
     if(mars::utils::pathExists(file)) {
       modelPath = mars::utils::getPathOfFile(file);
       if(modelPath[modelPath.size()-1] != '/') modelPath.append("/");
@@ -306,9 +369,14 @@ namespace xrock_gui_model {
       map["modelPath"] = modelPath;
       loadModel(map);
     }
+  }catch(const std::exception& e)
+  {
+      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+  }
   }
 
-  void ModelWidget::loadModel(ConfigMap &map) {
+  void ModelWidget::loadModel(ConfigMap &map){
+    try{
     ConfigMap myMap;
     if(map.hasKey("modelPath")) {
       modelPath << map["modelPath"];
@@ -416,9 +484,13 @@ namespace xrock_gui_model {
     setModelInfo(myMap);
     updateModelInfo();
     handleEditionLayout();
+  }catch(const std::exception& e)
+  {
+      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+  }
   }
 
-  void ModelWidget::handleEditionLayout() {
+  void ModelWidget::handleEditionLayout() {try{
     // if possible set the layout depending on the edition
     if(!edition.empty()) {
       bool found = false;
@@ -452,13 +524,17 @@ namespace xrock_gui_model {
         updateModelInfo();
       }
     }
+  }catch(const std::exception& e)
+  {
+      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+  }
   }
 
   /*
    * todo:
    *       - how to handle visual properties
    */
-  void ModelWidget::loadGraph(ConfigMap &map) {
+  void ModelWidget::loadGraph(ConfigMap &map){ try{
     //ConfigMap map = ConfigMap::fromYamlFile(file);
     ConfigMap config;
 
@@ -503,9 +579,14 @@ namespace xrock_gui_model {
         bagelGui->addEdge(edge);
       }
     }
+  }catch(const std::exception& e)
+  {
+      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+  }
   }
 
-  void ModelWidget::loadNode(ConfigMap &node, ConfigMap &config) {
+  void ModelWidget::loadNode(ConfigMap &node, ConfigMap &config){
+    try{
     std::string domain = mars::utils::tolower(node["model"]["domain"]);
     std::string name = node["name"];
     std::string origName = node["name"];
@@ -669,18 +750,30 @@ namespace xrock_gui_model {
     if(updateMap) {
       bagelGui->updateNodeMap(name, nodeMap);
     }
+  }catch(const std::exception& e)
+  {
+      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+  }
   }
 
-  ConfigMap ModelWidget::getDefaultConfig(const std::string &domain, const std::string &name, const std::string &version) {
+  ConfigMap ModelWidget::getDefaultConfig(const std::string &domain, const std::string &name, const std::string &version) 
+  {
+    try{
     ConfigMap defaultConfig;
     ConfigMap fullMap = mainLib->db->requestModel(domain, name, version);
     if(fullMap["versions"][0].hasKey("defaultConfiguration")) {
       defaultConfig = fullMap["versions"][0]["defaultConfiguration"];
     }
     return defaultConfig;
+  }catch(const std::exception& e)
+  {
+      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+    return ConfigMap();
+  }
   }
 
-  void ModelWidget::saveModel() {
+  void ModelWidget::saveModel(){try{
+    
     std::string suggestion = name->text().toStdString();
     if(suggestion.size() > 0 and mars::utils::getFilenameSuffix(suggestion) == "") {
       suggestion += ".yml";
@@ -700,9 +793,15 @@ namespace xrock_gui_model {
       createMap(&map);
       map.toYamlFile(file);
     }
+  }catch(const std::exception& e)
+  {
+      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+  }
   }
 
-  void ModelWidget::createMap(ConfigMap *m) {
+  
+    void ModelWidget::createMap(ConfigMap *m) {
+    try{
     ignoreUpdate = true;
     ConfigMap &map = *m;
     map = localMap;
@@ -718,6 +817,7 @@ namespace xrock_gui_model {
     std::string domainData = domainl + "Data";
     std::string t;
     t = mars::utils::trim(data->toPlainText().toStdString());
+    std::cout << "t is " << t << std::endl;
     if(!t.empty()) {
       map["versions"][0][domainData] = ConfigMap::fromYamlString(t);
     }
@@ -780,10 +880,7 @@ namespace xrock_gui_model {
     ConfigMap dataMap;
     if(map["versions"][0].hasKey(domainData) &&
        map["versions"][0][domainData].hasKey("data")) {
-      if (map["versions"][0][domainData]["data"].isMap())
-        dataMap = map["versions"][0][domainData]["data"];
-      else
-        dataMap = ConfigMap::fromYamlString(map["versions"][0][domainData]["data"]);
+      dataMap = ConfigMap::fromYamlString(map["versions"][0][domainData]["data"]);
       if(dataMap.hasKey("gui")) {
         dataMap.erase("gui");
         map["versions"][0][domainData]["data"] = dataMap.toYamlString();
@@ -803,17 +900,26 @@ namespace xrock_gui_model {
     }
     ignoreUpdate = false;
   }
+  catch(const std::exception& e)
+  {
+      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+  }
+  }
 
   void ModelWidget::saveGraph(ConfigMap &output, ConfigMap &interfaceMap,
                               ConfigMap &descriptionMap,
-                              const std::string &saveDomain) {
+                              const std::string &saveDomain){
+      try{                  
     ConfigMap map = bagelGui->createConfigMap();
     ConfigMap config;
     ConfigMap tmpInterfaces;
-    try {
-      tmpInterfaces["i"] = ConfigItem::fromYamlString(interfaces->toPlainText().toStdString());
+   
+    try{  
+      const std::string interfaces_Yaml = interfaces->toPlainText().toStdString();
+      if(!interfaces_Yaml.empty())
+        tmpInterfaces["i"] = ConfigItem::fromYamlString(interfaces_Yaml);
     } catch(...) {
-      fprintf(stderr, "ERROR: cannot load interfaces from text field\n");
+      fprintf(stderr, "ERROR: cannot load interfaces from text field at %s:%d\n", __FILE__, __LINE__);
       tmpInterfaces = ConfigMap();
     }
 
@@ -1021,6 +1127,10 @@ namespace xrock_gui_model {
       output["edges"].push_back(edge);
     }
     //output.toYamlFile("da2.yml");
+  }catch(const std::exception& e)
+  {
+      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+  }
   }
 
   void ModelWidget::clear() {
@@ -1044,7 +1154,8 @@ namespace xrock_gui_model {
 
   void ModelWidget::loadType(const std::string &domain,
                              const std::string &name,
-                             const std::string &version) {
+                             const std::string &version){
+    try{                           
     if(domain == "software" && name == "Deployment") return;
     fprintf(stderr, "check type: %s %s %s\n", domain.c_str(), name.c_str(), version.c_str());
     Model *model = dynamic_cast<Model*>(bagelGui->getCurrentModel());
@@ -1067,9 +1178,14 @@ namespace xrock_gui_model {
         }
       }
     }
+  }catch(const std::exception& e)
+  {
+      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+  }
   }
 
   void ModelWidget::setModelInfo(configmaps::ConfigMap &model) {
+   try{
     ignoreUpdate = true;
     localMap = model;
     type->setText(localMap["type"].getString().c_str());
@@ -1100,9 +1216,15 @@ namespace xrock_gui_model {
       layouts->setCurrentItem(layouts->item(layouts->count()-1));
     }
     ignoreUpdate = false;
+  }catch(const std::exception& e)
+  {
+      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+  }
   }
 
-  void ModelWidget::updateModelInfo() {
+
+  void ModelWidget::updateModelInfo(){
+     try{
     if(ignoreUpdate) return;
     bagel_gui::ModelInterface *model = bagelGui->getCurrentModel();
 
@@ -1152,7 +1274,11 @@ namespace xrock_gui_model {
       model->setModelInfo(localMap);
     }
   }
-
+catch(const std::exception& e)
+  {
+      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+  }
+  }
   void ModelWidget::getModelInfo(std::string *domain, std::string *name,
                                  std::string *version) {
     *name = this->name->text().toStdString();
@@ -1160,7 +1286,7 @@ namespace xrock_gui_model {
     *version = this->version->text().toStdString();
   }
 
-  void ModelWidget::editLocalMap() {
+  void ModelWidget::editLocalMap(){ try{
     ConfigMap env;
     ConfigMap copy = localMap;
     {
@@ -1172,9 +1298,15 @@ namespace xrock_gui_model {
     layoutMap = ConfigMap();
     setModelInfo(copy);
     updateModelInfo();
+  }catch(const std::exception& e)
+  {
+      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+  }
   }
 
-  void ModelWidget::editDescription() {
+
+  void ModelWidget::editDescription(){
+     try{
     ConfigMap env;
     ConfigMap copy = localMap;
     std::string description;
@@ -1196,10 +1328,30 @@ namespace xrock_gui_model {
     }
     localMap["versions"][0][domainData]["data"]["description"]["markdown"] = description;
   }
+  catch(const std::exception& e)
+  {
+      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+  }
+  }
 
   void ModelWidget::openUrl(const QUrl &link) {
     QDesktopServices::openUrl(link);
   }
 
 
-} // end of namespace xrock_gui_model
+  void ModelWidget::validateYamlSyntax()
+  {
+    const std::string data_text = data->toPlainText().toStdString();
+    if(data_text.empty())
+      return;
+    try {
+      ConfigMap tmpMap = ConfigMap::fromYamlString(data_text);
+      dataStatusLabel->setText("valid Yaml syntax");
+      dataStatusLabel->setStyleSheet("QLabel { background-color: #128260; color: white;}");
+    } catch (...) {
+      dataStatusLabel->setText("invalid Yaml syntax");
+      dataStatusLabel->setStyleSheet("QLabel { background-color: red; color: white;}");
+    }
+  }
+
+}// end of namespace xrock_gui_model

@@ -15,6 +15,7 @@
 #include <QLineEdit>
 #include <QTextEdit>
 #include <QCheckBox>
+#include <QLabel>
 
 namespace bagel_gui {
   class BagelGui;
@@ -70,6 +71,7 @@ namespace xrock_gui_model {
     void updateModelInfo();
     void getModelInfo(std::string *domain, std::string *name, std::string *verison);
     void openUrl(const QUrl &);
+    void validateYamlSyntax();
 
   private:
     bagel_gui::BagelGui *bagelGui;
@@ -84,6 +86,7 @@ namespace xrock_gui_model {
     QLineEdit *name, *type, *version, *domain, *layoutName, *maturity;
     QLineEdit *projectName, *designedBy;
     QTextEdit *includes, *data, *interfaces;
+    QLabel *dataStatusLabel;
     configmaps::ConfigMap interfaceMap;
     bool ignoreUpdate;
     std::vector<std::string> xrockConfigFilter;

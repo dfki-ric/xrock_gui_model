@@ -145,19 +145,18 @@ namespace xrock_gui_model {
     //fprintf(stderr, "START ImportDialog::versionChanged()\n\n");
     //fprintf(stderr, "%s\n\n", map.toYamlString().c_str());
     //fprintf(stderr, "END ImportDialog\n\n");
-    std::string domainData = selectedDomain + "Data";
     doc->setHtml("");
-    if(map["versions"][0].hasKey(domainData)) {
-      if(map["versions"][0][domainData].hasKey("data")) {
+    if(map["versions"][0].hasKey("data")) {
+      {
         ConfigMap dataMap;
-        if (map["versions"][0][domainData]["data"].isMap())
-            dataMap = map["versions"][0][domainData]["data"];
+        if (map["versions"][0]["data"].isMap())
+            dataMap = map["versions"][0]["data"];
         else
-            dataMap = ConfigMap::fromYamlString(map["versions"][0][domainData]["data"]);
+            dataMap = ConfigMap::fromYamlString(map["versions"][0]["data"]);
         if(dataMap.hasKey("description")) {
           if(dataMap["description"].hasKey("markdown")) {
             std::string md = dataMap["description"]["markdown"];
-            fprintf(stderr, "convert: %s\n", md.c_str());
+            //fprintf(stderr, "convert: %s\n", md.c_str());
             doc->setHtml(getHtml(md).c_str());
           }
         }

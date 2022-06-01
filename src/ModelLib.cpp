@@ -707,13 +707,12 @@ namespace xrock_gui_model {
       loadNodes(model, cMap, path, &nodesFound);
     }
     // check if we have links in data
-    if(map["versions"][0].hasKey("mechanicsData") &&
-       map["versions"][0]["mechanicsData"].hasKey("data")) {
+    if(map["versions"][0].hasKey("data")) {
       ConfigMap data;
-      if (map["versions"][0]["mechanicsData"]["data"].isMap())
+      if (map["versions"][0]["data"].isMap())
         data = map["versions"][0]["mechanicsData"]["data"];
       else
-        data = ConfigMap::fromYamlString(map["versions"][0]["mechanicsData"]["data"]);
+        data = ConfigMap::fromYamlString(map["versions"][0]["data"]);
       if(data.hasKey("bagel_control")) {
         std::string bagelControl = data["bagel_control"];
         if(!model->hasNodeInfo(bagelControl)) {
@@ -794,19 +793,18 @@ namespace xrock_gui_model {
     ConfigMap node = *(bagelGui->getNodeMap(name));
     ConfigMap config;
     std::string domain = node["domain"];
-    std::string domainData = domain + "Data";
-    if(node[domainData]["data"].hasKey("configuration")) {
-      config = node[domainData]["data"]["configuration"];
+    if(node["data"].hasKey("configuration")) {
+      config = node["data"]["configuration"];
     }
     else if(node.hasKey("defaultConfiguration")) {
-      config = node["defaultConfiguration"]["data"];
+      config = node["defaultConfiguration"];
     }
     {
       ConfigureDialog cd(&config, env, node["modelName"], true, true);
       cd.resize(400, 400);
       cd.exec();
     }
-    node[domainData]["data"]["configuration"] = config;
+    node["data"]["configuration"] = config;
     bagelGui->updateNodeMap(name, node);
   }
 
@@ -814,7 +812,6 @@ namespace xrock_gui_model {
     ConfigMap node = *(bagelGui->getNodeMap(name));
     ConfigMap config;
     std::string domain = node["domain"];
-    std::string domainData = domain + "Data";
     // check for selected bundle
     char *envs = getenv("ROCK_BUNDLE");
     if(envs) {
@@ -858,16 +855,15 @@ namespace xrock_gui_model {
     ConfigMap node = *(bagelGui->getNodeMap(name));
     ConfigMap config;
     std::string domain = node["domain"];
-    std::string domainData = domain + "Data";
-    if(node[domainData]["data"].hasKey("submodel")) {
-      config["submodel"] = node[domainData]["data"]["submodel"];
+    if(node["data"].hasKey("submodel")) {
+      config["submodel"] = node["data"]["submodel"];
     }
     {
       ConfigureDialog cd(&config, env, node["modelName"], true, true);
       cd.resize(400, 400);
       cd.exec();
     }
-    node[domainData]["data"]["submodel"] = config["submodel"];
+    node["data"]["submodel"] = config["submodel"];
     bagelGui->updateNodeMap(name, node);
   }
 
@@ -901,8 +897,7 @@ namespace xrock_gui_model {
         try {
           if(bagelType) {
             fprintf(stderr, "configure bagel port..\n");
-            std::string domainData = (std::string)node["domain"] + "Data";
-            std::vector<std::string> keys = {domainData, "data", "configuration", "interfaces", contextPortName};
+            std::vector<std::string> keys = {"data", "configuration", "interfaces", contextPortName};
             subMap = ConfigMapHelper::getSubItem(node, keys);
             if(portType == "inputs" and subMap and subMap->isMap()) {
               dropdown["merge"][0] = "SUM";
@@ -978,12 +973,13 @@ namespace xrock_gui_model {
       std::string name = node["modelName"];
       std::string versionName = version;
       std::string type = name + "::" + versionName;
-      std::string domainData = domain + "Data";
       widget->loadType(domain, name, versionName);
       if(!model->hasNodeInfo(type)) {
         type = name;
       }
+
       bagelGui->addNode(type, versionChangeName);
+      return;
       ConfigMap nodeMap = *(bagelGui->getNodeMap(versionChangeName));
       // update node configuration
       {
@@ -1019,8 +1015,8 @@ namespace xrock_gui_model {
             }
           }
         }
-        if(node.hasKey(domainData)) {
-          nodeMap[domainData].updateMap(node[domainData]);
+        if(node.hasKey("data")) {
+          nodeMap["data"].updateMap(node["data"]);
         }
       }
 
@@ -1324,18 +1320,17 @@ namespace xrock_gui_model {
       doc->page()->setLinkDelegationPolicy( QWebPage::DelegateAllLinks );
       widget->connect(doc, SIGNAL(linkClicked (const QUrl &)), widget, SLOT(openUrl(const QUrl &)));
       ConfigMap modelMap = db->requestModel(domain, name, version, true);
-      std::string domainData = domain + "Data";
-      if(modelMap["versions"][0].hasKey(domainData)) {
-        if(modelMap["versions"][0][domainData].hasKey("data")) {
+      if(modelMap["versions"][0].hasKey("data")) {
+        {
           ConfigMap dataMap;
-          if (modelMap["versions"][0][domainData]["data"].isMap())
-            dataMap = modelMap["versions"][0][domainData]["data"];
+          if (modelMap["versions"][0]["data"].isMap())
+            dataMap = modelMap["versions"][0]["data"];
           else
-            dataMap = ConfigMap::fromYamlString(modelMap["versions"][0][domainData]["data"]);
+            dataMap = ConfigMap::fromYamlString(modelMap["versions"][0]["data"]);
           if(dataMap.hasKey("description")) {
             if(dataMap["description"].hasKey("markdown")) {
               std::string md = dataMap["description"]["markdown"];
-              fprintf(stderr, "convert: %s\n", md.c_str());
+              //fprintf(stderr, "convert: %s\n", md.c_str());
               doc->setHtml(getHtml2(md).c_str());
             }
           }
@@ -1373,8 +1368,8 @@ namespace xrock_gui_model {
     }
 
     ConfigMap node = *(bagelGui->getNodeMap(contextNodeName));
-    node["softwareData"]["data"]["configuration"]["interfaces"][contextPortName]["merge"] = merge;
-    node["softwareData"]["data"]["configuration"]["interfaces"][contextPortName]["bias"] = biasValue;
+    node["data"]["configuration"]["interfaces"][contextPortName]["merge"] = merge;
+    node["data"]["configuration"]["interfaces"][contextPortName]["bias"] = biasValue;
     bagelGui->updateNodeMap(contextNodeName, node);
   }
 
@@ -1451,10 +1446,17 @@ namespace xrock_gui_model {
     // 1. get configuration from map
     // 2. store configuration in temp yaml file
     std::string cmd = "xrock-resolve-ports";
-    if(map.hasKey("softwareData") and map["softwareData"].hasKey("data") and
-       map["softwareData"]["data"].hasKey("configuration") and
-       map["softwareData"]["data"]["configuration"].hasKey("config")) {
-      std::string yaml = "--- name:default\n" + map["softwareData"]["data"]["configuration"]["config"].toYamlString();
+#ifdef __APPLE__
+    {
+      std::string c = getenv("AUTOPROJ_CURRENT_ROOT");
+      c += "/install/bin/";
+      cmd = "DYLD_LIBRARY_PATH=$MYLD_LIBRARY_PATH ruby " + c + cmd;
+    }
+#endif
+    if(map.hasKey("data") and
+       map["data"].hasKey("configuration") and
+       map["data"]["configuration"].hasKey("config")) {
+      std::string yaml = "--- name:default\n" + map["data"]["configuration"]["config"].toYamlString();
       std::ofstream file;
       file.open(configFile);
       file << yaml;
@@ -1464,12 +1466,12 @@ namespace xrock_gui_model {
       cmd += map["modelName"].getString();
       cmd += " default";
     }
-    else if(map.hasKey("softwareData") and map["softwareData"].hasKey("data") and
-            map["softwareData"]["data"].hasKey("configuration") and
-            map["softwareData"]["data"]["configuration"].hasKey("config_names")) {
+    else if(map.hasKey("data") and
+            map["data"].hasKey("configuration") and
+            map["data"]["configuration"].hasKey("config_names")) {
       cmd +=  " -o " + modelFile + " ";
       cmd += map["modelName"].getString();
-      for(auto it: map["softwareData"]["data"]["configuration"]["config_names"]) {
+      for(auto it: map["data"]["configuration"]["config_names"]) {
         cmd += " "+(std::string)it;
       }
     }
@@ -1489,6 +1491,13 @@ namespace xrock_gui_model {
     versionChangeName << map["name"];
     version += "_" + info["versions"][0]["name"].getString() + "_" + versionChangeName;
     cmd = "orogen_to_xrock --modelname " + map["modelName"].getString() + " --model_file " + modelFile + " --version_name " + version;
+#ifdef __APPLE__
+    {
+      std::string c = getenv("AUTOPROJ_CURRENT_ROOT");
+      c += "/install/bin/";
+      cmd = "DYLD_LIBRARY_PATH=$MYLD_LIBRARY_PATH python " + c + cmd;
+    }
+#endif
     printf("execute: %s\n", cmd.c_str());
     system(cmd.c_str());
     // 5. switch node to new version

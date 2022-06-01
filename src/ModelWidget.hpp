@@ -85,7 +85,7 @@ namespace xrock_gui_model {
     configmaps::ConfigMap localMap, layoutMap;
     QLineEdit *name, *type, *version, *domain, *layoutName, *maturity;
     QLineEdit *projectName, *designedBy;
-    QTextEdit *includes, *data, *interfaces;
+    QTextEdit *includes, *annotations, *interfaces;
     QLabel *dataStatusLabel;
     configmaps::ConfigMap interfaceMap;
     bool ignoreUpdate;

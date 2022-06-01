@@ -9,6 +9,8 @@ lib_defaults()
 define_module_info()
 
 add_definitions(-std=c++14)
+add_definitions(-DGL_SILENCE_DEPRECATION)
+
 set(FILE_DB 1)
 
 set(QT_USE_QTWEBKIT 1)
@@ -77,11 +79,16 @@ if (${USE_QT5})
 qt5_use_modules(${PROJECT_NAME} Widgets WebKitWidgets)
 endif (${USE_QT5})
 
+target_compile_options(${PROJECT_NAME} PRIVATE -Wno-inconsistent-missing-override)
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)
 
 target_link_libraries(${PROJECT_NAME}
                       ${PKGCONFIG_LIBRARIES}
                       ${QT_LIBRARIES}
 )
+
+add_executable(test_restdb test/test_restdb.cpp)
+target_link_libraries(test_restdb ${PROJECT_NAME})
 
 if(WIN32)
   set(LIB_INSTALL_DIR bin) # .dll are in PATH, like executables

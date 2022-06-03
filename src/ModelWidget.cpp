@@ -529,7 +529,8 @@ namespace xrock_gui_model {
    * todo:
    *       - how to handle visual properties
    */
-  void ModelWidget::loadGraph(ConfigMap &map){ try{
+  void ModelWidget::loadGraph(ConfigMap &map){
+    try{
     //ConfigMap map = ConfigMap::fromYamlFile(file);
     ConfigMap config;
 
@@ -566,9 +567,14 @@ namespace xrock_gui_model {
         edge["toNode"] = name;
         edge["toNodeInput"] = (*it)["to"]["interface"];;
 
-        edge["name"] = (*it)["name"];
+        edge["name"] = (*it)["name"].toString();
         if(it->hasKey("data")) {
-          edge.append(ConfigMap::fromYamlString((*it)["data"].getString()));
+          if((*it)["data"].isMap()) {
+            edge.append((*it)["data"]);
+          }
+          else {
+            edge.append(ConfigMap::fromYamlString((*it)["data"].getString()));
+          }
         }
         edge["smooth"] = true;
         bagelGui->addEdge(edge);
@@ -628,13 +634,16 @@ namespace xrock_gui_model {
     if(config.hasKey("edges")) {
       ConfigVector::iterator itConf = config["edges"].begin();
       for(; itConf != config["edges"].end(); ++itConf) {
-        std::string model = (*itConf)["name"];
-        if(model == name) {
-          data["edge_submodel"] = *itConf;
-          break;
+        if((*itConf).isMap() and (*itConf).hasKey("name")) {
+          std::string model = (*itConf)["name"];
+          if(model == name) {
+            data["edge_submodel"] = *itConf;
+            break;
+          }
         }
       }
     }
+
     // todo: handle name clashes
     const ConfigMap *nodeMap_ = bagelGui->getNodeMap(name);
     if(!nodeMap_) {

@@ -12,6 +12,7 @@
 #include <memory>
 #include "DBInterface.hpp"
 
+
 namespace xrock_gui_model {
 
   class RestDB : public DBInterface {
@@ -32,6 +33,7 @@ namespace xrock_gui_model {
     virtual void set_dbUser(const std::string &_dbUser);
     virtual void set_dbPassword(const std::string &_dbPassword);
     virtual void set_dbGraph(const std::string &_dbGraph);
+    virtual void set_dbPath(const fs::path &_dbPath);
 
 
   private:

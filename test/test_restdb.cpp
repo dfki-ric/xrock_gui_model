@@ -20,8 +20,9 @@ int main(int argv, char** argc) {
   client->setDbAddress("http://localhost:8183");
   client->setDbUser("");
   client->setDbPassword("");
-  client->setDefaultGraph("graph_test");
-
+  client->setWorkingGraph("graph_test");
+  client->setWorkingDbPath("modkom/graph_test");
+  
   std::vector<std::pair<std::string, std::string>> result = client->requestModelListByDomain("ComponentModel", mars::utils::toupper("software"));
 
   for(auto r: result) {

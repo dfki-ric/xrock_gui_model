@@ -17,7 +17,8 @@ namespace xrock_gui_model {
     client->setDbAddress("http://localhost:8183");
     client->setDbUser("");
     client->setDbPassword("");
-    client->setDefaultGraph("graph_test");
+    client->setWorkingGraph("graph_test");
+    client->setWorkingDbPath("modkom/graph_test");
   }
 
 
@@ -114,7 +115,9 @@ namespace xrock_gui_model {
 
 
   void RestDB::set_dbGraph(const std::string &_dbGraph) {
-    client->setDefaultGraph(_dbGraph);
+    client->setWorkingGraph(_dbGraph);
   }
-
+  void RestDB::set_dbPath(const fs::path &_dbPath) {
+    client->setWorkingDbPath(_dbPath);
+  }
 } // end of namespace xrock_gui_model

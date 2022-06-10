@@ -8,7 +8,7 @@ find_package(lib_manager)
 lib_defaults()
 define_module_info()
 
-add_definitions(-std=c++14)
+add_definitions(-std=c++17)
 add_definitions(-DGL_SILENCE_DEPRECATION)
 
 set(FILE_DB 1)
@@ -88,6 +88,7 @@ target_link_libraries(${PROJECT_NAME}
 )
 
 add_executable(test_restdb test/test_restdb.cpp)
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17) # Use C++17
 target_link_libraries(test_restdb ${PROJECT_NAME})
 
 if(WIN32)

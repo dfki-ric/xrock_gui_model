@@ -17,8 +17,7 @@ namespace xrock_gui_model {
     client->setDbAddress("http://localhost:8183");
     client->setDbUser("");
     client->setDbPassword("");
-    client->setWorkingGraph("graph_test");
-    client->setWorkingDbPath("modkom/graph_test");
+
   }
 
 

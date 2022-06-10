@@ -66,7 +66,7 @@ namespace xrock_gui_model {
       mars::utils::handleFilenamePrefix(&defaultAddress, confDir);
       if(env.hasKey("dbType")) {
         if(env["dbType"] == "RestDB") {
-          defaultAddress = "http://localhost:8183/";
+          defaultAddress = "http://localhost:8183";
         }
       }
       std::string confDir2 = confDir + "/XRockGUI.yml";

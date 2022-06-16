@@ -47,7 +47,7 @@ namespace xrock_gui_model {
       props["version"] = version;
     }
 
-    std::vector<XTypePtr> xtypes = client->findByJsonPropString("ComponentModel", props.toJsonString());
+    std::vector<XTypePtr> xtypes = client->findByJsonPropString("ComponentModel", props.toJsonString(), limit ? 3 : -1);
     if (xtypes.size() == 0) {
       std::cerr<<"ComponentModel with props: "<<props.toJsonString()<<" not loaded"<<std::endl;
       abort();

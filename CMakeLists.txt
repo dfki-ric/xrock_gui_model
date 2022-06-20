@@ -26,6 +26,7 @@ pkg_check_modules(PKGCONFIG REQUIRED
           config_map_gui
           cfg_manager
           xdbi
+          xtypes
 )
 
 include_directories(${PKGCONFIG_INCLUDE_DIRS})

@@ -17,11 +17,10 @@ int main(int argv, char** argc) {
   std::unique_ptr<xdbi::Client> client;
 
   client = std::make_unique<xdbi::Client>();
-  client->setWorkingDbPath("http://localhost:8183");
+  client->setDbAddress("http://localhost:8183");
   client->setDbUser("");
   client->setDbPassword("");
   client->setWorkingGraph("graph_test");
-  //client->setWorkingDbPath("modkom/graph_test");
   
   std::vector<std::pair<std::string, std::string>> result = client->requestModelListByDomain("ComponentModel", mars::utils::toupper("software"));
 

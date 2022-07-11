@@ -9,6 +9,7 @@
 
 #include <configmaps/ConfigMap.hpp>
 #include <xdbi/Client.hpp>
+#include <xtypes_generator/XTypeRegistry.hpp>
 #include <memory>
 #include "DBInterface.hpp"
 
@@ -38,7 +39,7 @@ namespace xrock_gui_model {
 
   private:
     std::unique_ptr<xdbi::Client> client;
-
+    xtypes::XTypeRegistry registry;
   };
 } // end of namespace xrock_gui_model
 

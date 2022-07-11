@@ -1,19 +1,21 @@
 #include "RestDB.hpp"
 #include <mars/utils/misc.h>
-#include <xtypes/ComponentModel.hpp>
+#include <modkom_types/ComponentModel.hpp>
 
 #include <iostream>
 #include <iomanip>
 #include <ctime>
 
 using namespace configmaps;
+using namespace modkom_types;
 
 namespace xrock_gui_model {
 
 
 
   RestDB::RestDB() {
-    client = std::make_unique<xdbi::Client>();
+    registry.register_class<ComponentModel>();
+    client = std::make_unique<xdbi::Client>(registry);
     client->setDbAddress("http://localhost:8183");
     client->setDbUser("");
     client->setDbPassword("");

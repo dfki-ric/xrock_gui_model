@@ -26,8 +26,10 @@ pkg_check_modules(PKGCONFIG REQUIRED
           config_map_gui
           cfg_manager
           xdbi
-          xtypes
 )
+
+find_package(xtypes_generator REQUIRED)
+find_package(modkom_types REQUIRED)
 
 include_directories(${PKGCONFIG_INCLUDE_DIRS})
 link_directories(${PKGCONFIG_LIBRARY_DIRS})
@@ -86,6 +88,8 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)
 target_link_libraries(${PROJECT_NAME}
                       ${PKGCONFIG_LIBRARIES}
                       ${QT_LIBRARIES}
+		      modkom_types::modkom_types_cpp
+		      xtypes_generator::xtypes_generator_cpp
 )
 
 add_executable(test_restdb test/test_restdb.cpp)

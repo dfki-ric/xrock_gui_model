@@ -121,9 +121,11 @@ configure_file(${PROJECT_NAME}.pc.in ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.pc @ONL
 install(FILES ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.pc DESTINATION lib/pkgconfig)
 
 
+configure_file(bin/xrock_gui.in ${CMAKE_BINARY_DIR}/xrock_gui @ONLY)
+configure_file(bin/shader_gui.in ${CMAKE_BINARY_DIR}/shader_gui @ONLY)
 install(DIRECTORY configuration/ DESTINATION configuration/)
-INSTALL(PROGRAMS bin/xrock_gui DESTINATION bin)
-INSTALL(PROGRAMS bin/shader_gui DESTINATION bin)
-INSTALL(PROGRAMS bin/cnd_gui DESTINATION bin)
+INSTALL(PROGRAMS ${CMAKE_BINARY_DIR}/xrock_gui DESTINATION bin)
+INSTALL(PROGRAMS ${CMAKE_BINARY_DIR}/shader_gui DESTINATION bin)
+#INSTALL(PROGRAMS bin/cnd_gui DESTINATION bin)
 INSTALL(PROGRAMS bin/xrock-resolve-ports DESTINATION bin)
 INSTALL(PROGRAMS bin/xrock-create-deployment DESTINATION bin)

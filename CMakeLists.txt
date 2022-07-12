@@ -16,6 +16,8 @@ set(FILE_DB 1)
 set(QT_USE_QTWEBKIT 1)
 setup_qt()
 
+find_package(nlohmann_json 3.10.5 REQUIRED)
+
 pkg_check_modules(PKGCONFIG REQUIRED
           lib_manager
           bagel_gui
@@ -86,11 +88,13 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)
 target_link_libraries(${PROJECT_NAME}
                       ${PKGCONFIG_LIBRARIES}
                       ${QT_LIBRARIES}
+	              nlohmann_json::nlohmann_json
 )
 
 add_executable(test_restdb test/test_restdb.cpp)
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17) # Use C++17
-target_link_libraries(test_restdb ${PROJECT_NAME})
+target_link_libraries(test_restdb ${PROJECT_NAME} nlohmann_json::nlohmann_json
+)
 
 if(WIN32)
   set(LIB_INSTALL_DIR bin) # .dll are in PATH, like executables

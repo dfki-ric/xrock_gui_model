@@ -16,8 +16,8 @@ using namespace configmaps;
 
 
 int main(int argv, char** argc) {
-  xtypes::XTypeRegistry registry;
-  registry.register_class<modkom_types::ComponentModel>();
+  xtypes::XTypeRegistryPtr registry = std::make_unique<xtypes::XTypeRegistry>();
+  registry->register_class<modkom_types::ComponentModel>();
   std::unique_ptr<xdbi::Client> client;
   client = std::make_unique<xdbi::Client>(registry);
   client->setDbAddress("http://localhost:8183");

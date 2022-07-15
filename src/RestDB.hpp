@@ -39,7 +39,7 @@ namespace xrock_gui_model {
 
   private:
     std::unique_ptr<xdbi::Client> client;
-    xtypes::XTypeRegistry registry;
+    xtypes::XTypeRegistryPtr registry;
   };
 } // end of namespace xrock_gui_model
 

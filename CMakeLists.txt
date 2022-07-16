@@ -123,7 +123,7 @@ install(FILES ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.pc DESTINATION lib/pkgconfig)
 if(APPLE)
   set(PYTHON_SHEBANG "/opt/local/bin/python")
 else(APPLE)
-  set(PYTHON_SHEBANG "/bin/env python")
+  set(PYTHON_SHEBANG "/usr/bin/env python")
 endif(APPLE)
 
 configure_file(bin/xrock_gui.in ${CMAKE_BINARY_DIR}/xrock_gui @ONLY)

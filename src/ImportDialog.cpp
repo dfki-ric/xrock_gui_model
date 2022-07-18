@@ -206,6 +206,10 @@ namespace xrock_gui_model {
     selectedModel   = std::string("");
     selectedVersion = std::string("");
     modelList = modelLib->db->requestModelListByDomain( selectedDomain );
+    std::sort(modelList.begin(), modelList.end());
+    auto last = std::unique(modelList.begin(),modelList.end());
+    modelList.erase(last, modelList.end());
+
     for(auto it: modelList) {
       models->addItem(it.first.c_str());
     }

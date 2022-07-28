@@ -30,7 +30,7 @@ pkg_check_modules(PKGCONFIG REQUIRED
 
 find_package(xtypes_generator REQUIRED)
 find_package(modkom_types REQUIRED)
-
+find_package( Boost COMPONENTS system thread REQUIRED)
 include_directories(${PKGCONFIG_INCLUDE_DIRS})
 link_directories(${PKGCONFIG_LIBRARY_DIRS})
 add_definitions(${PKGCONFIG_CFLAGS_OTHER})  #flags excluding the ones with -I
@@ -90,6 +90,7 @@ target_link_libraries(${PROJECT_NAME}
                       ${QT_LIBRARIES}
 		      modkom_types::modkom_types_cpp
 		      xtypes_generator::xtypes_generator_cpp
+		      ${Boost_SYSTEM_LIBRARY} 	
 )
 
 add_executable(test_restdb test/test_restdb.cpp)

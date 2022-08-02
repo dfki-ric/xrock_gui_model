@@ -5,8 +5,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(PkgConfig REQUIRED)
 find_package(lib_manager)
-pkg_check_modules(PKGCONFIG REQUIRED
-          lib_manager)
+
 lib_defaults()
 define_module_info()
 if(APPLE)
@@ -19,7 +18,7 @@ set(FILE_DB 1)
 
 set(QT_USE_QTWEBKIT 1)
 setup_qt()
-#pkg_check_modules(lib_manager REQUIRED IMPORTED_TARGET lib_manager)
+pkg_check_modules(lib_manager REQUIRED IMPORTED_TARGET lib_manager)
 pkg_check_modules(bagel_gui REQUIRED IMPORTED_TARGET bagel_gui)
 pkg_check_modules(osg_graph_viz REQUIRED IMPORTED_TARGET osg_graph_viz)
 pkg_check_modules(configmaps REQUIRED IMPORTED_TARGET configmaps)
@@ -87,7 +86,7 @@ target_compile_options(${PROJECT_NAME} PRIVATE -Wno-inconsistent-missing-overrid
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 
 target_link_libraries(${PROJECT_NAME}  PUBLIC
-	lib_manager
+        PkgConfig::lib_manager
         PkgConfig::bagel_gui
         PkgConfig::osg_graph_viz
         PkgConfig::configmaps

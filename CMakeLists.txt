@@ -1,8 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
 project(xrock_gui_model VERSION 1.0.0 DESCRIPTION "xrock_gui")
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 find_package(PkgConfig REQUIRED)
 find_package(lib_manager)
 

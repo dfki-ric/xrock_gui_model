@@ -588,9 +588,7 @@ namespace xrock_gui_model {
   }
 
   void Model::resetConfig(configmaps::ConfigMap &map) {
-    std::string domain = map["domain"];
     std::string modelName = map["modelName"];
-    std::string modelVersion = map["modelVersion"];
     osg_graph_viz::NodeInfo ndi = infoMap[modelName];
     ConfigMap &model = ndi.map;
 

@@ -556,7 +556,6 @@ namespace xrock_gui_model
       QMessageBox message;
       ConfigMap localMap = model->getModelInfo();
       std::string domain = "software";
-      std::string type = "system_modelling::task_graph::Task";
       std::string name = "behavior_graph::MotionControlTask";
       std::string version = localMap["version"][0]["name"];
       std::string graphFile = "tmp/bagel/" + localMap["name"].getString() + "/" + version + "/" + localMap["name"].getString() + ".yml";
@@ -672,6 +671,7 @@ namespace xrock_gui_model
                 found = true;
                 break;
               }
+              n -= step;
             }
           }
           if (!found)
@@ -683,7 +683,6 @@ namespace xrock_gui_model
             nodeMap["outputs"][0]["interfaceExportName"] = motorName + "/des_angle";
             bagelGui->updateNodeMap(motorName, nodeMap);
           }
-          n -= step;
         }
       }
       widget->loadType("software", "PIPE", "v1.0.0");
@@ -908,7 +907,6 @@ namespace xrock_gui_model
   {
     ConfigMap node = *(bagelGui->getNodeMap(name));
     ConfigMap config;
-    std::string domain = node["domain"];
     if (node["data"].hasKey("configuration"))
     {
       config = node["data"]["configuration"];
@@ -930,7 +928,6 @@ namespace xrock_gui_model
   {
     ConfigMap node = *(bagelGui->getNodeMap(name));
     ConfigMap config;
-    std::string domain = node["domain"];
     // check for selected bundle
     char *envs = getenv("ROCK_BUNDLE");
     if (envs)
@@ -979,7 +976,6 @@ namespace xrock_gui_model
   {
     ConfigMap node = *(bagelGui->getNodeMap(name));
     ConfigMap config;
-    std::string domain = node["domain"];
     if (node["data"].hasKey("submodel"))
     {
       config["submodel"] = node["data"]["submodel"];
@@ -1131,7 +1127,7 @@ namespace xrock_gui_model
       }
 
       bagelGui->addNode(type, versionChangeName);
-      return;
+
       ConfigMap nodeMap = *(bagelGui->getNodeMap(versionChangeName));
       // update node configuration
       {
@@ -1626,11 +1622,11 @@ namespace xrock_gui_model
     // save context name
     std::vector<std::string> r;
     r.push_back("change version");
-    ConfigMap node = *(bagelGui->getNodeMap(name));
-    // if(node["domain"] == "software") {
-    //  todo: identify rock nodes
-    //  if(node["softwareData"]["data"].hasKey("framework") &&
-    //     node["softwareData"]["data"]["framework"] == "Rock") {
+    // ConfigMap node = *(bagelGui->getNodeMap(name));
+    //  if(node["domain"] == "software") {
+    //   todo: identify rock nodes
+    //   if(node["softwareData"]["data"].hasKey("framework") &&
+    //      node["softwareData"]["data"]["framework"] == "Rock") {
     r.push_back("configure node");
     r.push_back("configure components");
     r.push_back("reset configuration");

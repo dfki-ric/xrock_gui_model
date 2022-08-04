@@ -37,9 +37,9 @@ namespace xrock_gui_model {
     }
 
     {
-      std::vector<std::string>::iterator it = searchPaths.begin();
-      for(; it!=searchPaths.end(); ++it) {
-        loadNodeInfo(*it);
+      std::vector<std::string>::iterator it2 = searchPaths.begin();
+      for(; it2!=searchPaths.end(); ++it2) {
+        loadNodeInfo(*it2);
       }
     }
 
@@ -77,9 +77,8 @@ namespace xrock_gui_model {
     edition = "";
   }
 
-  Model::Model(const Model *other) : ModelInterface(other->bagelGui) {
-    infoMap = other->infoMap;
-    edition = "";
+  Model::Model(const Model *other) : ModelInterface(other->bagelGui),
+  				      infoMap(other->infoMap),edition("") {
   }
 
   Model::~Model() {
@@ -230,11 +229,11 @@ namespace xrock_gui_model {
           ++numOutputs;
         }
       }
-      for(auto it: tmpMap["inputs"]) {
-        map["inputs"].push_back(it);
+      for(auto it3: tmpMap["inputs"]) {
+        map["inputs"].push_back(it3);
       }
-      for(auto it: tmpMap["outputs"]) {
-        map["outputs"].push_back(it);
+      for(auto it4: tmpMap["outputs"]) {
+        map["outputs"].push_back(it4);
       }
     }
 

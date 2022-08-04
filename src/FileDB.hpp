@@ -19,15 +19,15 @@ namespace xrock_gui_model {
     FileDB();
     ~FileDB();
 
-    std::vector<std::pair<std::string, std::string>> requestModelListByDomain(const std::string &domain);
-    std::vector<std::string> requestVersions(const std::string &domain, const std::string &model);
+    std::vector<std::pair<std::string, std::string>> requestModelListByDomain(const std::string &domain) override;
+    std::vector<std::string> requestVersions(const std::string &domain, const std::string &model) override;
     configmaps::ConfigMap requestModel(const std::string &domain,
                                               const std::string &model,
                                               const std::string &version,
-                                              const bool limit = false);
+                                              const bool limit = false) override;
     bool storeModel(const configmaps::ConfigMap &map);
 
-    void set_dbAddress(const std::string &_dbAddress);
+    void set_dbAddress(const std::string &_dbAddress) override;
 
   private:
     std::string dbAddress;

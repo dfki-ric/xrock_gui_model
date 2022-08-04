@@ -16,8 +16,8 @@ namespace xrock_gui_model {
     ConfigMapHelper() {}
     ~ConfigMapHelper() {}
 
-    static void packSubmodel(configmaps::ConfigMap &target, configmaps::ConfigVector &source);
-    static void unpackSubmodel(configmaps::ConfigMap &target, configmaps::ConfigVector &source);
+    static void packSubmodel(configmaps::ConfigMap &target, const configmaps::ConfigVector &source);
+    static void unpackSubmodel(configmaps::ConfigMap &target,const configmaps::ConfigVector &source);
     static configmaps::ConfigItem* getSubItem(configmaps::ConfigMap &map,
                                               std::vector<std::string> path);
     static configmaps::ConfigItem* getSubItem(configmaps::ConfigItem *item,

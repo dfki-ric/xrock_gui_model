@@ -13,8 +13,7 @@ namespace xrock_gui_model {
 
 
 
-  RestDB::RestDB() {
-    registry = std::make_unique<xtypes::XTypeRegistry>();
+  RestDB::RestDB() : registry(new xtypes::XTypeRegistry()) {
     registry->register_class<ComponentModel>();
     client = std::make_unique<xdbi::Client>(registry);
     client->setDbAddress("http://localhost:8183");

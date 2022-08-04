@@ -616,8 +616,8 @@ namespace xrock_gui_model {
     if(config.hasKey("nodes")) {
       ConfigVector::iterator itConf = config["nodes"].begin();
       for(; itConf != config["nodes"].end(); ++itConf) {
-        std::string model = (*itConf)["name"];
-        if(model == name) {
+        std::string model_name = (*itConf)["name"];
+        if(model_name == name) {
           if(itConf->hasKey("data")) {
             if ((*itConf)["data"].isMap())
               data["configuration"] = (*itConf)["data"];
@@ -635,8 +635,8 @@ namespace xrock_gui_model {
       ConfigVector::iterator itConf = config["edges"].begin();
       for(; itConf != config["edges"].end(); ++itConf) {
         if((*itConf).isMap() and (*itConf).hasKey("name")) {
-          std::string model = (*itConf)["name"];
-          if(model == name) {
+          std::string model_name = (*itConf)["name"];
+          if(model_name == name) {
             data["edge_submodel"] = *itConf;
             break;
           }
@@ -681,13 +681,13 @@ namespace xrock_gui_model {
           (*itNodeMap)["interface"] = 1;
           (*itNodeMap)["interfaceExportName"] = (*it2)["name"];
           if(it2->hasKey("data")) {
-            ConfigMap data;
+            ConfigMap i_data;
             if ((*it2)["data"].isMap())
-              data = (*it2)["data"];
+              i_data = (*it2)["data"];
             else
-              data = ConfigMap::fromYamlString((*it2)["data"]);
-            if(data.hasKey("initValue")) {
-              (*itNodeMap)["initValue"] = data["initValue"];
+              i_data = ConfigMap::fromYamlString((*it2)["data"]);
+            if(i_data.hasKey("initValue")) {
+              (*itNodeMap)["initValue"] = i_data["initValue"];
             }
           }
           updateMap = true;
@@ -1066,16 +1066,16 @@ namespace xrock_gui_model {
     }
 
     if(tmpInterfaces.hasKey("i")) {
-      for(auto it : tmpInterfaces["i"]) {
-        if(!it.hasKey("linkToNode")) {
+      for(auto t : tmpInterfaces["i"]) {
+        if(!t.hasKey("linkToNode")) {
           ConfigVector::iterator it3 = interfaceMap["interfaces"].begin();
           for(; it3!=interfaceMap["interfaces"].end(); ++it3) {
-            if((std::string)(*it3)["name"] == (std::string)it["name"]) {
+            if((std::string)(*it3)["name"] == (std::string)t["name"]) {
               break;
             }
           }
           if(it3 == interfaceMap["interfaces"].end()) {
-            interfaceMap["interfaces"].push_back(it);
+            interfaceMap["interfaces"].push_back(t);
           }
         }
       }

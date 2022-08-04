@@ -22,15 +22,15 @@ namespace xrock_gui_model {
     RestDB();
     ~RestDB();
 
-    virtual std::vector<std::pair<std::string, std::string>> requestModelListByDomain(const std::string &domain);
-    virtual std::vector<std::string> requestVersions(const std::string &domain, const std::string &model);
+    virtual std::vector<std::pair<std::string, std::string>> requestModelListByDomain(const std::string &domain) override;
+    virtual std::vector<std::string> requestVersions(const std::string &domain, const std::string &model) override;
     virtual configmaps::ConfigMap requestModel(const std::string &domain,
                                                const std::string &model,
                                                const std::string &version,
-                                               const bool limit = false);
+                                               const bool limit = false) override;
     virtual bool storeModel(const configmaps::ConfigMap &map);
 
-    virtual void set_dbAddress(const std::string &_dbAddress);
+    virtual void set_dbAddress(const std::string &_dbAddress) override;
     virtual void set_dbUser(const std::string &_dbUser);
     virtual void set_dbPassword(const std::string &_dbPassword);
     virtual void set_dbGraph(const std::string &_dbGraph);

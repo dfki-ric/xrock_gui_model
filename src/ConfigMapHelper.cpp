@@ -4,7 +4,7 @@ using namespace configmaps;
 
 namespace xrock_gui_model {
 
-  void ConfigMapHelper::unpackSubmodel(ConfigMap &target, ConfigVector &source) {
+  void ConfigMapHelper::unpackSubmodel(ConfigMap &target, const ConfigVector &source) {
     size_t i = 0;
     for(auto it: source) {
       target["submodel"][i]["name"] = it["name"];
@@ -26,7 +26,7 @@ namespace xrock_gui_model {
     }
   }
 
-  void ConfigMapHelper::packSubmodel(ConfigMap &target, ConfigVector &source) {
+  void ConfigMapHelper::packSubmodel(ConfigMap &target, const ConfigVector &source) {
     size_t i = 0;
     for(auto it: source) {
       target["submodel"][i]["name"] = it["name"];

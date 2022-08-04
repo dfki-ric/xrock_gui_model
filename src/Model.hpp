@@ -13,7 +13,7 @@ namespace xrock_gui_model {
 
   class Model : public bagel_gui::ModelInterface {
   public:
-    Model(bagel_gui::BagelGui *bagelGui);
+    explicit Model(bagel_gui::BagelGui *bagelGui);
     Model(const Model *other);
     ~Model();
 
@@ -41,11 +41,11 @@ namespace xrock_gui_model {
     bool groupNodes(unsigned long groupNodeId, unsigned long nodeId);
     bool loadSubgraphInfo(const std::string &filename,
                           const std::string &absPath) {return false;}
-    std::map<unsigned long, std::vector<std::string> > getCompatiblePorts(unsigned long nodeId, std::string outPortName) {return std::map<unsigned long, std::vector<std::string> >();}
+    std::map<unsigned long, std::vector<std::string> > getCompatiblePorts(unsigned long nodeId,  std::string outPortName) {return std::map<unsigned long, std::vector<std::string> >();}
     bool handlePortCompatibility() {return false;}
     const std::map<std::string, osg_graph_viz::NodeInfo>& getNodeInfoMap();
     //void displayWidget( QWidget *pParent );
-    bool addNodeInfo(configmaps::ConfigMap &model, std::string version = "");
+    bool addNodeInfo(configmaps::ConfigMap &model, std::string version = "" );
     bool hasNodeInfo(const std::string &type);
     configmaps::ConfigMap getNodeInfo(const std::string &type);
     void setModelInfo(configmaps::ConfigMap &map);

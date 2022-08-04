@@ -34,7 +34,7 @@ namespace xrock_gui_model {
 
   
   public:
-    ModelLib(lib_manager::LibManager *theManager);
+    explicit ModelLib(lib_manager::LibManager *theManager);
     ~ModelLib();
 
     // LibInterface methods
@@ -63,12 +63,12 @@ namespace xrock_gui_model {
     void openConfigFile(const std::string &name);
     void configureInPort(const std::string &nodeName, const std::string &portName);
     void configureOutPort(const std::string &nodeName, const std::string &portName);
-    void selectVersion(std::string version);
+    void selectVersion(const std::string &version);
     void exportCnd(const configmaps::ConfigMap &map_, const std::string &filename);
     void importCND(const std::string &filename);
-    void nodeContextClicked(std::string name);
-    void inPortContextClicked(std::string name);
-    void outPortContextClicked(std::string name);
+    void nodeContextClicked(const std::string& name);
+    void inPortContextClicked(const std::string& name);
+    void outPortContextClicked(const std::string& name);
     std::vector<std::string> getNodeContextStrings(const std::string &name);
     std::vector<std::string> getInPortContextStrings(const std::string &nodeName,
                                                      const std::string &portName);
@@ -101,10 +101,10 @@ namespace xrock_gui_model {
     void loadModelFromParameter();
     bool loadCart();
     void loadSettingsFromFile(const std::string& filename);
-    void writeStatus(const int statusId, const std::string message);
+    void writeStatus(const int statusId, const std::string& message);
     void openConfigureInterfaceDialog(const std::string &nodeName, 
                                       const std::string &portName,
-                                      const std::string portType);
+                                      const std::string &portType);
     void configureComponents(const std::string &name);
     void createBagelModel();
     void createBagelTask();

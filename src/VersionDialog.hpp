@@ -25,7 +25,7 @@ namespace xrock_gui_model {
     Q_OBJECT
 
   public:
-    VersionDialog(ModelLib *modelLib);
+    explicit VersionDialog(ModelLib *modelLib);
     ~VersionDialog();
     void requestComponent(const std::string &domain, const std::string &name);
 

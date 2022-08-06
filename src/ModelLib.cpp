@@ -31,14 +31,6 @@ using namespace lib_manager;
 using namespace bagel_gui;
 using namespace configmaps;
 using namespace mars::utils;
-static constexpr const char banner[] =
-
-    " __   _______   ____   _____ _  _______ _    _ _____  \n"
-    " \\ \\ / /  __ \\ / __ \\ / ____| |/ / ____| |  | |_   _| \n"
-    "  \\ V /| |__) | |  | | |    | ' / |  __| |  | | | |   \n"
-    "   > < |  _  /| |  | | |    |  <| | |_ | |  | | | |   \n"
-    "  / . \\| | \\ \\| |__| | |____| . \\ |__| | |__| |_| |_  \n"
-    " /_/ \\_\\_|  \\_\\____/ \\_____|_|\\_\\_____|\\____/|_____|\n";
 
 namespace xrock_gui_model
 {
@@ -671,7 +663,6 @@ namespace xrock_gui_model
                 found = true;
                 break;
               }
-              n -= step;
             }
           }
           if (!found)
@@ -683,6 +674,8 @@ namespace xrock_gui_model
             nodeMap["outputs"][0]["interfaceExportName"] = motorName + "/des_angle";
             bagelGui->updateNodeMap(motorName, nodeMap);
           }
+
+          n -= step;
         }
       }
       widget->loadType("software", "PIPE", "v1.0.0");
@@ -1127,7 +1120,7 @@ namespace xrock_gui_model
       }
 
       bagelGui->addNode(type, versionChangeName);
-
+      return;
       ConfigMap nodeMap = *(bagelGui->getNodeMap(versionChangeName));
       // update node configuration
       {
@@ -1497,9 +1490,9 @@ namespace xrock_gui_model
     widget->loadModel(map);
   }
 
-  void ModelLib::nodeContextClicked(const std::string &name)
+  void ModelLib::nodeContextClicked(const std::string name)
   {
-    std::cout << banner << std::endl;
+
     if (name == "change version")
     {
       changeNodeVersion(contextNodeName);
@@ -1572,7 +1565,7 @@ namespace xrock_gui_model
     }
   }
 
-  void ModelLib::inPortContextClicked(const std::string &name)
+  void ModelLib::inPortContextClicked(const std::string name)
   {
     if (name == "configure interface")
     {
@@ -1607,7 +1600,7 @@ namespace xrock_gui_model
     bagelGui->updateNodeMap(contextNodeName, node);
   }
 
-  void ModelLib::outPortContextClicked(const std::string &name)
+  void ModelLib::outPortContextClicked(const std::string name)
   {
     if (name == "configure interface")
     {

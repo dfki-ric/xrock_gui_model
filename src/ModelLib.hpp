@@ -1,6 +1,6 @@
 /**
  * \author Malte Langosz (malte.langosz@dfki.de)
- * \brief 
+ * \brief
  * \version 0.1
  */
 
@@ -18,11 +18,13 @@
 #include <mars/cfg_manager/CFGManagerInterface.h>
 #include "DBInterface.hpp"
 
-namespace bagel_gui {
+namespace bagel_gui
+{
   class BagelModel;
 }
 
-namespace xrock_gui_model {
+namespace xrock_gui_model
+{
 
   class Model;
   class ModelWidget;
@@ -30,23 +32,27 @@ namespace xrock_gui_model {
   class ModelLib : public lib_manager::LibInterface,
                    public mars::main_gui::MenuInterface,
                    public bagel_gui::PluginInterface,
-                   public mars::cfg_manager::CFGClient {
+                   public mars::cfg_manager::CFGClient
+  {
 
-  
   public:
     explicit ModelLib(lib_manager::LibManager *theManager);
     ~ModelLib();
 
     // LibInterface methods
     int getLibVersion() const
-    { return 1; }
-    
+    {
+      return 1;
+    }
+
     const std::string getLibName() const
-    { return std::string("xrock_gui_model"); }
-    
+    {
+      return std::string("xrock_gui_model");
+    }
+
     CREATE_MODULE_INFO();
 
-    Model* getModelInstance();
+    Model *getModelInstance();
 
     // CFGClient methods
     virtual void cfgUpdateProperty(mars::cfg_manager::cfgPropertyStruct _property);
@@ -66,9 +72,9 @@ namespace xrock_gui_model {
     void selectVersion(const std::string &version);
     void exportCnd(const configmaps::ConfigMap &map_, const std::string &filename);
     void importCND(const std::string &filename);
-    void nodeContextClicked(const std::string& name);
-    void inPortContextClicked(const std::string& name);
-    void outPortContextClicked(const std::string& name);
+    void nodeContextClicked(const std::string name);
+    void inPortContextClicked(const std::string name);
+    void outPortContextClicked(const std::string name);
     std::vector<std::string> getNodeContextStrings(const std::string &name);
     std::vector<std::string> getInPortContextStrings(const std::string &nodeName,
                                                      const std::string &portName);
@@ -76,8 +82,8 @@ namespace xrock_gui_model {
                                                       const std::string &portName);
     void requestModel();
 
-  //public slots:
-    void addComponent(std::string domain, std::string modelName, std::string version, std::string nodeName="");
+    // public slots:
+    void addComponent(std::string domain, std::string modelName, std::string version, std::string nodeName = "");
     void loadComponent(std::string domain, std::string modelName, std::string version);
     void applyConfiguration(configmaps::ConfigMap &map);
     DBInterface *db;
@@ -100,15 +106,14 @@ namespace xrock_gui_model {
     void loadStartModel();
     void loadModelFromParameter();
     bool loadCart();
-    void loadSettingsFromFile(const std::string& filename);
-    void writeStatus(const int statusId, const std::string& message);
-    void openConfigureInterfaceDialog(const std::string &nodeName, 
+    void loadSettingsFromFile(const std::string &filename);
+    void writeStatus(const int statusId, const std::string &message);
+    void openConfigureInterfaceDialog(const std::string &nodeName,
                                       const std::string &portName,
                                       const std::string &portType);
     void configureComponents(const std::string &name);
     void createBagelModel();
     void createBagelTask();
-
   };
 
 } // end of namespace xrock_gui_model

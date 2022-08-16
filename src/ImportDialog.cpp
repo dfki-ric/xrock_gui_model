@@ -185,7 +185,7 @@ namespace xrock_gui_model {
 
 
   void ImportDialog::updateFilter(const QString &filter) {
-    QRegExp exp(filter);
+    QRegExp exp(filter, Qt::CaseInsensitive);
 
     models->clear();
     for(auto it: modelList) {

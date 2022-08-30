@@ -3,7 +3,7 @@
                       bagel_gui">
   </description>
   <depend package="database/xdbi" />
-  <depend package="modkom/modkom_types" />
+  <depend package="representation/xtypes" />
   <depend package="qt4-webkit" />
   <depend package="simulation/lib_manager" />
   <depend package="bagel/bagel_gui" />

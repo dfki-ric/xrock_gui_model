@@ -1,13 +1,13 @@
 #include "RestDB.hpp"
 #include <mars/utils/misc.h>
-#include <modkom_types/ComponentModel.hpp>
+#include <xtypes/ComponentModel.hpp>
 
 #include <iostream>
 #include <iomanip>
 #include <ctime>
 
 using namespace configmaps;
-using namespace modkom_types;
+using namespace xtypes;
 
 namespace xrock_gui_model {
 

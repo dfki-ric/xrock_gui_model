@@ -26,7 +26,7 @@ pkg_check_modules(cfg_manager REQUIRED IMPORTED_TARGET cfg_manager)
 
 
 find_package(xdbi REQUIRED)
-find_package(modkom_types REQUIRED)
+find_package(xtypes REQUIRED)
 find_package( Boost COMPONENTS system thread REQUIRED)
 
 set(SOURCES 
@@ -82,7 +82,7 @@ endif (${USE_QT5})
 target_compile_options(${PROJECT_NAME} PRIVATE -Wno-inconsistent-missing-override)
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 
-target_link_libraries(${PROJECT_NAME}  PUBLIC
+target_link_libraries(${PROJECT_NAME}
         PkgConfig::lib_manager
         PkgConfig::bagel_gui
         PkgConfig::osg_graph_viz
@@ -92,7 +92,7 @@ target_link_libraries(${PROJECT_NAME}  PUBLIC
         PkgConfig::config_map_gui
         PkgConfig::cfg_manager
         ${QT_LIBRARIES}
-        modkom_types::modkom_types_cpp
+        xtypes::xtypes_cpp
         xtypes_generator::xtypes_generator_cpp
         xdbi::xdbi_cpp
         ${Boost_SYSTEM_LIBRARY} 	

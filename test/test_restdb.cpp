@@ -6,7 +6,7 @@
 #include <mars/utils/misc.h>
 #include <xtypes_generator/XType.hpp>
 #include <xtypes_generator/XTypeRegistry.hpp>
-#include <modkom_types/ComponentModel.hpp>
+#include <xtypes/ComponentModel.hpp>
 
 #include <iostream>
 #include <iomanip>
@@ -17,7 +17,7 @@ using namespace configmaps;
 
 int main(int argv, char** argc) {
   xtypes::XTypeRegistryPtr registry = std::make_unique<xtypes::XTypeRegistry>();
-  registry->register_class<modkom_types::ComponentModel>();
+  registry->register_class<xtypes::ComponentModel>();
   std::unique_ptr<xdbi::Client> client;
   client = std::make_unique<xdbi::Client>(registry);
   client->setDbAddress("http://localhost:8183");

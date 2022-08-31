@@ -100,7 +100,9 @@ target_link_libraries(${PROJECT_NAME}
 
 add_executable(test_restdb test/test_restdb.cpp)
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17) # Use C++17
-target_link_libraries(test_restdb ${PROJECT_NAME})
+target_link_libraries(test_restdb ${PROJECT_NAME}
+          PkgConfig::configmaps
+)
 
 if(WIN32)
   set(LIB_INSTALL_DIR bin) # .dll are in PATH, like executables
@@ -126,10 +128,19 @@ install(FILES ${HEADERS} DESTINATION include/${PROJECT_NAME})
 configure_file(${PROJECT_NAME}.pc.in ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.pc @ONLY)
 install(FILES ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.pc DESTINATION lib/pkgconfig)
 
+if(APPLE)
+  set(PYTHON_SHEBANG "/opt/local/bin/python")
+else(APPLE)
+  set(PYTHON_SHEBANG "/usr/bin/env python")
+endif(APPLE)
 
+configure_file(bin/xrock_gui.in ${CMAKE_BINARY_DIR}/xrock_gui @ONLY)
+configure_file(bin/shader_gui.in ${CMAKE_BINARY_DIR}/shader_gui @ONLY)
 install(DIRECTORY configuration/ DESTINATION configuration/)
-INSTALL(PROGRAMS bin/xrock_gui DESTINATION bin)
-INSTALL(PROGRAMS bin/shader_gui DESTINATION bin)
-INSTALL(PROGRAMS bin/cnd_gui DESTINATION bin)
+INSTALL(PROGRAMS ${CMAKE_BINARY_DIR}/xrock_gui DESTINATION bin)
+INSTALL(PROGRAMS ${CMAKE_BINARY_DIR}/shader_gui DESTINATION bin)
+#INSTALL(PROGRAMS bin/cnd_gui DESTINATION bin)
 INSTALL(PROGRAMS bin/xrock-resolve-ports DESTINATION bin)
-INSTALL(PROGRAMS bin/xrock-create-deployment DESTINATION bin)
+
+configure_file(bin/xrock-create-deployment.in ${CMAKE_BINARY_DIR}/xrock-create-deployment @ONLY)
+INSTALL(PROGRAMS ${CMAKE_BINARY_DIR}/xrock-create-deployment DESTINATION bin)

@@ -1,4 +1,4 @@
-#!/opt/local/bin/python
+#!@PYTHON_SHEBANG@
 
 import argparse
 import sys

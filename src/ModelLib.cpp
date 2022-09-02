@@ -10,6 +10,7 @@
 #include "ImportDialog.hpp"
 #include "FileDB.hpp"
 #include "RestDB.hpp"
+#include "ServerlessDB.hpp"
 #include "VersionDialog.hpp"
 #include "ConfigureDialog.hpp"
 #include "ConfigMapHelper.hpp"
@@ -77,6 +78,7 @@ namespace xrock_gui_model
           defaultAddress = "http://localhost:8183";
         }
       }
+      
       std::string confDir2 = confDir + "/XRockGUI.yml";
       if (mars::utils::pathExists(confDir2))
       {
@@ -91,8 +93,15 @@ namespace xrock_gui_model
       {
         db = new RestDB();
         // db = libManager->getLibraryAs<DBInterface>(env["io_library"], true);
+        std::cout << "Using restdb"<<std::endl;
+
       }
-      if (!db)
+      else if(env.hasKey("dbType") and env["dbType"] == "ServerlessDB" and env.hasKey("dbPath"))
+      {
+        db = new ServerlessDB(env["dbPath"].toString());
+        std::cout << "Using serverless where db path is: "<<env["dbPath"].toString()<<std::endl;
+      }
+      else
       {
         prop_dbAddress.sValue = mars::utils::pathJoin(confDir, prop_dbAddress.sValue);
         db = new FileDB();

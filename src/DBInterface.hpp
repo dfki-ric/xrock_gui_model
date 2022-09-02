@@ -26,7 +26,7 @@ namespace xrock_gui_model {
                                                 const bool limit = false) = 0;
     virtual bool storeModel(const configmaps::ConfigMap &map) = 0;
 
-    virtual void set_dbAddress(const std::string &_dbAddress) = 0;
+    virtual void set_dbAddress(const std::string &_dbAddress) {};
 
   };
 } // end of namespace xrock_gui_model

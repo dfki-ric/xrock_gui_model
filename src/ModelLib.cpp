@@ -1269,187 +1269,194 @@ namespace xrock_gui_model
   void ModelLib::exportCnd(const configmaps::ConfigMap &map_,
                            const std::string &filename)
   {
-    ConfigMap map = map_;
-    ConfigMap output;
-    ConfigMap nameMap;
-    ConfigMap dNameMap;
-    bool haveMarsTask = false;
-    bool compileDeployments = false;
-    // handle file path and node order
-    for (auto node : map["nodes"])
-    {
-      if (node["type"] == "software::Deployment")
-      {
-        std::string name = node["name"];
+    ConfigMap map = bagelGui->getCurrentModel()->getModelInfo();
+    std::stringstream cnd_export;
+    cnd_export << "export_cnd -m " << map["name"].getString()
+               << " -v " << map["versions"][0]["name"].getString()
+               << " -o " << filename;
 
-        output["deployments"][name]["deployer"] = "orogen";
-        output["deployments"][name]["process_name"] = name;
-        output["deployments"][name]["hostID"] = "local";
-        if (node.hasKey("softwareData") and node["softwareData"].hasKey("data") and
-            node["softwareData"]["data"].hasKey("configuration"))
-        {
-          ConfigItem item(node["softwareData"]["data"]["configuration"]);
-          trimMap(item);
-          ConfigMap m = item;
-          if (m.hasKey("deployer"))
-          {
-            output["deployments"][name]["deployer"] = m["deployer"];
-          }
-          if (m.hasKey("process_name"))
-          {
-            output["deployments"][name]["process_name"] = m["process_name"];
-          }
-          if (m.hasKey("hostID"))
-          {
-            output["deployments"][name]["hostID"] = m["hostID"];
-          }
-        }
-        dNameMap[name] = output["deployments"][name]["process_name"];
-      }
-      else
-      {
-        if (node["domain"] == "software")
-        {
-          std::string name = node["name"];
-          nameMap[name] = 1;
-          ConfigItem item(node["softwareData"]["data"]);
-          trimMap(item);
-          ConfigMap m = item;
-          if (m.hasKey("properties"))
-          {
-            ConfigVector props;
-            for (auto prop : m["properties"])
-            {
-              if (prop.hasKey("Value"))
-              {
-                props.push_back(prop);
-              }
-            }
-            m.erase("properties");
-            if (props.size() > 0)
-            {
-              m["properties"] = props;
-            }
-          }
-          if (m.hasKey("configuration"))
-          {
-            ConfigMap m2 = m["configuration"];
-            m.erase("configuration");
-            m.updateMap(m2);
-          }
-          if (m.hasKey("description"))
-          {
-            m.erase("description");
-          }
-          std::string type = node["modelName"];
-          if (type == "mars::Task")
-          {
-            haveMarsTask = true;
-          }
-          output["tasks"][name] = m;
-          output["tasks"][name]["type"] = type;
-          if (node.hasKey("parentName") and node["parentName"].getString().size() > 0)
-          {
-            std::string parent = node["parentName"];
-            std::vector<std::string> arrName = mars::utils::explodeString(':', node["type"]);
-            std::string process_name = "orogen_default_" + arrName[0] + "__" + arrName[2];
-            output["deployments"][parent]["taskList"][name] = process_name;
-            if (output["deployments"][parent]["taskList"].size() > 1)
-            {
-              compileDeployments = true;
-              output["deployments"][parent]["process_name"] = dNameMap[parent];
-            }
-            else
-            {
-              output["deployments"][parent]["process_name"] = process_name;
-            }
-          }
-          else
-          {
-            std::string depName = name + "_deployment";
-            output["deployments"][depName]["deployer"] = "orogen";
-            output["deployments"][depName]["hostID"] = "local";
-            std::vector<std::string> arrName = mars::utils::explodeString(':', node["type"]);
-            std::string process_name = "orogen_default_" + arrName[0] + "__" + arrName[2];
-            output["deployments"][depName]["taskList"][name] = process_name;
-            output["deployments"][depName]["process_name"] = process_name;
-            dNameMap[depName] = depName;
-          }
-        }
-      }
-    }
-    if (compileDeployments)
-    {
-      for (ConfigMap::iterator it = output["deployments"].beginMap();
-           it != output["deployments"].endMap(); ++it)
-      {
-        for (ConfigMap::iterator nt = it->second["taskList"].beginMap();
-             nt != it->second["taskList"].endMap(); ++nt)
-        {
-          nt->second = nt->first;
-        }
-        output["deployments"][it->first]["process_name"] = dNameMap[it->first];
-      }
-    }
-    int i = 0;
-    for (auto edge : map["edges"])
-    {
-      ConfigMap m;
-      if (edge.hasKey("transport"))
-      {
-        m["transport"] = edge["transport"];
-      }
-      if (edge.hasKey("type"))
-      {
-        m["type"] = edge["type"];
-      }
-      if (edge.hasKey("size"))
-      {
-        m["size"] = edge["size"];
-      }
-      std::string name = edge["fromNode"];
-      if (!nameMap.hasKey(name))
-        continue;
-      // remove domian namespace
-      m["from"]["task_id"] = name;
-      m["from"]["port_name"] = edge["fromNodeOutput"];
-      // remove domian namespace
-      name << edge["toNode"];
-      if (!nameMap.hasKey(name))
-        continue;
-      m["to"]["task_id"] = name;
-      m["to"]["port_name"] = edge["toNodeInput"];
-      char buffer[100];
-      // todo: use snprintf
-      sprintf(buffer, "%d", i++);
-      output["connections"][std::string(buffer)] = m;
-    }
-    output.toYamlFile(filename);
-    if (haveMarsTask)
-    {
-      // generate pre cnd because we have to first load mars::Task then
-      // the plugin tasks
-      for (ConfigMap::iterator it = output["tasks"].beginMap();
-           it != output["tasks"].endMap(); ++it)
-      {
-        if (it->second["type"] != "mars::Task")
-        {
-          it->second["state"] = "PRE_OPERATIONAL";
-        }
-      }
-      std::string preFile = filename;
-      mars::utils::removeFilenameSuffix(&preFile);
-      if (output.hasKey("connections"))
-      {
-        output.erase("connections");
-      }
-      output.toYamlFile(preFile + "_pre.cnd");
-    }
-    // write shutdown cnd
-    std::string shutdownFile = mars::utils::pathJoin(mars::utils::getPathOfFile(filename), "shutdown.cnd");
-    FILE *f = fopen(shutdownFile.c_str(), "w");
-    fprintf(f, "deployments:\n\ntasks:\n\nconnections:\n\n");
-    fclose(f);
+    std::system(cnd_export.str().c_str());
+    //   ConfigMap map = map_;
+    //   ConfigMap output;
+    //   ConfigMap nameMap;
+    //   ConfigMap dNameMap;
+    //   bool haveMarsTask = false;
+    //   bool compileDeployments = false;
+    //   // handle file path and node order
+    //   for (auto node : map["nodes"])
+    //   {
+    //     if (node["type"] == "software::Deployment")
+    //     {
+    //       std::string name = node["name"];
+
+    //       output["deployments"][name]["deployer"] = "orogen";
+    //       output["deployments"][name]["process_name"] = name;
+    //       output["deployments"][name]["hostID"] = "local";
+    //       if (node.hasKey("softwareData") and node["softwareData"].hasKey("data") and
+    //           node["softwareData"]["data"].hasKey("configuration"))
+    //       {
+    //         ConfigItem item(node["softwareData"]["data"]["configuration"]);
+    //         trimMap(item);
+    //         ConfigMap m = item;
+    //         if (m.hasKey("deployer"))
+    //         {
+    //           output["deployments"][name]["deployer"] = m["deployer"];
+    //         }
+    //         if (m.hasKey("process_name"))
+    //         {
+    //           output["deployments"][name]["process_name"] = m["process_name"];
+    //         }
+    //         if (m.hasKey("hostID"))
+    //         {
+    //           output["deployments"][name]["hostID"] = m["hostID"];
+    //         }
+    //       }
+    //       dNameMap[name] = output["deployments"][name]["process_name"];
+    //     }
+    //     else
+    //     {
+    //       if (node["domain"] == "software")
+    //       {
+    //         std::string name = node["name"];
+    //         nameMap[name] = 1;
+    //         ConfigItem item(node["softwareData"]["data"]);
+    //         trimMap(item);
+    //         ConfigMap m = item;
+    //         if (m.hasKey("properties"))
+    //         {
+    //           ConfigVector props;
+    //           for (auto prop : m["properties"])
+    //           {
+    //             if (prop.hasKey("Value"))
+    //             {
+    //               props.push_back(prop);
+    //             }
+    //           }
+    //           m.erase("properties");
+    //           if (props.size() > 0)
+    //           {
+    //             m["properties"] = props;
+    //           }
+    //         }
+    //         if (m.hasKey("configuration"))
+    //         {
+    //           ConfigMap m2 = m["configuration"];
+    //           m.erase("configuration");
+    //           m.updateMap(m2);
+    //         }
+    //         if (m.hasKey("description"))
+    //         {
+    //           m.erase("description");
+    //         }
+    //         std::string type = node["modelName"];
+    //         if (type == "mars::Task")
+    //         {
+    //           haveMarsTask = true;
+    //         }
+    //         output["tasks"][name] = m;
+    //         output["tasks"][name]["type"] = type;
+    //         if (node.hasKey("parentName") and node["parentName"].getString().size() > 0)
+    //         {
+    //           std::string parent = node["parentName"];
+    //           std::vector<std::string> arrName = mars::utils::explodeString(':', node["type"]);
+    //           std::string process_name = "orogen_default_" + arrName[0] + "__" + arrName[2];
+    //           output["deployments"][parent]["taskList"][name] = process_name;
+    //           if (output["deployments"][parent]["taskList"].size() > 1)
+    //           {
+    //             compileDeployments = true;
+    //             output["deployments"][parent]["process_name"] = dNameMap[parent];
+    //           }
+    //           else
+    //           {
+    //             output["deployments"][parent]["process_name"] = process_name;
+    //           }
+    //         }
+    //         else
+    //         {
+    //           std::string depName = name + "_deployment";
+    //           output["deployments"][depName]["deployer"] = "orogen";
+    //           output["deployments"][depName]["hostID"] = "local";
+    //           std::vector<std::string> arrName = mars::utils::explodeString(':', node["type"]);
+    //           std::string process_name = "orogen_default_" + arrName[0] + "__" + arrName[2];
+    //           output["deployments"][depName]["taskList"][name] = process_name;
+    //           output["deployments"][depName]["process_name"] = process_name;
+    //           dNameMap[depName] = depName;
+    //         }
+    //       }
+    //     }
+    //   }
+    //   if (compileDeployments)
+    //   {
+    //     for (ConfigMap::iterator it = output["deployments"].beginMap();
+    //          it != output["deployments"].endMap(); ++it)
+    //     {
+    //       for (ConfigMap::iterator nt = it->second["taskList"].beginMap();
+    //            nt != it->second["taskList"].endMap(); ++nt)
+    //       {
+    //         nt->second = nt->first;
+    //       }
+    //       output["deployments"][it->first]["process_name"] = dNameMap[it->first];
+    //     }
+    //   }
+    //   int i = 0;
+    //   for (auto edge : map["edges"])
+    //   {
+    //     ConfigMap m;
+    //     if (edge.hasKey("transport"))
+    //     {
+    //       m["transport"] = edge["transport"];
+    //     }
+    //     if (edge.hasKey("type"))
+    //     {
+    //       m["type"] = edge["type"];
+    //     }
+    //     if (edge.hasKey("size"))
+    //     {
+    //       m["size"] = edge["size"];
+    //     }
+    //     std::string name = edge["fromNode"];
+    //     if (!nameMap.hasKey(name))
+    //       continue;
+    //     // remove domian namespace
+    //     m["from"]["task_id"] = name;
+    //     m["from"]["port_name"] = edge["fromNodeOutput"];
+    //     // remove domian namespace
+    //     name << edge["toNode"];
+    //     if (!nameMap.hasKey(name))
+    //       continue;
+    //     m["to"]["task_id"] = name;
+    //     m["to"]["port_name"] = edge["toNodeInput"];
+    //     char buffer[100];
+    //     // todo: use snprintf
+    //     sprintf(buffer, "%d", i++);
+    //     output["connections"][std::string(buffer)] = m;
+    //   }
+    //   output.toYamlFile(filename);
+    //   if (haveMarsTask)
+    //   {
+    //     // generate pre cnd because we have to first load mars::Task then
+    //     // the plugin tasks
+    //     for (ConfigMap::iterator it = output["tasks"].beginMap();
+    //          it != output["tasks"].endMap(); ++it)
+    //     {
+    //       if (it->second["type"] != "mars::Task")
+    //       {
+    //         it->second["state"] = "PRE_OPERATIONAL";
+    //       }
+    //     }
+    //     std::string preFile = filename;
+    //     mars::utils::removeFilenameSuffix(&preFile);
+    //     if (output.hasKey("connections"))
+    //     {
+    //       output.erase("connections");
+    //     }
+    //     output.toYamlFile(preFile + "_pre.cnd");
+    //   }
+    //   // write shutdown cnd
+    //   std::string shutdownFile = mars::utils::pathJoin(mars::utils::getPathOfFile(filename), "shutdown.cnd");
+    //   FILE *f = fopen(shutdownFile.c_str(), "w");
+    //   fprintf(f, "deployments:\n\ntasks:\n\nconnections:\n\n");
+    //   fclose(f);
   }
 
   void ModelLib::importCND(const std::string &fileName)

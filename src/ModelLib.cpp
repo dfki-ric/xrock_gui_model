@@ -327,7 +327,7 @@ namespace xrock_gui_model
     case 5:
     {
       QString fileName = QFileDialog::getSaveFileName(NULL, QObject::tr("Select Model"),
-                                                      ".", QObject::tr("YAML syntax (*.cnd)"), 0,
+                                                      "export.cnd", QObject::tr("YAML syntax (*.cnd)"), 0,
                                                       QFileDialog::DontUseNativeDialog);
       if (!fileName.isNull())
       {
@@ -529,7 +529,7 @@ namespace xrock_gui_model
     case 20:
     {
       QString fileName = QFileDialog::getOpenFileName(NULL, QObject::tr("Select Model"),
-                                                      ".", QObject::tr("YAML syntax (*.yml)"), 0,
+                                                      ".", QObject::tr("YAML syntax (*.cnd)"), 0,
                                                       QFileDialog::DontUseNativeDialog);
       if (!fileName.isNull())
       {

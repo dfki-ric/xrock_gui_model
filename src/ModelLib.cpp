@@ -18,6 +18,7 @@
 #include <lib_manager/LibManager.hpp>
 #include <bagel_gui/BagelGui.hpp>
 #include <bagel_gui/BagelModel.hpp>
+#include <mars/main_gui/MainGUI.h>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QMessageBox>
@@ -78,7 +79,7 @@ namespace xrock_gui_model
           defaultAddress = "http://localhost:8183";
         }
       }
-      
+
       std::string confDir2 = confDir + "/XRockGUI.yml";
       if (mars::utils::pathExists(confDir2))
       {
@@ -93,13 +94,12 @@ namespace xrock_gui_model
       {
         db = new RestDB();
         // db = libManager->getLibraryAs<DBInterface>(env["io_library"], true);
-        std::cout << "Using restdb"<<std::endl;
-
+        std::cout << "Using restdb" << std::endl;
       }
-      else if(env.hasKey("dbType") and env["dbType"] == "ServerlessDB" and env.hasKey("dbPath"))
+      else if (env.hasKey("dbType") and env["dbType"] == "ServerlessDB" and env.hasKey("dbPath"))
       {
         db = new ServerlessDB(env["dbPath"].toString());
-        std::cout << "Using serverless where db path is: "<<env["dbPath"].toString()<<std::endl;
+        std::cout << "Using serverless where db path is: " << env["dbPath"].toString() << std::endl;
       }
       else
       {
@@ -129,6 +129,8 @@ namespace xrock_gui_model
     gui = libManager->getLibraryAs<mars::main_gui::GuiInterface>("main_gui");
     if (gui)
     {
+      std::string resourcesPath = mars::utils::getCurrentWorkingDir();
+      const std::string icon = mars::utils::pathJoin(resourcesPath, "bagel/xrock_gui_model/resources/images/");
       gui->addGenericMenuAction("../File/Import/Model", 1, this);
       gui->addGenericMenuAction("../File/Import/CNDModel", 20, this);
       gui->addGenericMenuAction("../File/Export/Model", 2, this);
@@ -145,6 +147,28 @@ namespace xrock_gui_model
       gui->addGenericMenuAction("../Expert/Create Bagel Task", 13, this);
       gui->addGenericMenuAction("../Expert/Launch CND", 15, this);
       gui->addGenericMenuAction("../Expert/Stop CND", 16, this);
+      gui->addGenericMenuAction("../Actions/Load Model", 7, this, 0,
+                                icon + "load.png", true);
+      gui->addGenericMenuAction("../Actions/Add Component", 6, this, 0,
+                                icon + "add.png", true);
+      gui->addGenericMenuAction("../Actions/Save Model", 4, this, 0,
+                                icon + "save.png", true);
+      gui->addGenericMenuAction("../Actions/Reload", 30, this, 0,
+                                icon + "reload.png", true);
+
+      // db = new RestDB();
+
+      mars::main_gui::MainGUI *main_gui = dynamic_cast<mars::main_gui::MainGUI *>(gui);
+      // for(auto b : DBInterface::loadBackends()) std::cout << "backend " << b << std::endl;
+      main_gui->addComboBoxToToolbar("Actions", DBInterface::loadBackends(), [this](std::string new_backend)
+                                     {
+        std::cout << "backend changed  " << new_backend << std::endl;
+        menuAction(21);
+        if (new_backend == "Client")
+          menuAction(22);
+        else if (new_backend == "MultiDbClient")
+          menuAction(23); });
+
       widget = new ModelWidget(cfg, bagelGui, this);
       if (!widget->getHiddenCloseState())
       {
@@ -543,6 +567,67 @@ namespace xrock_gui_model
       if (!fileName.isNull())
       {
         importCND(fileName.toStdString());
+      }
+      break;
+    }
+    case 21: // Serverless
+    {
+      std::string conf = bagelGui->getConfigDir();
+      ConfigMap config = ConfigMap::fromYamlFile(conf + "/config_default.yml", true);
+      if (config.hasKey("dbType"))
+      {
+        if (config["dbType"] != "ServerlessDB")
+        {
+          config["dbType"] = "ServerlessDB";
+          if (not config.hasKey("dbPath"))
+            config["dbPath"] = "modkom/component_db"; // TODO : (std::string)db->get_dbPath();
+          db = new (db) ServerlessDB(config["dbPath"].getString());
+          // std::cout << "dont know " << config.toYamlString() << std::endl;
+          std::cout << conf << std::endl;
+          config.toYamlFile(conf + "/config_default.yml");
+          std::cout << config.toYamlString() << std::endl;
+        }
+      }
+      break;
+    }
+    case 22: // Client
+    {
+      std::string conf = bagelGui->getConfigDir();
+      ConfigMap config = ConfigMap::fromYamlFile(conf + "/config_default.yml", true);
+      if (config.hasKey("dbType"))
+      {
+        if (config["dbType"] != "RestDB")
+        {
+          config["dbType"] = "RestDB";
+          db = new (db) RestDB();
+
+          std::cout << conf << std::endl;
+          config.toYamlFile(conf + "/config_default.yml");
+          std::cout << config.toYamlString() << std::endl;
+
+          if (!db->isConnected())
+          {
+            QMessageBox::warning(nullptr, "Warning", "server is not running?! please run : jsondb -d modkom/component_db/", QMessageBox::Ok);
+          }
+        }
+      }
+      break;
+    }
+    case 23: // MultiDbClient
+    {
+      //TODO: implement
+      std::cout << "implementation required" << std::endl;
+      break;
+    }
+    case 30: // Reload
+    {
+      if (ModelInterface *model = bagelGui->getCurrentModel())
+      {
+        ConfigMap currentModel = model->getModelInfo();
+        ConfigMap newModel = db->requestModel(currentModel["domain"], currentModel["name"], currentModel["version"]);
+        // load updated model in new tab
+        widget->loadModel(newModel);
+        //  bagelGui->close(widget->curr)
       }
       break;
     }

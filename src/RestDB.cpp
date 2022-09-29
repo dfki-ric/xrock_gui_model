@@ -16,7 +16,7 @@ namespace xrock_gui_model {
   RestDB::RestDB() : registry(new xtypes::XTypeRegistry()) {
     registry->register_class<ComponentModel>();
     client = std::make_unique<xdbi::Client>(registry);
-    client->setDbAddress("http://localhost:8183");
+    client->setDbAddress("http://0.0.0.0:8183");
     client->setDbUser("");
     client->setDbPassword("");
 
@@ -27,14 +27,43 @@ namespace xrock_gui_model {
   }
 
   std::vector<std::pair<std::string, std::string>> RestDB::requestModelListByDomain(const std::string& domain) {
-    return client->requestModelListByDomain("ComponentModel", mars::utils::toupper(domain));
+    nl::json props;
+    props["domain"] = mars::utils::toupper(domain);
+    const std::vector<XTypePtr> models = client->find("ComponentModel", props, 0);
+    std::vector<std::pair<std::string, std::string>> out;
+  //   for (const auto &model : models)
+  //   {
+  //       if (!model->has_property("version"))
+  //           throw std::runtime_error("Model of ComponentModel type has no 'version' property!");
+  //       auto types = std::static_pointer_cast<ComponentModel>(model)->get_types();
+  //       out.push_back(std::make_pair(model->get_property("name"), types[0]->get_name()));
+  //   }
+  //   return out;
+  //   //return client->requestModelListByDomain("ComponentModel", mars::utils::toupper(domain));
+  // }
+      for (const auto &model : models)
+    {
+        if (!model->has_property("version"))
+            throw std::runtime_error("Model of  componentModel type has no 'version' property!");
+        out.push_back(std::make_pair(model->get_property("name"), model->get_property("type")));
+    }
+    return out;
   }
-
-
   std::vector<std::string> RestDB::requestVersions(const std::string& domain, const std::string &model) {
     // ToDo as soon as modelDeepness is integrated, we can simplify this
     // request["modelDeepness"] = "versionOnly";
-    return client->requestVersions("ComponentModel", mars::utils::toupper(domain), model);
+    nl::json props;
+    props["name"] = model;
+    props["domain"] = mars::utils::toupper(domain);
+    const std::vector<XTypePtr> models = client->find("ComponentModel", props);
+    std::vector<std::string> out;
+    for (const auto &model : models)
+    {
+        if (!model->has_property("version"))
+            throw std::runtime_error("Model of ComponentModel type has no 'version' property!");
+        out.push_back(model->get_property("version"));
+    }
+    return out;
   }
 
 
@@ -48,8 +77,7 @@ namespace xrock_gui_model {
     if(version.size() > 0) {
       props["version"] = version;
     }
-
-    std::vector<XTypePtr> xtypes = client->findByJsonPropString("ComponentModel", props.toJsonString(), limit ? 3 : -1);
+    std::vector<XTypePtr> xtypes = client->find("ComponentModel",props.toJsonString(), limit ? 3 : -1);;
     if (xtypes.size() == 0) {
       std::cerr<<"ComponentModel with props: "<<props.toJsonString()<<" not loaded"<<std::endl;
       abort();
@@ -117,6 +145,14 @@ namespace xrock_gui_model {
 
   void RestDB::set_dbGraph(const std::string &_dbGraph) {
     client->setWorkingGraph(_dbGraph);
+  }
+  // std::vector<std::string> RestDB::loadBackends()
+  // {
+  //   return xdbi::DbInterface::get_available_backends();
+  // }
+  bool RestDB::isConnected() 
+  {
+    return client->isConnected();
   }
   //void RestDB::set_dbPath(const fs::path &_dbPath) {
   //  client->setWorkingDbPath(_dbPath);

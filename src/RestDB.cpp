@@ -139,6 +139,10 @@ namespace xrock_gui_model {
   void RestDB::set_dbGraph(const std::string &_dbGraph) {
     client->setWorkingGraph(_dbGraph);
   }
+  bool RestDB::isConnected()
+  {
+    return client->isConnected();
+  }
   //void RestDB::set_dbPath(const fs::path &_dbPath) {
   //  client->setWorkingDbPath(_dbPath);
   //}

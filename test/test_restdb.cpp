@@ -25,11 +25,11 @@ int main(int argv, char** argc) {
   client->setDbPassword("");
   client->setWorkingGraph("graph_test");
   
-  std::vector<std::pair<std::string, std::string>> result = client->requestModelListByDomain("ComponentModel", mars::utils::toupper("software"));
+  // std::vector<std::pair<std::string, std::string>> result = client->requestModelListByDomain("ComponentModel", mars::utils::toupper("software"));
 
-  for(auto r: result) {
-    fprintf(stderr, "%s: %s\n", r.first.c_str(), r.second.c_str());
-  }
+  // for(auto r: result) {
+  //   fprintf(stderr, "%s: %s\n", r.first.c_str(), r.second.c_str());
+  // }
   return 0;
 }
 

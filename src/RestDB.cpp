@@ -27,14 +27,35 @@ namespace xrock_gui_model {
   }
 
   std::vector<std::pair<std::string, std::string>> RestDB::requestModelListByDomain(const std::string& domain) {
-    return client->requestModelListByDomain("ComponentModel", mars::utils::toupper(domain));
+    nl::json props;
+    props["domain"] = mars::utils::toupper(domain);
+    const std::vector<XTypePtr> models = client->find("ComponentModel", props, 0);
+    std::vector<std::pair<std::string, std::string>> out;
+    for (const auto &model : models)
+    {
+      if (!model->has_property("version"))
+        throw std::runtime_error("Model of  componentModel type has no 'version' property!");
+      out.push_back(std::make_pair(model->get_property("name"), model->get_property("type")));
+    }
+    return out;
   }
 
 
   std::vector<std::string> RestDB::requestVersions(const std::string& domain, const std::string &model) {
     // ToDo as soon as modelDeepness is integrated, we can simplify this
     // request["modelDeepness"] = "versionOnly";
-    return client->requestVersions("ComponentModel", mars::utils::toupper(domain), model);
+   nl::json props;
+   props["name"] = model;
+   props["domain"] = mars::utils::toupper(domain);
+   const std::vector<XTypePtr> models = client->find("ComponentModel", props);
+   std::vector<std::string> out;
+   for (const auto &model : models)
+   {
+     if (!model->has_property("version"))
+       throw std::runtime_error("Model of ComponentModel type has no 'version' property!");
+     out.push_back(model->get_property("version"));
+   }
+   return out;
   }
 
 
@@ -42,16 +63,16 @@ namespace xrock_gui_model {
                                   const std::string &model,
                                   const std::string &version,
                                   const bool limit) {
-    ConfigMap props;
+    nl::json props;
     props["domain"] = mars::utils::toupper(domain);
     props["name"] = model;
     if(version.size() > 0) {
       props["version"] = version;
     }
 
-    std::vector<XTypePtr> xtypes = client->findByJsonPropString("ComponentModel", props.toJsonString(), limit ? 3 : -1);
+    std::vector<XTypePtr> xtypes = client->find("ComponentModel", props, limit ? 3 : -1);
     if (xtypes.size() == 0) {
-      std::cerr<<"ComponentModel with props: "<<props.toJsonString()<<" not loaded"<<std::endl;
+      std::cerr<<"ComponentModel with props: "<<props<<" not loaded"<<std::endl;
       abort();
     }
     return ConfigMap::fromJsonString(std::static_pointer_cast<ComponentModel>(xtypes[0])->export_to_basic_model());

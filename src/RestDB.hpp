@@ -34,10 +34,9 @@ namespace xrock_gui_model {
     virtual void set_dbUser(const std::string &_dbUser);
     virtual void set_dbPassword(const std::string &_dbPassword);
     virtual void set_dbGraph(const std::string &_dbGraph);
-    //virtual void set_dbPath(const fs::path &_dbPath);
-    //virtual std::vector<std::string> loadBackends() override;
     virtual bool isConnected() override;
-
+    //virtual void set_dbPath(const fs::path &_dbPath);
+    
 
   private:
     std::unique_ptr<xdbi::Client> client;

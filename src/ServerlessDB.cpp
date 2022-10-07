@@ -26,26 +26,18 @@ namespace xrock_gui_model {
   std::vector<std::pair<std::string, std::string>> ServerlessDB::requestModelListByDomain(const std::string& domain) {
     nl::json props;
     props["domain"] = mars::utils::toupper(domain);
-    const std::vector<XTypePtr> models = serverless->find("ComponentModel", props, 0);
+    const std::vector<XTypePtr> models = serverless->find("ComponentModel", props, 1);
     std::vector<std::pair<std::string, std::string>> out;
     for (const auto &model : models)
     {
-        if (!model->has_property("version"))
-            throw std::runtime_error("Model of ComponentModel type has no 'version' property!");
-       
-    //     //std::cout << std::static_pointer_cast<ComponentModel>(model)->export_to_basic_model() << std::endl;
-    //     auto types = std::static_pointer_cast<ComponentModel>(model)->get_types();
-    //     if(!types.empty())
-    //       out.push_back(std::make_pair(model->get_property("name"), types[0]->get_name()));
-    // }
-    // //for(auto [a, b] : out) std::cout << a << " : " << b << std::endl;
-    // return out;
+      if (!model->has_property("version"))
+        throw std::runtime_error("Model of ComponentModel type has no 'version' property!");
       for (const auto &model : models)
-    {
+      {
         if (!model->has_property("version"))
-            throw std::runtime_error("Model of componentModel type has no 'version' property!");
+          throw std::runtime_error("Model of componentModel type has no 'version' property!");
         out.push_back(std::make_pair(model->get_property("name"), model->get_property("type")));
-    }
+      }
     }
     return out;
   }
@@ -61,9 +53,9 @@ namespace xrock_gui_model {
     std::vector<std::string> out;
     for (const auto &model : models)
     {
-        if (!model->has_property("version"))
-            throw std::runtime_error("Model of ComponentModel type has no 'version' property!");
-        out.push_back(model->get_property("version"));
+      if (!model->has_property("version"))
+        throw std::runtime_error("Model of ComponentModel type has no 'version' property!");
+      out.push_back(model->get_property("version"));
     }
     return out;
   }
@@ -80,7 +72,7 @@ namespace xrock_gui_model {
       props["version"] = version;
     }
 
-    std::vector<XTypePtr> xtypes = serverless->find("ComponentModel", props, limit ? 3 : -1);;
+    std::vector<XTypePtr> xtypes = serverless->find("ComponentModel", props, limit ? 3 : -1);
     if (xtypes.size() == 0) {
       std::cerr<<"ComponentModel with props: "<<props<<" not loaded"<<std::endl;
       abort();

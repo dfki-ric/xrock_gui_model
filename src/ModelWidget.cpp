@@ -330,7 +330,6 @@ namespace xrock_gui_model {
 
     QMessageBox message;
     if(success) {
-      bagelGui->getCurrentTabView()->setHasChanges(false); // everything was saved to db, view has no unsaved work.
       message.setText("The model was successfully stored!");
     }
     else {

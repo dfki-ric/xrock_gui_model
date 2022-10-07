@@ -26,7 +26,7 @@ namespace xrock_gui_model {
   std::vector<std::pair<std::string, std::string>> ServerlessDB::requestModelListByDomain(const std::string& domain) {
     nl::json props;
     props["domain"] = mars::utils::toupper(domain);
-    const std::vector<XTypePtr> models = serverless->find("ComponentModel", props, 1);
+    const std::vector<XTypePtr> models = serverless->find("ComponentModel", props, 0);
     std::vector<std::pair<std::string, std::string>> out;
     for (const auto &model : models)
     {

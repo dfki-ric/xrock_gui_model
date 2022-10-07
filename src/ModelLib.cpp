@@ -291,6 +291,7 @@ namespace xrock_gui_model
     }
     try
     {
+      //std::cout << "Loading config file from "<<workspace + "/" + filename << std::endl;
       ConfigMap gConfig = ConfigMap::fromYamlFile(workspace + "/" + filename);
       const std::string user = gConfig["database"]["username"];
       const std::string password = gConfig["database"]["password"];
@@ -301,15 +302,18 @@ namespace xrock_gui_model
         cfg->setPropertyValue("XRockGUI", "dbUser", "value", user);
         cfg->setPropertyValue("XRockGUI", "dbPassword", "value", password);
       }
-      std::cout << "loadGeneralSettings: settings loaded from file: " << filename << std::endl;
+      std::cout << "loadSettingsFromFile: settings loaded from file: " << filename << std::endl;
     }
     catch (std::invalid_argument &e)
     {
-      std::cout << e.what() << std::endl;
+      QMessageBox::critical(nullptr, "Error", e.what(),  QMessageBox::Ok); 
     }
     catch (...)
     {
-      std::cout << "loadGeneralSettings: ERROR while loading: " << workspace << filename << std::endl;
+      std::stringstream ss;
+      ss << "loadSettingsFromFile: ERROR while loading: " << workspace << '/' << filename;
+      std::cerr << ss.str() << std::endl;
+      //QMessageBox::critical(nullptr, "Error",QString::fromStdString(ss.str()),  QMessageBox::Ok);  
     }
   }
 
@@ -607,7 +611,7 @@ namespace xrock_gui_model
 
           if (!db->isConnected())
           {
-            QMessageBox::warning(nullptr, "Warning", "server is not running?! please run : jsondb -d modkom/component_db/", QMessageBox::Ok);
+            QMessageBox::warning(nullptr, "Warning", "Server is not running! Please run server using command:\njsondb -d modkom/component_db/", QMessageBox::Ok);
           }
         }
       }
@@ -626,7 +630,10 @@ namespace xrock_gui_model
         ConfigMap currentModel = model->getModelInfo();
         ConfigMap newModel = db->requestModel(currentModel["domain"], currentModel["name"], currentModel["version"]);
         // load updated model in new tab
-        widget->loadModel(newModel);
+        //widget->loadModel(newModel);
+        widget->setModelInfo(newModel);
+        widget->updateModelInfo();
+
         //  bagelGui->close(widget->curr)
       }
       break;
@@ -1138,7 +1145,11 @@ namespace xrock_gui_model
         }
         catch (...)
         {
-          // what to do if the defaultConfig is not a valid YAML
+          
+        std::stringstream ss;
+        ss << "defaultConfig is not a valid YAML " ;
+        QMessageBox::critical(nullptr, "Error",QString::fromStdString(ss.str()),  QMessageBox::Ok);
+            // what to do if the defaultConfig is not a valid YAML
         }
         break;
       }
@@ -1175,6 +1186,10 @@ namespace xrock_gui_model
     }
     catch (...)
     {
+      std::stringstream ss;
+      ss<< "defaultConfig is not a valid YAML ";
+      QMessageBox::critical(nullptr, "Error",QString::fromStdString(ss.str()),  QMessageBox::Ok);
+        
       // how to handle if the config is no more a valid YAML? Could this happen?
     }
   }

@@ -11,8 +11,6 @@ using namespace xtypes;
 
 namespace xrock_gui_model {
 
-
-
   RestDB::RestDB() : registry(new xtypes::XTypeRegistry()) {
     registry->register_class<ComponentModel>();
     client = std::make_unique<xdbi::Client>(registry);
@@ -77,7 +75,7 @@ namespace xrock_gui_model {
     if(version.size() > 0) {
       props["version"] = version;
     }
-    std::vector<XTypePtr> xtypes = client->find("ComponentModel",props.toJsonString(), limit ? 3 : -1);;
+    std::vector<XTypePtr> xtypes = client->find("ComponentModel",props.toJsonString(), limit ? 3 : -1);
     if (xtypes.size() == 0) {
       std::cerr<<"ComponentModel with props: "<<props.toJsonString()<<" not loaded"<<std::endl;
       abort();

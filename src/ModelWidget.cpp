@@ -180,7 +180,10 @@ namespace xrock_gui_model {
     }
     catch(const std::exception& e)
     {
-      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+      std::stringstream ss;
+      ss << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+      QMessageBox::warning(nullptr, "Warning",QString::fromStdString(ss.str()),  QMessageBox::Ok);
+        
     }
   }
 
@@ -241,7 +244,9 @@ namespace xrock_gui_model {
     }
     catch(const std::exception& e)
     {
-      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+           std::stringstream ss;
+      ss << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+      QMessageBox::warning(nullptr, "Warning",QString::fromStdString(ss.str()),  QMessageBox::Ok);
     }
   }
 
@@ -285,7 +290,10 @@ namespace xrock_gui_model {
 
     catch(const std::exception& e)
     {
-      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+      std::stringstream ss;
+      ss << "Exception thrown: " << e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n'
+         << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+      QMessageBox::warning(nullptr, "Warning", QString::fromStdString(ss.str()), QMessageBox::Ok);
     }
   }
 
@@ -322,6 +330,7 @@ namespace xrock_gui_model {
 
     QMessageBox message;
     if(success) {
+      bagelGui->getCurrentTabView()->setHasChanges(false); // everything was saved to db, view has no unsaved work.
       message.setText("The model was successfully stored!");
     }
     else {
@@ -331,7 +340,9 @@ namespace xrock_gui_model {
     }
     catch(const std::exception& e)
     {
-      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+            std::stringstream ss;
+      ss << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+      QMessageBox::warning(nullptr, "Warning",QString::fromStdString(ss.str()),  QMessageBox::Ok);
     }
   }
 
@@ -341,7 +352,9 @@ namespace xrock_gui_model {
     }
     catch(const std::exception& e)
     {
-      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+            std::stringstream ss;
+      ss << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+      QMessageBox::warning(nullptr, "Warning",QString::fromStdString(ss.str()),  QMessageBox::Ok);
     }
   }
 
@@ -356,7 +369,9 @@ namespace xrock_gui_model {
     }
     catch(const std::exception& e)
     {
-      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+            std::stringstream ss;
+      ss << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+      QMessageBox::warning(nullptr, "Warning",QString::fromStdString(ss.str()),  QMessageBox::Ok);
     }
   }
   void ModelWidget::loadModel(const std::string &file){
@@ -371,7 +386,9 @@ namespace xrock_gui_model {
     }
   }catch(const std::exception& e)
   {
-      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+            std::stringstream ss;
+      ss << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+      QMessageBox::warning(nullptr, "Warning",QString::fromStdString(ss.str()),  QMessageBox::Ok);
   }
   }
 
@@ -481,7 +498,9 @@ namespace xrock_gui_model {
     handleEditionLayout();
   }catch(const std::exception& e)
   {
-      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+            std::stringstream ss;
+      ss << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+      QMessageBox::warning(nullptr, "Warning",QString::fromStdString(ss.str()),  QMessageBox::Ok);
   }
   }
 
@@ -521,7 +540,9 @@ namespace xrock_gui_model {
     }
   }catch(const std::exception& e)
   {
-      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+            std::stringstream ss;
+      ss << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+      QMessageBox::warning(nullptr, "Warning",QString::fromStdString(ss.str()),  QMessageBox::Ok);
   }
   }
 
@@ -582,7 +603,9 @@ namespace xrock_gui_model {
     }
   }catch(const std::exception& e)
   {
-      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+            std::stringstream ss;
+      ss << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+      QMessageBox::warning(nullptr, "Warning",QString::fromStdString(ss.str()),  QMessageBox::Ok);
   }
   }
 
@@ -756,7 +779,9 @@ namespace xrock_gui_model {
     }
   }catch(const std::exception& e)
   {
-      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+            std::stringstream ss;
+      ss << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+      QMessageBox::warning(nullptr, "Warning",QString::fromStdString(ss.str()),  QMessageBox::Ok);
   }
   }
 
@@ -771,7 +796,9 @@ namespace xrock_gui_model {
     return defaultConfig;
   }catch(const std::exception& e)
   {
-      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+            std::stringstream ss;
+      ss << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+      QMessageBox::warning(nullptr, "Warning",QString::fromStdString(ss.str()),  QMessageBox::Ok);
     return ConfigMap();
   }
   }
@@ -799,7 +826,9 @@ namespace xrock_gui_model {
     }
   }catch(const std::exception& e)
   {
-      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+            std::stringstream ss;
+      ss << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+      QMessageBox::warning(nullptr, "Warning",QString::fromStdString(ss.str()),  QMessageBox::Ok);
   }
   }
 
@@ -902,7 +931,9 @@ namespace xrock_gui_model {
   }
   catch(const std::exception& e)
   {
-      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+            std::stringstream ss;
+      ss << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+      QMessageBox::warning(nullptr, "Warning",QString::fromStdString(ss.str()),  QMessageBox::Ok);
   }
   }
 
@@ -1127,7 +1158,9 @@ namespace xrock_gui_model {
     //output.toYamlFile("da2.yml");
   }catch(const std::exception& e)
   {
-      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+      std::stringstream ss;
+      ss << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+      QMessageBox::warning(nullptr, "Warning",QString::fromStdString(ss.str()),  QMessageBox::Ok);
   }
   }
 
@@ -1178,7 +1211,9 @@ namespace xrock_gui_model {
     }
   }catch(const std::exception& e)
   {
-      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+            std::stringstream ss;
+      ss << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+      QMessageBox::warning(nullptr, "Warning",QString::fromStdString(ss.str()),  QMessageBox::Ok);
   }
   }
 
@@ -1218,7 +1253,9 @@ namespace xrock_gui_model {
     ignoreUpdate = false;
   }catch(const std::exception& e)
   {
-      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+            std::stringstream ss;
+      ss << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+      QMessageBox::warning(nullptr, "Warning",QString::fromStdString(ss.str()),  QMessageBox::Ok);
   }
   }
 
@@ -1277,7 +1314,9 @@ namespace xrock_gui_model {
   }
 catch(const std::exception& e)
   {
-      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+            std::stringstream ss;
+      ss << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+      QMessageBox::warning(nullptr, "Warning",QString::fromStdString(ss.str()),  QMessageBox::Ok);
   }
   }
   void ModelWidget::getModelInfo(std::string *domain, std::string *name,
@@ -1301,7 +1340,9 @@ catch(const std::exception& e)
     updateModelInfo();
   }catch(const std::exception& e)
   {
-      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+            std::stringstream ss;
+      ss << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+      QMessageBox::warning(nullptr, "Warning",QString::fromStdString(ss.str()),  QMessageBox::Ok);
   }
   }
 
@@ -1331,7 +1372,9 @@ catch(const std::exception& e)
   }
   catch(const std::exception& e)
   {
-      qDebug() << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+            std::stringstream ss;
+      ss << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+      QMessageBox::warning(nullptr, "Warning",QString::fromStdString(ss.str()),  QMessageBox::Ok);
   }
   }
 

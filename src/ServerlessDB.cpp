@@ -127,6 +127,6 @@ namespace xrock_gui_model {
     serverless->setWorkingGraph(_dbGraph);
   }
   void ServerlessDB::set_dbPath(const fs::path &_dbPath) {
-   client->setWorkingDbPath(_dbPath);
+   serverless->setWorkingDbPath(_dbPath);
   }
 } // end of namespace xrock_gui_model

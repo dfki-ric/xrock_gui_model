@@ -60,9 +60,17 @@ namespace xrock_gui_model
     importToBagel = false;
     cfg = libManager->getLibraryAs<mars::cfg_manager::CFGManagerInterface>("cfg_manager", true);
     std::string confDir = ".";
-    if (cfg)
-    {
+    
+    resourcesPath = XROCK_DEFAULT_RESOURCES_PATH;
+    if(cfg) {
+      std::string resourcesPathConfig = cfg->getOrCreateProperty("Preferences",
+                                                     "resources_path",
+                                                     "").sValue;
+      if(resourcesPathConfig != "") {
+        resourcesPath = resourcesPathConfig;
+      }
       cfg->getPropertyValue("Config", "config_path", "value", &confDir);
+    
       env = ConfigMap::fromYamlFile(confDir + "/config_default.yml", true);
       // try to load environment
       if (mars::utils::pathExists(confDir + "/config.yml"))
@@ -130,7 +138,8 @@ namespace xrock_gui_model
     if (gui)
     {
       // todo: remove by proper resources handling
-      const std::string icon = mars::utils::pathJoin(confDir, "../../../bagel/xrock_gui_model/resources/images/");
+      const std::string icon = mars::utils::pathJoin(resourcesPath, "xrock_gui_model/resources/images/");
+      std::cout << icon << std::endl;
       gui->addGenericMenuAction("../File/Import/Model", 1, this);
       gui->addGenericMenuAction("../File/Import/CNDModel", 20, this);
       gui->addGenericMenuAction("../File/Export/Model", 2, this);
@@ -578,14 +587,17 @@ namespace xrock_gui_model
     {
       std::string conf = bagelGui->getConfigDir();
       ConfigMap config = ConfigMap::fromYamlFile(conf + "/config_default.yml", true);
+      std::string c = getenv("AUTOPROJ_CURRENT_ROOT");
+
       if (config.hasKey("dbType"))
       {
         if (config["dbType"] != "ServerlessDB")
         {
           config["dbType"] = "ServerlessDB";
+          
           if (not config.hasKey("dbPath"))
-            config["dbPath"] = "../../../modkom/component_db"; // TODO : (std::string)db->get_dbPath();
-          db = new (db) ServerlessDB(mars::utils::pathJoin(conf, config["dbPath"].getString()));
+            config["dbPath"] = mars::utils::pathJoin(c ,"modkom/component_db"); // TODO : (std::string)db->get_dbPath();
+          db = new (db) ServerlessDB(config["dbPath"].getString());
           // std::cout << "dont know " << config.toYamlString() << std::endl;
           std::cout << conf << std::endl;
           config.toYamlFile(mars::utils::pathJoin(conf, "config_default.yml"));
@@ -625,23 +637,17 @@ namespace xrock_gui_model
     }
     case 30: // Reload
     {
-      Model *model = dynamic_cast<Model *>(bagelGui->getCurrentModel());
-      if (model)
+      if (ModelInterface *model = bagelGui->getCurrentModel())
       {
         ConfigMap currentModel = model->getModelInfo();
+        ConfigMap newModel = db->requestModel(currentModel["domain"], currentModel["name"], currentModel["version"], true);
+        // load updated model in new tab
+        //widget->loadModel(newModel);
+        widget->setModelInfo(newModel);
+        widget->updateModelInfo();
 
-        if(currentModel.hasKey("name"))
-        {
-          
-          ConfigMap newModel = db->requestModel(currentModel["domain"], currentModel["name"], currentModel["version"], true);
-          // load updated model in new tab
-          widget->loadModel(newModel);
-   
-        }
-        else  QMessageBox::warning(nullptr, "Warning", "Nothing to reload.", QMessageBox::Ok);
-
+        //  bagelGui->close(widget->curr)
       }
-
       break;
     }
     }

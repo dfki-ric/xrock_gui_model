@@ -26,7 +26,7 @@ namespace xrock_gui_model {
   std::vector<std::pair<std::string, std::string>> ServerlessDB::requestModelListByDomain(const std::string& domain) {
     nl::json props;
     props["domain"] = mars::utils::toupper(domain);
-    const std::vector<XTypePtr> models = serverless->find("ComponentModel", props, 1);
+    const std::vector<XTypePtr> models = serverless->find("ComponentModel", props, 0);
     std::vector<std::pair<std::string, std::string>> out;
     for (const auto &model : models)
     {
@@ -49,7 +49,7 @@ namespace xrock_gui_model {
     nl::json props;
     props["name"] = model;
     props["domain"] = mars::utils::toupper(domain);
-    const std::vector<XTypePtr> models = serverless->find("ComponentModel", props);
+    const std::vector<XTypePtr> models = serverless->find("ComponentModel", props,0);
     std::vector<std::string> out;
     for (const auto &model : models)
     {
@@ -126,7 +126,7 @@ namespace xrock_gui_model {
   void ServerlessDB::set_dbGraph(const std::string &_dbGraph) {
     serverless->setWorkingGraph(_dbGraph);
   }
-  //void ServerlessDB::set_dbPath(const fs::path &_dbPath) {
-  //  client->setWorkingDbPath(_dbPath);
-  //}
+  void ServerlessDB::set_dbPath(const fs::path &_dbPath) {
+   client->setWorkingDbPath(_dbPath);
+  }
 } // end of namespace xrock_gui_model

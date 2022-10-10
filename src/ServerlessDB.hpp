@@ -31,7 +31,7 @@ namespace xrock_gui_model {
     virtual bool storeModel(const configmaps::ConfigMap &map);
 
     virtual void set_dbGraph(const std::string &_dbGraph);
-    //virtual void set_dbPath(const fs::path &_dbPath);
+    virtual void set_dbPath(const fs::path &_dbPath);
 
 
   private:

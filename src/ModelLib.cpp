@@ -625,17 +625,23 @@ namespace xrock_gui_model
     }
     case 30: // Reload
     {
-      if (ModelInterface *model = bagelGui->getCurrentModel())
+      Model *model = dynamic_cast<Model *>(bagelGui->getCurrentModel());
+      if (model)
       {
         ConfigMap currentModel = model->getModelInfo();
-        ConfigMap newModel = db->requestModel(currentModel["domain"], currentModel["name"], currentModel["version"], true);
-        // load updated model in new tab
-        //widget->loadModel(newModel);
-        widget->setModelInfo(newModel);
-        widget->updateModelInfo();
 
-        //  bagelGui->close(widget->curr)
+        if(currentModel.hasKey("name"))
+        {
+          
+          ConfigMap newModel = db->requestModel(currentModel["domain"], currentModel["name"], currentModel["version"], true);
+          // load updated model in new tab
+          widget->loadModel(newModel);
+   
+        }
+        else  QMessageBox::warning(nullptr, "Warning", "Nothing to reload.", QMessageBox::Ok);
+
       }
+
       break;
     }
     }

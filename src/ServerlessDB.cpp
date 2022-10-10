@@ -49,7 +49,7 @@ namespace xrock_gui_model {
     nl::json props;
     props["name"] = model;
     props["domain"] = mars::utils::toupper(domain);
-    const std::vector<XTypePtr> models = serverless->find("ComponentModel", props,0);
+    const std::vector<XTypePtr> models = serverless->find("ComponentModel", props, 0);
     std::vector<std::string> out;
     for (const auto &model : models)
     {

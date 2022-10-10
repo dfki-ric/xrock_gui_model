@@ -628,7 +628,7 @@ namespace xrock_gui_model
       if (ModelInterface *model = bagelGui->getCurrentModel())
       {
         ConfigMap currentModel = model->getModelInfo();
-        ConfigMap newModel = db->requestModel(currentModel["domain"], currentModel["name"], currentModel["version"]);
+        ConfigMap newModel = db->requestModel(currentModel["domain"], currentModel["name"], currentModel["version"], true);
         // load updated model in new tab
         //widget->loadModel(newModel);
         widget->setModelInfo(newModel);
@@ -872,7 +872,7 @@ namespace xrock_gui_model
           }
           else
           {
-            map = db->requestModel("mechanics", modelName, std::string("v1"));
+            map = db->requestModel("mechanics", modelName, std::string("v1"), true);
             modelCache[modelName] = map;
           }
           handleModelMap(model, map, name);

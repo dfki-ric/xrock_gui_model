@@ -1,4 +1,4 @@
-#include "RestDB.hpp"
+#include "ServerlessDB.hpp"
 #include <mars/utils/misc.h>
 #include <xtypes/ComponentModel.hpp>
 
@@ -11,53 +11,57 @@ using namespace xtypes;
 
 namespace xrock_gui_model {
 
-  RestDB::RestDB() : registry(new xtypes::XTypeRegistry()) {
+
+
+  ServerlessDB::ServerlessDB(const fs::path& db_path) : registry(new xtypes::XTypeRegistry()) {
     registry->register_class<ComponentModel>();
-    client = std::make_unique<xdbi::Client>(registry);
-    client->setDbAddress("http://0.0.0.0:8183");
-    client->setDbUser("");
-    client->setDbPassword("");
+    serverless= std::make_unique<xdbi::Serverless>(registry,db_path);
 
   }
 
 
-  RestDB::~RestDB() {
+  ServerlessDB::~ServerlessDB() {
   }
 
-  std::vector<std::pair<std::string, std::string>> RestDB::requestModelListByDomain(const std::string& domain) {
+  std::vector<std::pair<std::string, std::string>> ServerlessDB::requestModelListByDomain(const std::string& domain) {
     nl::json props;
     props["domain"] = mars::utils::toupper(domain);
-    const std::vector<XTypePtr> models = client->find("ComponentModel", props, 0);
+    const std::vector<XTypePtr> models = serverless->find("ComponentModel", props, 0);
     std::vector<std::pair<std::string, std::string>> out;
     for (const auto &model : models)
     {
       if (!model->has_property("version"))
-        throw std::runtime_error("Model of  componentModel type has no 'version' property!");
-      out.push_back(std::make_pair(model->get_property("name"), model->get_property("type")));
+        throw std::runtime_error("Model of ComponentModel type has no 'version' property!");
+      for (const auto &model : models)
+      {
+        if (!model->has_property("version"))
+          throw std::runtime_error("Model of componentModel type has no 'version' property!");
+        out.push_back(std::make_pair(model->get_property("name"), model->get_property("type")));
+      }
     }
     return out;
   }
 
 
-  std::vector<std::string> RestDB::requestVersions(const std::string& domain, const std::string &model) {
+  std::vector<std::string> ServerlessDB::requestVersions(const std::string& domain, const std::string &model) {
     // ToDo as soon as modelDeepness is integrated, we can simplify this
     // request["modelDeepness"] = "versionOnly";
-   nl::json props;
-   props["name"] = model;
-   props["domain"] = mars::utils::toupper(domain);
-   const std::vector<XTypePtr> models = client->find("ComponentModel", props,0);
-   std::vector<std::string> out;
-   for (const auto &model : models)
-   {
-     if (!model->has_property("version"))
-       throw std::runtime_error("Model of ComponentModel type has no 'version' property!");
-     out.push_back(model->get_property("version"));
-   }
-   return out;
+    nl::json props;
+    props["name"] = model;
+    props["domain"] = mars::utils::toupper(domain);
+    const std::vector<XTypePtr> models = serverless->find("ComponentModel", props, 0);
+    std::vector<std::string> out;
+    for (const auto &model : models)
+    {
+      if (!model->has_property("version"))
+        throw std::runtime_error("Model of ComponentModel type has no 'version' property!");
+      out.push_back(model->get_property("version"));
+    }
+    return out;
   }
 
 
-  ConfigMap RestDB::requestModel(const std::string &domain,
+  ConfigMap ServerlessDB::requestModel(const std::string &domain,
                                   const std::string &model,
                                   const std::string &version,
                                   const bool limit) {
@@ -68,7 +72,7 @@ namespace xrock_gui_model {
       props["version"] = version;
     }
 
-    std::vector<XTypePtr> xtypes = client->find("ComponentModel", props, limit ? 3 : -1);
+    std::vector<XTypePtr> xtypes = serverless->find("ComponentModel", props, limit ? 3 : -1);
     if (xtypes.size() == 0) {
       std::cerr<<"ComponentModel with props: "<<props<<" not loaded"<<std::endl;
       abort();
@@ -77,7 +81,7 @@ namespace xrock_gui_model {
   }
 
 
-  bool RestDB::storeModel(const ConfigMap &map) {
+  bool ServerlessDB::storeModel(const ConfigMap &map) {
     ConfigMap model = ConfigMap(map);
     // here we assume that the maps fits to the json representation required by the db
     auto t = std::time(nullptr);
@@ -98,7 +102,7 @@ namespace xrock_gui_model {
         ComponentModel dummy;
         dummy.set_properties(u);
         const std::string& uri(dummy.uri());
-        std::vector<XTypePtr> full_models = client->find("ComponentModel", nl::json{{"uri", uri}});//, limit_recursion=True, recursion_depth=3)
+        std::vector<XTypePtr> full_models = serverless->find("ComponentModel", nl::json{{"uri", uri}});//, limit_recursion=True, recursion_depth=3)
         assert(full_models.size() == 1);
         return std::static_pointer_cast<ComponentModel>(full_models[0]);
     };
@@ -110,7 +114,7 @@ namespace xrock_gui_model {
       db_models.push_back(std::static_pointer_cast<XType>(m));
 
     try {
-      client->update(db_models);
+      serverless->update(db_models);
     } catch (...) {
         fprintf(stderr, "ERROR: Problem with database communication\n");
         return false;
@@ -119,29 +123,10 @@ namespace xrock_gui_model {
   }
 
 
-  void RestDB::set_dbAddress(const std::string &_db_Address) {
-    client->setDbAddress(_db_Address);
+  void ServerlessDB::set_dbGraph(const std::string &_dbGraph) {
+    serverless->setWorkingGraph(_dbGraph);
   }
-
-
-  void RestDB::set_dbUser(const std::string &_dbUser) {
-    client->setDbUser(_dbUser);
+  void ServerlessDB::set_dbPath(const fs::path &_dbPath) {
+   serverless->setWorkingDbPath(_dbPath);
   }
-
-
-  void RestDB::set_dbPassword(const std::string &_dbPassword) {
-    client->setDbPassword(_dbPassword);
-  }
-
-
-  void RestDB::set_dbGraph(const std::string &_dbGraph) {
-    client->setWorkingGraph(_dbGraph);
-  }
-  bool RestDB::isConnected()
-  {
-    return client->isConnected();
-  }
-  //void RestDB::set_dbPath(const fs::path &_dbPath) {
-  //  client->setWorkingDbPath(_dbPath);
-  //}
 } // end of namespace xrock_gui_model

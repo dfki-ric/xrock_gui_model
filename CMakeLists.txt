@@ -9,7 +9,7 @@ if(APPLE)
 add_definitions(-std=c++17)
 add_definitions(-DGL_SILENCE_DEPRECATION)
 endif(APPLE)
-
+add_definitions(-DXROCK_DEFAULT_RESOURCES_PATH=\"${CMAKE_INSTALL_PREFIX}/share\")
 
 set(FILE_DB 1)
 
@@ -39,6 +39,7 @@ set(SOURCES
   src/ConfigMapHelper.cpp
   src/FileDB.cpp
   src/RestDB.cpp
+  src/ServerlessDB.cpp
 )
 
 set(HEADERS
@@ -51,6 +52,7 @@ set(HEADERS
   src/ConfigMapHelper.hpp
   src/FileDB.hpp
   src/RestDB.hpp
+  src/ServerlessDB.hpp
 )
 
 set (QT_MOC_HEADER
@@ -141,6 +143,6 @@ INSTALL(PROGRAMS ${CMAKE_BINARY_DIR}/xrock_gui DESTINATION bin)
 INSTALL(PROGRAMS ${CMAKE_BINARY_DIR}/shader_gui DESTINATION bin)
 #INSTALL(PROGRAMS bin/cnd_gui DESTINATION bin)
 INSTALL(PROGRAMS bin/xrock-resolve-ports DESTINATION bin)
-
+install(DIRECTORY resources/ DESTINATION share/xrock_gui_model/resources/)
 configure_file(bin/xrock-create-deployment.in ${CMAKE_BINARY_DIR}/xrock-create-deployment @ONLY)
 INSTALL(PROGRAMS ${CMAKE_BINARY_DIR}/xrock-create-deployment DESTINATION bin)

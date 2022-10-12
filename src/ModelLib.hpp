@@ -102,6 +102,7 @@ namespace xrock_gui_model
     mars::cfg_manager::cfgParamId dbUser_paramId;
     mars::cfg_manager::cfgParamId dbPassword_paramId;
     std::string lastExecFolder;
+    std::string resourcesPath;
 
     void loadStartModel();
     void loadModelFromParameter();

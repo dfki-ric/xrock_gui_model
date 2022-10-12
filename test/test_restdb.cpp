@@ -20,16 +20,16 @@ int main(int argv, char** argc) {
   registry->register_class<xtypes::ComponentModel>();
   std::unique_ptr<xdbi::Client> client;
   client = std::make_unique<xdbi::Client>(registry);
-  client->setDbAddress("http://localhost:8183");
+  client->setDbAddress("http://0.0.0.0:8183");
   client->setDbUser("");
   client->setDbPassword("");
   client->setWorkingGraph("graph_test");
   
-  std::vector<std::pair<std::string, std::string>> result = client->requestModelListByDomain("ComponentModel", mars::utils::toupper("software"));
+  // std::vector<std::pair<std::string, std::string>> result = client->requestModelListByDomain("ComponentModel", mars::utils::toupper("software"));
 
-  for(auto r: result) {
-    fprintf(stderr, "%s: %s\n", r.first.c_str(), r.second.c_str());
-  }
+  // for(auto r: result) {
+  //   fprintf(stderr, "%s: %s\n", r.first.c_str(), r.second.c_str());
+  // }
   return 0;
 }
 

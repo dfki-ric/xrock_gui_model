@@ -72,6 +72,7 @@ namespace xrock_gui_model
       cfg->getPropertyValue("Config", "config_path", "value", &confDir);
     
       env = ConfigMap::fromYamlFile(confDir + "/config_default.yml", true);
+      env["AUTOPROJ_CURRENT_ROOT"] = getenv("AUTOPROJ_CURRENT_ROOT");
       // try to load environment
       if (mars::utils::pathExists(confDir + "/config.yml"))
       {
@@ -106,8 +107,9 @@ namespace xrock_gui_model
       }
       else if (env.hasKey("dbType") and env["dbType"] == "ServerlessDB" and env.hasKey("dbPath"))
       {
-        db = new ServerlessDB(env["dbPath"].toString());
-        std::cout << "Using serverless where db path is: " << env["dbPath"].toString() << std::endl;
+        std::string dbAbsPath = mars::utils::pathJoin(env["AUTOPROJ_CURRENT_ROOT"], env["dbPath"].toString());
+        db = new ServerlessDB(dbAbsPath);
+        std::cout << "Using serverless where db path is: " << dbAbsPath << std::endl;
       }
       else
       {
@@ -585,54 +587,23 @@ namespace xrock_gui_model
     }
     case 21: // Serverless
     {
-      std::string conf = bagelGui->getConfigDir();
-      ConfigMap config = ConfigMap::fromYamlFile(conf + "/config_default.yml", true);
-      std::string c = getenv("AUTOPROJ_CURRENT_ROOT");
-
-      if (config.hasKey("dbType"))
-      {
-        if (config["dbType"] != "ServerlessDB")
-        {
-          config["dbType"] = "ServerlessDB";
-          
-          if (not config.hasKey("dbPath"))
-            config["dbPath"] = mars::utils::pathJoin(c ,"modkom/component_db"); // TODO : (std::string)db->get_dbPath();
-          db = new (db) ServerlessDB(config["dbPath"].getString());
-          // std::cout << "dont know " << config.toYamlString() << std::endl;
-          std::cout << conf << std::endl;
-          config.toYamlFile(mars::utils::pathJoin(conf, "config_default.yml"));
-          std::cout << config.toYamlString() << std::endl;
-        }
-      }
-      break;
+      db = new (db) ServerlessDB(mars::utils::pathJoin(env["AUTOPROJ_CURRENT_ROOT"], env["dbPath"].getString())); //Todo get this from a textfield
     }
     case 22: // Client
     {
-      std::string conf = bagelGui->getConfigDir();
-      ConfigMap config = ConfigMap::fromYamlFile(conf + "/config_default.yml", true);
-      if (config.hasKey("dbType"))
+      db = new (db) RestDB();
+
+      if (!db->isConnected())
       {
-        if (config["dbType"] != "RestDB")
-        {
-          config["dbType"] = "RestDB";
-          db = new (db) RestDB();
-
-          std::cout << conf << std::endl;
-          config.toYamlFile(conf + "/config_default.yml");
-          std::cout << config.toYamlString() << std::endl;
-
-          if (!db->isConnected())
-          {
-            QMessageBox::warning(nullptr, "Warning", "Server is not running! Please run server using command:\njsondb -d modkom/component_db/", QMessageBox::Ok);
-          }
-        }
+        std::string msg = "Server is not running! Please run server using command:\njsondb -d "+env["dbPath"].getString();
+        QMessageBox::warning(nullptr, "Warning", msg.c_str(), QMessageBox::Ok);
       }
       break;
     }
     case 23: // MultiDbClient
     {
       //TODO: implement
-      std::cout << "implementation required" << std::endl;
+      std::cout << "integration of MultiDbClient still required" << std::endl;
       break;
     }
     case 30: // Reload

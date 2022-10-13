@@ -588,6 +588,7 @@ namespace xrock_gui_model
     case 21: // Serverless
     {
       db = new (db) ServerlessDB(mars::utils::pathJoin(env["AUTOPROJ_CURRENT_ROOT"], env["dbPath"].getString())); //Todo get this from a textfield
+      break;
     }
     case 22: // Client
     {

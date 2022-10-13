@@ -170,9 +170,49 @@ namespace xrock_gui_model
       // db = new RestDB();
 
       mars::main_gui::MainGUI *main_gui = dynamic_cast<mars::main_gui::MainGUI *>(gui);
+      main_gui->addComboBoxToToolbar("Actions", DBInterface::loadBackends(), [this, main_gui](std::string new_backend)
+                                     {
+                                      std::cout << "backend changed  " << new_backend << std::endl;
+                                      if(new_backend == "Serverless")
+                                        {
+                                          menuAction(21);
+                                          main_gui->disableToolbarLineEdit({2,3});
+                                          main_gui->enableToolbarLineEdit({1});
+                                        }
+                                      else if (new_backend == "Client")
+                                        {
+                                          menuAction(22);
+                                          main_gui->disableToolbarLineEdit({1});
+                                          main_gui->enableToolbarLineEdit({2,3,4});
+                                        }
+                                      else if (new_backend == "MultiDbClient")
+                                        menuAction(23); });
+      main_gui->addLineEditToToolbar(1, "Actions", " db path: ", "modkom/component_db",
+                                     [this](std::string text)
       // for(auto b : DBInterface::loadBackends()) std::cout << "backend " << b << std::endl;
       main_gui->addComboBoxToToolbar("Actions", DBInterface::loadBackends(), [this](std::string new_backend)
                                      {
+                                       ServerlessDB *sdb = dynamic_cast<ServerlessDB *>(db);
+                                       sdb->set_dbPath(text);
+                                     });
+      main_gui->addLineEditToToolbar(2, "Actions", " URL: ", "http://0.0.0.0", [this, main_gui](std::string text)
+                                     {
+                                       RestDB *rdb = dynamic_cast<RestDB *>(db);
+                                       std::string port = main_gui->getToolbarLineEditText(3);
+                                       std::cout << " port no " << port << std::endl;
+                                       std::string dbAddress = text + ':' + port;
+                                       rdb->set_dbAddress(dbAddress);
+                                       std::cout << "URL changed  " << text << std::endl;
+                                     });
+      main_gui->addLineEditToToolbar(3, "Actions", " port: ", "8183", [this, main_gui](std::string text)
+                                     { 
+                                       RestDB *rdb = dynamic_cast<RestDB *>(db);
+                                       std::string url = main_gui->getToolbarLineEditText(2);
+                                       std::string dbAddress= url + ':' + text;
+                                       rdb->set_dbAddress(dbAddress); });
+      main_gui->addLineEditToToolbar(4, "Actions", " graph: ", "graph_test", [this](std::string text)
+                                     {db->set_dbGraph(text);});
+      main_gui->disableToolbarLineEdit({2, 3});
         std::cout << "backend changed  " << new_backend << std::endl;
         menuAction(21);
         if (new_backend == "Client")
@@ -343,6 +383,7 @@ namespace xrock_gui_model
 
   void ModelLib::menuAction(int action, bool checked)
   {
+    mars::main_gui::MainGUI *main_gui = dynamic_cast<mars::main_gui::MainGUI *>(gui);
     switch (action)
     {
     case 1:
@@ -596,7 +637,7 @@ namespace xrock_gui_model
 
       if (!db->isConnected())
       {
-        std::string msg = "Server is not running! Please run server using command:\njsondb -d "+env["dbPath"].getString();
+        std::string msg = "Server is not running! Please run server using command:\njsondb -d "+main_gui->getToolbarLineEditText(1);
         QMessageBox::warning(nullptr, "Warning", msg.c_str(), QMessageBox::Ok);
       }
       break;

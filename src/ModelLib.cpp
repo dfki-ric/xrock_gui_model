@@ -111,6 +111,11 @@ namespace xrock_gui_model
         db = new ServerlessDB(dbAbsPath);
         std::cout << "Using serverless where db path is: " << dbAbsPath << std::endl;
       }
+      else if (env.hasKey("dbType") and env["dbType"] == "MultiDB")
+      {
+        // todo
+      }
+      
       else
       {
         prop_dbAddress.sValue = mars::utils::pathJoin(confDir, prop_dbAddress.sValue);
@@ -123,11 +128,6 @@ namespace xrock_gui_model
     if (bagelGui)
     {
       model = new Model(bagelGui);
-      // std::vector<std::pair<std::string, std::string>> models = db->requestModelListByDomain("software");
-      // for(auto it: models) {
-      //   ConfigMap modelMap = db->requestModel("software", it.first, it.second);
-      //   model->addNodeInfo(modelMap);
-      // }
       bagelGui->addModelInterface("xrock", model);
       bagelGui->createView("xrock", "Model");
       bagelGui->addPlugin(this);
@@ -139,7 +139,6 @@ namespace xrock_gui_model
     gui = libManager->getLibraryAs<mars::main_gui::GuiInterface>("main_gui");
     if (gui)
     {
-      // todo: remove by proper resources handling
       const std::string icon = mars::utils::pathJoin(resourcesPath, "xrock_gui_model/resources/images/");
       std::cout << icon << std::endl;
       gui->addGenericMenuAction("../File/Import/Model", 1, this);
@@ -167,8 +166,6 @@ namespace xrock_gui_model
       gui->addGenericMenuAction("../Actions/Reload", 30, this, 0,
                                 icon + "reload.png", true);
 
-      // db = new RestDB();
-
       mars::main_gui::MainGUI *main_gui = dynamic_cast<mars::main_gui::MainGUI *>(gui);
       main_gui->addComboBoxToToolbar("Actions", DBInterface::loadBackends(), [this, main_gui](std::string new_backend)
                                      {
@@ -189,8 +186,6 @@ namespace xrock_gui_model
                                         menuAction(23); });
       main_gui->addLineEditToToolbar(1, "Actions", " db path: ", "modkom/component_db",
                                      [this](std::string text)
-      // for(auto b : DBInterface::loadBackends()) std::cout << "backend " << b << std::endl;
-      main_gui->addComboBoxToToolbar("Actions", DBInterface::loadBackends(), [this](std::string new_backend)
                                      {
                                        ServerlessDB *sdb = dynamic_cast<ServerlessDB *>(db);
                                        sdb->set_dbPath(text);
@@ -213,12 +208,6 @@ namespace xrock_gui_model
       main_gui->addLineEditToToolbar(4, "Actions", " graph: ", "graph_test", [this](std::string text)
                                      {db->set_dbGraph(text);});
       main_gui->disableToolbarLineEdit({2, 3});
-        std::cout << "backend changed  " << new_backend << std::endl;
-        menuAction(21);
-        if (new_backend == "Client")
-          menuAction(22);
-        else if (new_backend == "MultiDbClient")
-          menuAction(23); });
 
       widget = new ModelWidget(cfg, bagelGui, this);
       if (!widget->getHiddenCloseState())
@@ -239,8 +228,6 @@ namespace xrock_gui_model
       fprintf(stderr, "ModelLib: was not able to get main_gui");
     }
     loadSettingsFromFile("generalsettings.yml");
-    // loadStartModel();
-    // loadCart();
     loadModelFromParameter();
   }
 
@@ -342,7 +329,7 @@ namespace xrock_gui_model
     }
     try
     {
-      //std::cout << "Loading config file from "<<workspace + "/" + filename << std::endl;
+      // std::cout << "Loading config file from "<<workspace + "/" + filename << std::endl;
       ConfigMap gConfig = ConfigMap::fromYamlFile(workspace + "/" + filename);
       const std::string user = gConfig["database"]["username"];
       const std::string password = gConfig["database"]["password"];
@@ -357,14 +344,14 @@ namespace xrock_gui_model
     }
     catch (std::invalid_argument &e)
     {
-      QMessageBox::critical(nullptr, "Error", e.what(),  QMessageBox::Ok); 
+      QMessageBox::critical(nullptr, "Error", e.what(), QMessageBox::Ok);
     }
     catch (...)
     {
       std::stringstream ss;
       ss << "loadSettingsFromFile: ERROR while loading: " << workspace << '/' << filename;
       std::cerr << ss.str() << std::endl;
-      //QMessageBox::critical(nullptr, "Error",QString::fromStdString(ss.str()),  QMessageBox::Ok);  
+      // QMessageBox::critical(nullptr, "Error",QString::fromStdString(ss.str()),  QMessageBox::Ok);
     }
   }
 
@@ -1175,11 +1162,11 @@ namespace xrock_gui_model
         }
         catch (...)
         {
-          
-        std::stringstream ss;
-        ss << "defaultConfig is not a valid YAML " ;
-        QMessageBox::critical(nullptr, "Error",QString::fromStdString(ss.str()),  QMessageBox::Ok);
-            // what to do if the defaultConfig is not a valid YAML
+
+          std::stringstream ss;
+          ss << "defaultConfig is not a valid YAML ";
+          QMessageBox::critical(nullptr, "Error", QString::fromStdString(ss.str()), QMessageBox::Ok);
+          // what to do if the defaultConfig is not a valid YAML
         }
         break;
       }
@@ -1217,9 +1204,9 @@ namespace xrock_gui_model
     catch (...)
     {
       std::stringstream ss;
-      ss<< "defaultConfig is not a valid YAML ";
-      QMessageBox::critical(nullptr, "Error",QString::fromStdString(ss.str()),  QMessageBox::Ok);
-        
+      ss << "defaultConfig is not a valid YAML ";
+      QMessageBox::critical(nullptr, "Error", QString::fromStdString(ss.str()), QMessageBox::Ok);
+
       // how to handle if the config is no more a valid YAML? Could this happen?
     }
   }

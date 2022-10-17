@@ -81,6 +81,7 @@ namespace xrock_gui_model
     std::vector<std::string> getOutPortContextStrings(const std::string &nodeName,
                                                       const std::string &portName);
     void requestModel();
+    void addComponent();
 
     // public slots:
     void addComponent(std::string domain, std::string modelName, std::string version, std::string nodeName = "");

@@ -819,6 +819,12 @@ namespace xrock_gui_model
     ImportDialog id(this, true);
     id.exec();
   }
+  void ModelLib::addComponent()
+  {
+    importToBagel = false;
+    ImportDialog id(this, false);
+    id.exec();
+  }
 
   void ModelLib::addComponent(std::string domain, std::string modelName, std::string version, std::string nodeName)
   {

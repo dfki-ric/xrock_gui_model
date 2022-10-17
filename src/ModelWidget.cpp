@@ -161,9 +161,12 @@ namespace xrock_gui_model {
     hLayout->addWidget(b);
     vLayout->addLayout(hLayout);
     hLayout = new QHBoxLayout();
+    b = new QPushButton("add Component");
+    connect(b, SIGNAL(clicked()), this, SLOT(addComponent()));
+    hLayout->addStretch();
+    hLayout->addWidget(b);
     b = new QPushButton("load model");
     connect(b, SIGNAL(clicked()), this, SLOT(requestModel()));
-    hLayout->addStretch();
     hLayout->addWidget(b);
     b = new QPushButton("save model");
     connect(b, SIGNAL(clicked()), this, SLOT(storeModel()));
@@ -351,8 +354,21 @@ namespace xrock_gui_model {
     }
     catch(const std::exception& e)
     {
-            std::stringstream ss;
+      std::stringstream ss;
       ss << "Exception thrown: " <<  e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n' << "\tAt " << __PRETTY_FUNCTION__ << '\n';
+      QMessageBox::warning(nullptr, "Warning",QString::fromStdString(ss.str()),  QMessageBox::Ok);
+    }
+  }
+  void ModelWidget::addComponent(){
+    try
+    {
+      mainLib->addComponent();
+    }  
+    catch (const std::exception &e)
+    {
+      std::stringstream ss;
+      ss << "Exception thrown: " << e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n'
+               << "\tAt " << __PRETTY_FUNCTION__ << '\n';
       QMessageBox::warning(nullptr, "Warning",QString::fromStdString(ss.str()),  QMessageBox::Ok);
     }
   }

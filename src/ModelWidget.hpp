@@ -62,6 +62,7 @@ namespace xrock_gui_model {
     void checkComputation(int v);
     void layoutsClicked(const QModelIndex &index);
     void addRemoveLayout();
+    void addComponent();
     void loadModel();
     void saveModel();
     void storeModel();

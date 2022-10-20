@@ -1406,6 +1406,12 @@ namespace xrock_gui_model
     cnd_export << "export_cnd -m " << map["name"].getString()
                << " -v " << map["versions"][0]["name"].getString()
                << " -o " << filename;
+    if(dynamic_cast<ServerlessDB*>(db)){
+      cnd_export << " -b serverless ";
+    }
+    else if(dynamic_cast<MultiDB*>(db)){
+      cnd_export << " -b multidb ";
+    }
 
     std::system(cnd_export.str().c_str());
     //   ConfigMap map = map_;

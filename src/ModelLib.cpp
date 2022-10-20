@@ -1409,9 +1409,9 @@ namespace xrock_gui_model
     if(dynamic_cast<ServerlessDB*>(db)){
       cnd_export << " -b serverless ";
     }
-    else if(dynamic_cast<MultiDB*>(db)){
-      cnd_export << " -b multidb ";
-    }
+   // else if(dynamic_cast<MultiDB*>(db)){
+    //  cnd_export << " -b multidb ";
+    //}
 
     std::system(cnd_export.str().c_str());
     //   ConfigMap map = map_;

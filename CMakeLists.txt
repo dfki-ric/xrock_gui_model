@@ -15,6 +15,13 @@ set(FILE_DB 1)
 
 set(QT_USE_QTWEBKIT 1)
 setup_qt()
+if (${USE_QT5})
+  QT5_ADD_RESOURCES(icon_resource resources/resources.qrc)
+  set(PUBLIC_DEPENDECIES Qt5Widgets)
+else()
+  QT4_ADD_RESOURCES(icon_resource resources/resources.qrc)
+  set(PUBLIC_DEPENDENCIES "QtCore QtGui")
+endif()
 pkg_check_modules(lib_manager REQUIRED IMPORTED_TARGET lib_manager)
 pkg_check_modules(bagel_gui REQUIRED IMPORTED_TARGET bagel_gui)
 pkg_check_modules(osg_graph_viz REQUIRED IMPORTED_TARGET osg_graph_viz)
@@ -67,8 +74,7 @@ qt5_wrap_cpp ( QT_MOC_HEADER_SRC ${QT_MOC_HEADER} )
 else (${USE_QT5})
 qt4_wrap_cpp ( QT_MOC_HEADER_SRC ${QT_MOC_HEADER} )
 endif (${USE_QT5})
-
-add_library(${PROJECT_NAME} SHARED ${SOURCES} ${QT_MOC_HEADER_SRC})
+add_library(${PROJECT_NAME} SHARED ${SOURCES} ${QT_MOC_HEADER_SRC} ${icon_resource})
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 target_include_directories(${PROJECT_NAME}
   PUBLIC

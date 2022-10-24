@@ -167,6 +167,7 @@ namespace xrock_gui_model
                                 icon + "reload.png", true);
 
       mars::main_gui::MainGUI *main_gui = dynamic_cast<mars::main_gui::MainGUI *>(gui);
+      main_gui->mainWindow_p()->setWindowIcon(QIcon(":/images/xrock_gui.ico"));
       main_gui->addComboBoxToToolbar("Actions", DBInterface::loadBackends(), [this, main_gui](std::string new_backend)
                                      {
                                       std::cout << "backend changed  " << new_backend << std::endl;

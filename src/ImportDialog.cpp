@@ -80,8 +80,14 @@ namespace xrock_gui_model {
 
     QPushButton *button = new QPushButton("add component");
     if(load) {
+      this->setWindowTitle ("Load Model/Component");
       button->setText("load model");
     }
+    else
+    {
+      this->setWindowTitle ("Add Model/Component");
+    }
+    
     vLayout->addWidget(button);
     connect(button, SIGNAL(clicked()), this, SLOT(addModel()));
 

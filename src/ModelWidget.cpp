@@ -18,7 +18,7 @@
 #include <bagel_gui/BagelModel.hpp>
 #include <mars/utils/misc.h>
 #include <QDesktopServices>
-
+#include <xtypes/ComponentModel.hpp>
 
 using namespace configmaps;
 
@@ -60,7 +60,13 @@ namespace xrock_gui_model {
 
     l = new QLabel("domain");
     layout->addWidget(l, i, 0);
-    domain = new QLineEdit("");
+    domain = new QComboBox();
+    auto cm = std::make_shared<ComponentModel>();
+    auto allowed = cm->get_allowed_property_values("domain");
+    for(const auto a : allowed)
+        domain->addItem(QString::fromStdString(a));
+    //QStringList allowed = {"SOFTWARE", "MECHANICS", "COMPUTATION", "ELECTRONICS", "BEHAVIOR", "ASSEMBLY", "NOT_SET"};
+    //domain->addItems(allowed);
     layout->addWidget(domain, i++, 1);
     connect(domain, SIGNAL(textChanged(const QString&)), this, SLOT(updateModelInfo()));
 
@@ -314,7 +320,7 @@ namespace xrock_gui_model {
     if(name->text().isEmpty())        { QMessageBox::warning(this, "Warning", "name is empty!",  QMessageBox::Ok); return; };
     if(type->text().isEmpty())        { QMessageBox::warning(this, "Warning", "type is empty!",  QMessageBox::Ok); return; };
     if(version->text().isEmpty())     { QMessageBox::warning(this, "Warning", "version is empty!",  QMessageBox::Ok); return; };
-    if(domain->text().isEmpty())      { QMessageBox::warning(this, "Warning", "domain is empty!",  QMessageBox::Ok); return; };
+    //if(domain->text().isEmpty())      { QMessageBox::warning(this, "Warning", "domain is empty!",  QMessageBox::Ok); return; };
     if(projectName->text().isEmpty()) { QMessageBox::warning(this, "Warning", "projectName is empty!",  QMessageBox::Ok); return;  };
     if(designedBy->text().isEmpty())  { QMessageBox::warning(this, "Warning", "designedBy is empty!",  QMessageBox::Ok); return;  };
     //- validate data yaml syntax
@@ -1184,7 +1190,7 @@ namespace xrock_gui_model {
     edition = "";
     name->clear();
     type->clear();
-    domain->clear();
+    //domain->clear();
     maturity->clear();
     projectName->clear();
     designedBy->clear();
@@ -1237,7 +1243,9 @@ namespace xrock_gui_model {
     ignoreUpdate = true;
     localMap = model;
     type->setText(localMap["type"].getString().c_str());
-    domain->setText(localMap["domain"].getString().c_str());
+    const std::string domain_str = mars::utils::toupper(localMap["domain"].getString());
+    domain->setCurrentIndex((domain->findText(domain_str.c_str(), Qt::MatchExactly)));
+    //domain->setText(localMap["domain"].getString().c_str());
     name->setText(localMap["name"].getString().c_str());
     version->setText(localMap["versions"][0]["name"].getString().c_str());
     if(localMap["versions"][0].hasKey("projectName")) {
@@ -1284,7 +1292,8 @@ namespace xrock_gui_model {
       localMap["name"]     = name->text().toStdString();
       localMap["type"]     = type->text().toStdString();
       localMap["versions"][0]["name"]  = version->text().toStdString();
-      localMap["domain"]   = domain->text().toStdString();
+      //localMap["domain"]   = domain->text().toStdString();
+      localMap["domain"]   = domain->currentText().toStdString();
       if(maturity->text().toStdString() != "") {
         localMap["versions"][0]["maturity"] = maturity->text().toStdString();
       }
@@ -1337,7 +1346,7 @@ catch(const std::exception& e)
   void ModelWidget::getModelInfo(std::string *domain, std::string *name,
                                  std::string *version) {
     *name = this->name->text().toStdString();
-    *domain = this->domain->text().toStdString();
+    *domain = this->domain->currentText().toStdString();
     *version = this->version->text().toStdString();
   }
 

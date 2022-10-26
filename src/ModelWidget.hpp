@@ -12,6 +12,7 @@
 
 #include <QWidget>
 #include <QListWidget>
+#include <QComboBox>
 #include <QLineEdit>
 #include <QTextEdit>
 #include <QCheckBox>
@@ -84,7 +85,8 @@ namespace xrock_gui_model {
     //std::vector<std::string> nodeTypes;
     //std::string newNode;
     configmaps::ConfigMap localMap, layoutMap;
-    QLineEdit *name, *type, *version, *domain, *layoutName, *maturity;
+    QLineEdit *name, *type, *version,*layoutName, *maturity;
+    QComboBox *domain;
     QLineEdit *projectName, *designedBy;
     QTextEdit *includes, *annotations, *interfaces;
     QLabel *dataStatusLabel;

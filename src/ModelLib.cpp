@@ -145,6 +145,7 @@ namespace xrock_gui_model
       gui->addGenericMenuAction("../File/Import/CNDModel", 20, this);
       gui->addGenericMenuAction("../File/Export/Model", 2, this);
       gui->addGenericMenuAction("../File/Export/CNDModel", 5, this);
+      gui->addGenericMenuAction("../File/Export/CNDModel With tf_enhance", 31, this);
       gui->addGenericMenuAction("../Database/Add Component", 6, this);
       gui->addGenericMenuAction("../Database/Store Model", 4, this);
       gui->addGenericMenuAction("../Database/Load Model", 7, this);
@@ -654,6 +655,22 @@ namespace xrock_gui_model
           QMessageBox::warning(nullptr, "Warning", "Nothing to reload.", QMessageBox::Ok);
       }
 
+      break;
+    }
+    case 31:
+    {
+      QString fileName = QFileDialog::getSaveFileName(NULL, QObject::tr("Select Model"),
+                                                      "export.cnd", QObject::tr("YAML syntax (*.cnd)"), 0,
+                                                      QFileDialog::DontUseNativeDialog);
+ 
+     QString urdf_file = QFileDialog::getOpenFileName(NULL, QObject::tr("Select urdf_file"),
+                                                      ".", QObject::tr("YAML syntax (*.urdf)"), 0,
+                                                      QFileDialog::DontUseNativeDialog);
+      if (!fileName.isNull())
+      {
+        ConfigMap map = bagelGui->createConfigMap();
+        exportCnd(map, fileName.toStdString(), urdf_file.toStdString());
+      }
       break;
     }
     }
@@ -1400,13 +1417,19 @@ namespace xrock_gui_model
   }
 
   void ModelLib::exportCnd(const configmaps::ConfigMap &map_,
-                           const std::string &filename)
+                           const std::string &filename, const std::string &urdf_file)
   {
+    // ask user to pick a urdf file
+    
     ConfigMap map = bagelGui->getCurrentModel()->getModelInfo();
     std::stringstream cnd_export;
     cnd_export << "export_cnd -m " << map["name"].getString()
                << " -v " << map["versions"][0]["name"].getString()
                << " -o " << filename;
+    if(!urdf_file.empty()) 
+    {
+      cnd_export << " -t --tf_enhance -u " << urdf_file;
+    }          
     if(dynamic_cast<ServerlessDB*>(db)){
       cnd_export << " -b serverless ";
     }

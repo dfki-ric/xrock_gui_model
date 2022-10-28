@@ -70,7 +70,7 @@ namespace xrock_gui_model
     void configureInPort(const std::string &nodeName, const std::string &portName);
     void configureOutPort(const std::string &nodeName, const std::string &portName);
     void selectVersion(const std::string &version);
-    void exportCnd(const configmaps::ConfigMap &map_, const std::string &filename);
+    void exportCnd(const configmaps::ConfigMap &map_, const std::string &filename,  const std::string &urdf_file = "");
     void importCND(const std::string &filename);
     void nodeContextClicked(const std::string name);
     void inPortContextClicked(const std::string name);

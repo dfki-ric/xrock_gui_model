@@ -1431,7 +1431,10 @@ namespace xrock_gui_model
       cnd_export << " -t --tf_enhance -u " << urdf_file;
     }          
     if(dynamic_cast<ServerlessDB*>(db)){
-      cnd_export << " -b serverless ";
+      cnd_export << " -b Serverless ";
+    }
+    else if(dynamic_cast<RestDB*>(db)){
+      cnd_export << " -b Client ";
     }
    // else if(dynamic_cast<MultiDB*>(db)){
     //  cnd_export << " -b multidb ";

@@ -1440,14 +1440,19 @@ namespace xrock_gui_model
     //  cnd_export << " -b multidb ";
     //}
 
-    std::system(cnd_export.str().c_str());
+    int ret = std::system(cnd_export.str().c_str());
+    if(ret == EXIT_SUCCESS)
+       QMessageBox::information(nullptr, "Export","Successfully exported",  QMessageBox::Ok);
+    else
+       QMessageBox::critical(nullptr, "Export", QString::fromStdString("Failed to export cnd with code: " + std::to_string(ret)), QMessageBox::Ok);
+
     //   ConfigMap map = map_;
     //   ConfigMap output;
     //   ConfigMap nameMap;
     //   ConfigMap dNameMap;
     //   bool haveMarsTask = false;
     //   bool compileDeployments = false;
-    //   // handle file path and node order
+    //   // handle file path and  node order
     //   for (auto node : map["nodes"])
     //   {
     //     if (node["type"] == "software::Deployment")

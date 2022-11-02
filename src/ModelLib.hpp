@@ -29,6 +29,30 @@ namespace xrock_gui_model
   class Model;
   class ModelWidget;
 
+  enum struct MenuActions : int {
+    LOAD_MODEL = 1,
+    SAVE_MODEL = 2,
+    TOGGLE_WIDGET = 3,
+    STORE_MODEL = 4,
+    EXPORT_CND = 5,
+    ADD_COMPONENT_FROM_DB = 6,
+    LOAD_MODEL_FROM_DB = 7,
+    IMPORT_HW_TO_BAGEL = 8,
+    EDIT_LOCAL_MAP = 10,
+    CREATE_BAGEL_MOTION_CONTROL_TASK = 11,
+    CREATE_BAGEL_MODEL = 12,
+    CREATE_BAGEL_TASK = 13,
+    EDIT_MODEL_DESCRIPTION = 14,
+    EXPORT_CND2 = 15,
+    EXPORT_CND3 = 16,
+    IMPORT_CND = 20,
+    SELECT_SERVERLESS = 21,
+    SELECT_CLIENT = 22,
+    SELECT_MULTIDB = 23,
+    RELOAD_MODEL_FROM_DB = 30,
+    EXPORT_CND_TFENHANCE = 31
+  };
+
   class ModelLib : public lib_manager::LibInterface,
                    public mars::main_gui::MenuInterface,
                    public bagel_gui::PluginInterface,

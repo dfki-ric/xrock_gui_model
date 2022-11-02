@@ -371,306 +371,322 @@ namespace xrock_gui_model
   void ModelLib::menuAction(int action, bool checked)
   {
     mars::main_gui::MainGUI *main_gui = dynamic_cast<mars::main_gui::MainGUI *>(gui);
-    switch (action)
+    switch (static_cast<MenuActions>(action))
     {
-    case 1:
-    {
-      widget->loadModel();
-      break;
-    }
-    case 2:
-    {
-      widget->saveModel();
-      break;
-    }
-    case 3:
-    {
-      if (widget->isHidden())
-      {
-        gui->addDockWidget((void *)widget, 1);
-      }
-      else
-      {
-        gui->removeDockWidget((void *)widget, 1);
-      }
-      break;
-    }
-    case 4: // store model
-    {
-      widget->storeModel();
-      break;
-    }
-    case 5:
-    {
-      QString fileName = QFileDialog::getSaveFileName(NULL, QObject::tr("Select Model"),
-                                                      "export.cnd", QObject::tr("YAML syntax (*.cnd)"), 0,
-                                                      QFileDialog::DontUseNativeDialog);
-      if (!fileName.isNull())
-      {
-        ConfigMap map = bagelGui->createConfigMap();
-        exportCnd(map, fileName.toStdString());
-      }
-      break;
-    }
-    case 6: // add component from database
-    {
-      ImportDialog id(this, false);
-      id.exec();
-      break;
-    }
-    case 7: // load model from database
-    {
-      requestModel();
-      break;
-    }
-    case 8: // import hardware information into bagel model
-    {
-      importToBagel = true;
-      ImportDialog id(this, true);
-      id.exec();
-      break;
-    }
-    case 10:
-    {
-      widget->editLocalMap();
-      break;
-    }
-    case 11:
-    {
-      ModelInterface *model = bagelGui->getCurrentModel();
-      if (model)
-      {
-        ConfigMap localMap = model->getModelInfo();
-        std::string domain = "software";
-        std::string type = "system_modelling::task_graph::Task";
-        std::string name = "behavior_graph::MotionControlTask.yml";
-        std::string version = localMap["name"];
-        std::string graphPath = "tmp/bagel/" + version;
-        std::string graphFile;
-        handleFilenamePrefix(&graphPath, env["wsd"].getString());
-        createDirectory(graphPath);
-        graphFile = graphPath + "/" + version + ".yml";
-        bagelGui->setLoadPath(graphPath);
-        if (pathExists(graphFile))
+        case MenuActions::LOAD_MODEL:
         {
-          bagelGui->load(graphFile);
+          widget->loadModel();
+          break;
         }
-        else
+        case MenuActions::SAVE_MODEL:
         {
-          bagelGui->createView("bagel", version);
+          widget->saveModel();
+          break;
         }
-        std::string smurfPath = "tmp/models/assembly/";
-        handleFilenamePrefix(&smurfPath, env["wsd"].getString());
-        smurfPath += version + "/" + localMap["versions"][0]["name"].getString() + "/smurf/" + version + ".smurf";
-        BagelModel *bagelModel = dynamic_cast<BagelModel *>(bagelGui->getCurrentModel());
-        if (bagelModel)
+        case MenuActions::TOGGLE_WIDGET:
         {
-          bagelModel->importSmurf(smurfPath);
-          ConfigMap map;
-          map["domain"] = domain;
-          map["name"] = name;
-          map["type"] = type;
-          map["versions"][0]["name"] = version;
-          map["versions"][0]["maturity"] = "INPROGRESS";
-          handleFilenamePrefix(&graphFile, getCurrentWorkingDir());
+          if (widget->isHidden())
+          {
+            gui->addDockWidget((void *)widget, 1);
+          }
+          else
+          {
+            gui->removeDockWidget((void *)widget, 1);
+          }
+          break;
+        }
+        case MenuActions::STORE_MODEL: // store model
+        {
+          widget->storeModel();
+          break;
+        }
+        case MenuActions::EXPORT_CND:
+        {
+          QString fileName = QFileDialog::getSaveFileName(NULL, QObject::tr("Select Model"),
+                                                          "export.cnd", QObject::tr("YAML syntax (*.cnd)"), 0,
+                                                          QFileDialog::DontUseNativeDialog);
+          if (!fileName.isNull())
+          {
+            ConfigMap map = bagelGui->createConfigMap();
+            exportCnd(map, fileName.toStdString());
+          }
+          break;
+        }
+        case MenuActions::ADD_COMPONENT_FROM_DB: // add component from database
+        {
+          ImportDialog id(this, false);
+          id.exec();
+          break;
+        }
+        case MenuActions::LOAD_MODEL_FROM_DB: // load model from database
+        {
+          requestModel();
+          break;
+        }
+        case MenuActions::IMPORT_HW_TO_BAGEL: // import hardware information into bagel model
+        {
+            // 20221102 MS: Why is this here? Has nothing todo with XROCK.
+          importToBagel = true;
+          ImportDialog id(this, true);
+          id.exec();
+          break;
+        }
+        case MenuActions::EDIT_LOCAL_MAP:
+        {
+            // 20221102 MS: Did not work for me. Is this relevant?
+          widget->editLocalMap();
+          break;
+        }
+        case MenuActions::CREATE_BAGEL_MOTION_CONTROL_TASK:
+        {
+            // 20221102 MS: Why is this here? Has nothing todo with XROCK.
+          ModelInterface *model = bagelGui->getCurrentModel();
+          if (model)
+          {
+            ConfigMap localMap = model->getModelInfo();
+            std::string domain = "software";
+            std::string type = "system_modelling::task_graph::Task";
+            std::string name = "behavior_graph::MotionControlTask.yml";
+            std::string version = localMap["name"];
+            std::string graphPath = "tmp/bagel/" + version;
+            std::string graphFile;
+            handleFilenamePrefix(&graphPath, env["wsd"].getString());
+            createDirectory(graphPath);
+            graphFile = graphPath + "/" + version + ".yml";
+            bagelGui->setLoadPath(graphPath);
+            if (pathExists(graphFile))
+            {
+              bagelGui->load(graphFile);
+            }
+            else
+            {
+              bagelGui->createView("bagel", version);
+            }
+            std::string smurfPath = "tmp/models/assembly/";
+            handleFilenamePrefix(&smurfPath, env["wsd"].getString());
+            smurfPath += version + "/" + localMap["versions"][0]["name"].getString() + "/smurf/" + version + ".smurf";
+            BagelModel *bagelModel = dynamic_cast<BagelModel *>(bagelGui->getCurrentModel());
+            if (bagelModel)
+            {
+              bagelModel->importSmurf(smurfPath);
+              ConfigMap map;
+              map["domain"] = domain;
+              map["name"] = name;
+              map["type"] = type;
+              map["versions"][0]["name"] = version;
+              map["versions"][0]["maturity"] = "INPROGRESS";
+              handleFilenamePrefix(&graphFile, getCurrentWorkingDir());
 
-          map["graphFile"] = graphFile;
-          ConfigMap interfaces;
-          interfaces["i"][0]["direction"] = "OUTGOING";
-          interfaces["i"][0]["name"] = "joint_commands";
-          interfaces["i"][0]["type"] = "::base::samples::Joints";
-          map["interfaces"] = interfaces["i"].toYamlString();
+              map["graphFile"] = graphFile;
+              ConfigMap interfaces;
+              interfaces["i"][0]["direction"] = "OUTGOING";
+              interfaces["i"][0]["name"] = "joint_commands";
+              interfaces["i"][0]["type"] = "::base::samples::Joints";
+              map["interfaces"] = interfaces["i"].toYamlString();
 
-          map["versions"][0]["defaultConfiguration"]["data"]["config"]["graphFilename"] = graphFile;
-          widget->setModelInfo(map);
+              map["versions"][0]["defaultConfiguration"]["data"]["config"]["graphFilename"] = graphFile;
+              widget->setModelInfo(map);
+            }
+          }
+          break;
         }
-      }
-      break;
-    }
-    case 12:
-    {
-      createBagelModel();
-      break;
-    }
-    case 13:
-    {
-      createBagelTask();
-      break;
-    }
-    case 14:
-    {
-      widget->editDescription();
-      break;
-    }
-    case 15:
-    {
-      ModelInterface *model = bagelGui->getCurrentModel();
-      if (!model)
-      {
-        return;
-      }
-      ConfigMap modelInfo = model->getModelInfo();
-      std::string uuid = QUuid::createUuid().toString().toStdString();
-      std::string path = mars::utils::pathJoin("tmp", uuid);
-      lastExecFolder = path;
-      mars::utils::createDirectory(path);
-      configmaps::ConfigMap map = bagelGui->createConfigMap();
-      std::string name = modelInfo["name"];
-      if (name.size() == 0)
-      {
-        name = "tmp_model_name";
-      }
-      std::string cndName = name + ".cnd";
-      std::string cndNamePre = name + "_pre.cnd";
-      std::string cndPath = mars::utils::pathJoin(path, cndName);
-      exportCnd(map, cndPath);
-      if (!mars::utils::pathExists(cndPath))
-      {
-        printf("ERROR: CND file was not exported successfully!\n");
-        break;
-      }
-      std::string pwd = mars::utils::getCurrentWorkingDir();
-      chdir(path.c_str());
-      std::ofstream file;
-      file.open(name + ".orogen");
-      file << "require 'cnd_orogen'" << std::endl;
-      file << std::endl;
-      file << "name '" << name << "'" << std::endl;
-      file << "cnd_model = ::CndOrogen.load_cnd_model('" << name << ".cnd')" << std::endl;
-      file << "::CndOrogen.load_orogen_project_from_cnd(self, cnd_model)" << std::endl;
-      file.close();
+        case MenuActions::CREATE_BAGEL_MODEL:
+        {
+            // 20221102 MS: Why is this here? Has nothing todo with XROCK.
+          createBagelModel();
+          break;
+        }
+        case MenuActions::CREATE_BAGEL_TASK:
+        {
+            // 20221102 MS: Why is this here? Has nothing todo with XROCK.
+          createBagelTask();
+          break;
+        }
+        case MenuActions::EDIT_MODEL_DESCRIPTION:
+        {
+          widget->editDescription();
+          break;
+        }
+        case MenuActions::EXPORT_CND2:
+        {
+            // 20221102 MS: Move to extra function ...
+          ModelInterface *model = bagelGui->getCurrentModel();
+          if (!model)
+          {
+            return;
+          }
+          ConfigMap modelInfo = model->getModelInfo();
+          std::string uuid = QUuid::createUuid().toString().toStdString();
+          std::string path = mars::utils::pathJoin("tmp", uuid);
+          lastExecFolder = path;
+          mars::utils::createDirectory(path);
+          configmaps::ConfigMap map = bagelGui->createConfigMap();
+          std::string name = modelInfo["name"];
+          if (name.size() == 0)
+          {
+            name = "tmp_model_name";
+          }
+          std::string cndName = name + ".cnd";
+          std::string cndNamePre = name + "_pre.cnd";
+          std::string cndPath = mars::utils::pathJoin(path, cndName);
+          exportCnd(map, cndPath);
+          if (!mars::utils::pathExists(cndPath))
+          {
+            printf("ERROR: CND file was not exported successfully!\n");
+            break;
+          }
+          std::string pwd = mars::utils::getCurrentWorkingDir();
+          chdir(path.c_str());
+          std::ofstream file;
+          file.open(name + ".orogen");
+          file << "require 'cnd_orogen'" << std::endl;
+          file << std::endl;
+          file << "name '" << name << "'" << std::endl;
+          file << "cnd_model = ::CndOrogen.load_cnd_model('" << name << ".cnd')" << std::endl;
+          file << "::CndOrogen.load_orogen_project_from_cnd(self, cnd_model)" << std::endl;
+          file.close();
 #ifdef __APPLE__
-      std::string rockLaunch = "mac-rock-launch";
-      // create pseudo manifest
-      file.open("manifest.xml");
-      file.close();
-      std::string cmd = "orogen --transports=corba,typelib --extensions=cpp_proxies,modelExport " + name + ".orogen";
-      printf("Call %s\n", cmd.c_str());
-      system(cmd.c_str());
-      cmd = "amake";
-      printf("Call %s\n", cmd.c_str());
-      system(cmd.c_str());
+          std::string rockLaunch = "mac-rock-launch";
+          // create pseudo manifest
+          file.open("manifest.xml");
+          file.close();
+          std::string cmd = "orogen --transports=corba,typelib --extensions=cpp_proxies,modelExport " + name + ".orogen";
+          printf("Call %s\n", cmd.c_str());
+          system(cmd.c_str());
+          cmd = "amake";
+          printf("Call %s\n", cmd.c_str());
+          system(cmd.c_str());
 #else
-      std::string rockLaunch = "rock-launch";
-      std::string cmd = "cnd-orogen " + cndName;
-      printf("Call %s\n", cmd.c_str());
-      system(cmd.c_str());
+          std::string rockLaunch = "rock-launch";
+          std::string cmd = "cnd-orogen " + cndName;
+          printf("Call %s\n", cmd.c_str());
+          system(cmd.c_str());
 #endif
-      if (mars::utils::pathExists(cndNamePre))
-      {
-        cmd = rockLaunch + " " + cndNamePre;
-        printf("Call %s\n", cmd.c_str());
-        system(cmd.c_str());
-      }
-      cmd = rockLaunch + " " + cndName;
-      printf("Call %s\n", cmd.c_str());
-      system(cmd.c_str());
-      chdir(pwd.c_str());
-      break;
-    }
-    case 16:
-    {
-      ModelInterface *model = bagelGui->getCurrentModel();
-      if (!model)
-      {
-        return;
-      }
-      ConfigMap modelInfo = model->getModelInfo();
-      std::string path = lastExecFolder;
-      std::string name = modelInfo["name"];
-      if (name.size() == 0)
-      {
-        name = "tmp_model_name";
-      }
-      std::string cndNamePre = name + "_pre.cnd";
-      std::string cndPathPre = mars::utils::pathJoin(path, cndNamePre);
-      std::string cndPath = mars::utils::pathJoin(path, "shutdown.cnd");
-      std::string cmd;
-#ifdef __APPLE__
-      std::string rockLaunch = "mac-rock-launch";
-#else
-      std::string rockLaunch = "rock-launch";
-#endif
-      if (mars::utils::pathExists(cndPathPre))
-      {
-        cmd = rockLaunch + " " + cndPathPre;
-        printf("Call %s\n", cmd.c_str());
-        system(cmd.c_str());
-      }
-      cmd = rockLaunch + " " + cndPath;
-      printf("Call %s\n", cmd.c_str());
-      system(cmd.c_str());
-      break;
-    }
-    case 20:
-    {
-      QString fileName = QFileDialog::getOpenFileName(NULL, QObject::tr("Select Model"),
-                                                      ".", QObject::tr("YAML syntax (*.cnd)"), 0,
-                                                      QFileDialog::DontUseNativeDialog);
-      if (!fileName.isNull())
-      {
-        importCND(fileName.toStdString());
-      }
-      break;
-    }
-    case 21: // Serverless
-    {
-      db = new (db) ServerlessDB(mars::utils::pathJoin(env["AUTOPROJ_CURRENT_ROOT"], env["dbPath"].getString())); //Todo get this from a textfield
-      break;
-    }
-    case 22: // Client
-    {
-      db = new (db) RestDB();
-
-      if (!db->isConnected())
-      {
-        std::string msg = "Server is not running! Please run server using command:\njsondb -d "+main_gui->getToolbarLineEditText(1);
-        QMessageBox::warning(nullptr, "Warning", msg.c_str(), QMessageBox::Ok);
-      }
-      break;
-    }
-    case 23: // MultiDbClient
-    {
-      //TODO: implement
-      std::cout << "integration of MultiDbClient still required" << std::endl;
-      break;
-    }
-    case 30: // Reload
-    {
-      Model *model = dynamic_cast<Model *>(bagelGui->getCurrentModel());
-      if (model)
-      {
-        bagelGui->closeCurrentTab();
-        ConfigMap currentModel = model->getModelInfo();
-
-        if (currentModel.hasKey("name"))
-        {
-          ConfigMap newModel = db->requestModel(currentModel["domain"], currentModel["name"], currentModel["versions"][0]["name"], true);
-          // load updated model in new tab
-          widget->loadModel(newModel);
+          if (mars::utils::pathExists(cndNamePre))
+          {
+            cmd = rockLaunch + " " + cndNamePre;
+            printf("Call %s\n", cmd.c_str());
+            system(cmd.c_str());
+          }
+          cmd = rockLaunch + " " + cndName;
+          printf("Call %s\n", cmd.c_str());
+          system(cmd.c_str());
+          chdir(pwd.c_str());
+          break;
         }
-        else
-          QMessageBox::warning(nullptr, "Warning", "Nothing to reload.", QMessageBox::Ok);
-      }
+        case MenuActions::EXPORT_CND3:
+        {
+            // 20221102 MS: Merge with EXPORT_CND2 and maybe use fall-through OR move to extra function
+          ModelInterface *model = bagelGui->getCurrentModel();
+          if (!model)
+          {
+            return;
+          }
+          ConfigMap modelInfo = model->getModelInfo();
+          std::string path = lastExecFolder;
+          std::string name = modelInfo["name"];
+          if (name.size() == 0)
+          {
+            name = "tmp_model_name";
+          }
+          std::string cndNamePre = name + "_pre.cnd";
+          std::string cndPathPre = mars::utils::pathJoin(path, cndNamePre);
+          std::string cndPath = mars::utils::pathJoin(path, "shutdown.cnd");
+          std::string cmd;
+#ifdef __APPLE__
+          std::string rockLaunch = "mac-rock-launch";
+#else
+          std::string rockLaunch = "rock-launch";
+#endif
+          if (mars::utils::pathExists(cndPathPre))
+          {
+            cmd = rockLaunch + " " + cndPathPre;
+            printf("Call %s\n", cmd.c_str());
+            system(cmd.c_str());
+          }
+          cmd = rockLaunch + " " + cndPath;
+          printf("Call %s\n", cmd.c_str());
+          system(cmd.c_str());
+          break;
+        }
+        case MenuActions::IMPORT_CND:
+        {
+          QString fileName = QFileDialog::getOpenFileName(NULL, QObject::tr("Select Model"),
+                                                          ".", QObject::tr("YAML syntax (*.cnd)"), 0,
+                                                          QFileDialog::DontUseNativeDialog);
+          if (!fileName.isNull())
+          {
+            importCND(fileName.toStdString());
+          }
+          break;
+        }
+        case MenuActions::SELECT_SERVERLESS: // Serverless
+        {
+            // 20221102 MS: If db is already set who deletes the existing backend? Possible memory leak
+          db = new (db) ServerlessDB(mars::utils::pathJoin(env["AUTOPROJ_CURRENT_ROOT"], env["dbPath"].getString())); //Todo get this from a textfield
+          break;
+        }
+        case MenuActions::SELECT_CLIENT: // Client
+        {
+            // 20221102 MS: If db is already set who deletes the existing backend? Possible memory leak
+          db = new (db) RestDB();
 
-      break;
-    }
-    case 31:
-    {
-      QString fileName = QFileDialog::getSaveFileName(NULL, QObject::tr("Select Model"),
-                                                      "export.cnd", QObject::tr("YAML syntax (*.cnd)"), 0,
-                                                      QFileDialog::DontUseNativeDialog);
- 
-     QString urdf_file = QFileDialog::getOpenFileName(NULL, QObject::tr("Select urdf_file"),
-                                                      ".", QObject::tr("YAML syntax (*.urdf)"), 0,
-                                                      QFileDialog::DontUseNativeDialog);
-      if (!fileName.isNull())
-      {
-        ConfigMap map = bagelGui->createConfigMap();
-        exportCnd(map, fileName.toStdString(), urdf_file.toStdString());
-      }
-      break;
-    }
+          if (!db->isConnected())
+          {
+            std::string msg = "Server is not running! Please run server using command:\njsondb -d "+main_gui->getToolbarLineEditText(1);
+            QMessageBox::warning(nullptr, "Warning", msg.c_str(), QMessageBox::Ok);
+          }
+          break;
+        }
+        case MenuActions::SELECT_MULTIDB: // MultiDbClient
+        {
+            // 20221102 MS: If db is already set who deletes the existing backend? Possible memory leak
+          //TODO: implement
+          std::cout << "integration of MultiDbClient still required" << std::endl;
+          break;
+        }
+        case MenuActions::RELOAD_MODEL_FROM_DB: // Reload
+        {
+            // 20221102 MS: We also have a class variable model. Shadowing issues can arise.
+          Model *model = dynamic_cast<Model *>(bagelGui->getCurrentModel());
+          if (model)
+          {
+            bagelGui->closeCurrentTab();
+            ConfigMap currentModel = model->getModelInfo();
+
+            if (currentModel.hasKey("name"))
+            {
+              ConfigMap newModel = db->requestModel(currentModel["domain"], currentModel["name"], currentModel["versions"][0]["name"], true);
+              // load updated model in new tab
+              widget->loadModel(newModel);
+            }
+            else
+              QMessageBox::warning(nullptr, "Warning", "Nothing to reload.", QMessageBox::Ok);
+          }
+
+          break;
+        }
+        case MenuActions::EXPORT_CND_TFENHANCE:
+        {
+          QString fileName = QFileDialog::getSaveFileName(NULL, QObject::tr("Select Model"),
+                                                          "export.cnd", QObject::tr("YAML syntax (*.cnd)"), 0,
+                                                          QFileDialog::DontUseNativeDialog);
+     
+         QString urdf_file = QFileDialog::getOpenFileName(NULL, QObject::tr("Select urdf_file"),
+                                                          ".", QObject::tr("YAML syntax (*.urdf)"), 0,
+                                                          QFileDialog::DontUseNativeDialog);
+          if (!fileName.isNull())
+          {
+            ConfigMap map = bagelGui->createConfigMap();
+            exportCnd(map, fileName.toStdString(), urdf_file.toStdString());
+          }
+          break;
+        }
+        default:
+        {
+            throw std::out_of_range("Cannot handle action " + std::to_string(action));
+            break;
+        }
     }
   }
 

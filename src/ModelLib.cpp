@@ -153,7 +153,6 @@ namespace xrock_gui_model
       gui->addGenericMenuAction("../Windows/ModelWidget", 3, this);
       gui->addGenericMenuAction("../Expert/Edit Description", 14, this);
       gui->addGenericMenuAction("../Expert/Edit Local Map", 10, this);
-      // gui->addGenericMenuAction("../Expert/Create Bagel", 11, this);
       gui->addGenericMenuAction("../Expert/Create Bagel Model", 12, this);
       gui->addGenericMenuAction("../Expert/Create Bagel Task", 13, this);
       gui->addGenericMenuAction("../Expert/Launch CND", 15, this);
@@ -280,8 +279,7 @@ namespace xrock_gui_model
         modelInfo["editable_interfaces"] = false;
         modelInfo["layouts"] = std::string("");
         widget->setModelInfo(modelInfo);
-        // fprintf(stderr, "loadStartModel: %s %s %s\n", domain.c_str(), modelName.c_str(), version.c_str());
-        // loadComponent(domain, modelName, version);
+
       }
       else
       {
@@ -353,7 +351,7 @@ namespace xrock_gui_model
       std::stringstream ss;
       ss << "loadSettingsFromFile: ERROR while loading: " << workspace << '/' << filename;
       std::cerr << ss.str() << std::endl;
-      // QMessageBox::critical(nullptr, "Error",QString::fromStdString(ss.str()),  QMessageBox::Ok);
+      
     }
   }
 
@@ -732,11 +730,7 @@ namespace xrock_gui_model
       std::string domain = "software";
       std::string type = "bagel::subgraph";
       std::string name = "bagel::" + localMap["name"].getString();
-      // todo: fix version handling
-      //       first: save in softwareData the whole model the bagel
-      //       graph is created for
       std::string version = localMap["name"];
-
       // check if we can load the model from the database
       ConfigMap map = db->requestModel(domain, name, version);
       // if the map is empty create the model info
@@ -826,8 +820,6 @@ namespace xrock_gui_model
       widget->loadType("software", "Timer", "v1.0.0");
       widget->loadType("software", "Modulated_Sine", "v1.0.0");
       widget->setEdition("software");
-      // todo: - handle order of nodes
-      // handle name clashes of exported interfaces with nodes in the graph
     }
   }
 
@@ -1016,7 +1008,6 @@ namespace xrock_gui_model
 
   void ModelLib::currentModelChanged(bagel_gui::ModelInterface *model)
   {
-    // Model *m = dynamic_cast<Model*>(model);
     widget->clear();
     if (model)
     {
@@ -1097,14 +1088,6 @@ namespace xrock_gui_model
     {
       printf("No bundle selected in env: ROCK_BUNDLE\n  Use bundle-sel to select one!\n");
     }
-
-    // open config file
-    // open dialog
-    // {
-    //   ConfigureDialog cd(&config, env, node["modelName"], true, true);
-    //   cd.resize(400, 400);
-    //   cd.exec();
-    // }
   }
 
   void ModelLib::configureComponents(const std::string &name)
@@ -1230,8 +1213,6 @@ namespace xrock_gui_model
       std::stringstream ss;
       ss << "defaultConfig is not a valid YAML ";
       QMessageBox::critical(nullptr, "Error", QString::fromStdString(ss.str()), QMessageBox::Ok);
-
-      // how to handle if the config is no more a valid YAML? Could this happen?
     }
   }
 
@@ -1446,187 +1427,6 @@ namespace xrock_gui_model
     else
        QMessageBox::critical(nullptr, "Export", QString::fromStdString("Failed to export cnd with code: " + std::to_string(ret)), QMessageBox::Ok);
 
-    //   ConfigMap map = map_;
-    //   ConfigMap output;
-    //   ConfigMap nameMap;
-    //   ConfigMap dNameMap;
-    //   bool haveMarsTask = false;
-    //   bool compileDeployments = false;
-    //   // handle file path and  node order
-    //   for (auto node : map["nodes"])
-    //   {
-    //     if (node["type"] == "software::Deployment")
-    //     {
-    //       std::string name = node["name"];
-
-    //       output["deployments"][name]["deployer"] = "orogen";
-    //       output["deployments"][name]["process_name"] = name;
-    //       output["deployments"][name]["hostID"] = "local";
-    //       if (node.hasKey("softwareData") and node["softwareData"].hasKey("data") and
-    //           node["softwareData"]["data"].hasKey("configuration"))
-    //       {
-    //         ConfigItem item(node["softwareData"]["data"]["configuration"]);
-    //         trimMap(item);
-    //         ConfigMap m = item;
-    //         if (m.hasKey("deployer"))
-    //         {
-    //           output["deployments"][name]["deployer"] = m["deployer"];
-    //         }
-    //         if (m.hasKey("process_name"))
-    //         {
-    //           output["deployments"][name]["process_name"] = m["process_name"];
-    //         }
-    //         if (m.hasKey("hostID"))
-    //         {
-    //           output["deployments"][name]["hostID"] = m["hostID"];
-    //         }
-    //       }
-    //       dNameMap[name] = output["deployments"][name]["process_name"];
-    //     }
-    //     else
-    //     {
-    //       if (node["domain"] == "software")
-    //       {
-    //         std::string name = node["name"];
-    //         nameMap[name] = 1;
-    //         ConfigItem item(node["softwareData"]["data"]);
-    //         trimMap(item);
-    //         ConfigMap m = item;
-    //         if (m.hasKey("properties"))
-    //         {
-    //           ConfigVector props;
-    //           for (auto prop : m["properties"])
-    //           {
-    //             if (prop.hasKey("Value"))
-    //             {
-    //               props.push_back(prop);
-    //             }
-    //           }
-    //           m.erase("properties");
-    //           if (props.size() > 0)
-    //           {
-    //             m["properties"] = props;
-    //           }
-    //         }
-    //         if (m.hasKey("configuration"))
-    //         {
-    //           ConfigMap m2 = m["configuration"];
-    //           m.erase("configuration");
-    //           m.updateMap(m2);
-    //         }
-    //         if (m.hasKey("description"))
-    //         {
-    //           m.erase("description");
-    //         }
-    //         std::string type = node["modelName"];
-    //         if (type == "mars::Task")
-    //         {
-    //           haveMarsTask = true;
-    //         }
-    //         output["tasks"][name] = m;
-    //         output["tasks"][name]["type"] = type;
-    //         if (node.hasKey("parentName") and node["parentName"].getString().size() > 0)
-    //         {
-    //           std::string parent = node["parentName"];
-    //           std::vector<std::string> arrName = mars::utils::explodeString(':', node["type"]);
-    //           std::string process_name = "orogen_default_" + arrName[0] + "__" + arrName[2];
-    //           output["deployments"][parent]["taskList"][name] = process_name;
-    //           if (output["deployments"][parent]["taskList"].size() > 1)
-    //           {
-    //             compileDeployments = true;
-    //             output["deployments"][parent]["process_name"] = dNameMap[parent];
-    //           }
-    //           else
-    //           {
-    //             output["deployments"][parent]["process_name"] = process_name;
-    //           }
-    //         }
-    //         else
-    //         {
-    //           std::string depName = name + "_deployment";
-    //           output["deployments"][depName]["deployer"] = "orogen";
-    //           output["deployments"][depName]["hostID"] = "local";
-    //           std::vector<std::string> arrName = mars::utils::explodeString(':', node["type"]);
-    //           std::string process_name = "orogen_default_" + arrName[0] + "__" + arrName[2];
-    //           output["deployments"][depName]["taskList"][name] = process_name;
-    //           output["deployments"][depName]["process_name"] = process_name;
-    //           dNameMap[depName] = depName;
-    //         }
-    //       }
-    //     }
-    //   }
-    //   if (compileDeployments)
-    //   {
-    //     for (ConfigMap::iterator it = output["deployments"].beginMap();
-    //          it != output["deployments"].endMap(); ++it)
-    //     {
-    //       for (ConfigMap::iterator nt = it->second["taskList"].beginMap();
-    //            nt != it->second["taskList"].endMap(); ++nt)
-    //       {
-    //         nt->second = nt->first;
-    //       }
-    //       output["deployments"][it->first]["process_name"] = dNameMap[it->first];
-    //     }
-    //   }
-    //   int i = 0;
-    //   for (auto edge : map["edges"])
-    //   {
-    //     ConfigMap m;
-    //     if (edge.hasKey("transport"))
-    //     {
-    //       m["transport"] = edge["transport"];
-    //     }
-    //     if (edge.hasKey("type"))
-    //     {
-    //       m["type"] = edge["type"];
-    //     }
-    //     if (edge.hasKey("size"))
-    //     {
-    //       m["size"] = edge["size"];
-    //     }
-    //     std::string name = edge["fromNode"];
-    //     if (!nameMap.hasKey(name))
-    //       continue;
-    //     // remove domian namespace
-    //     m["from"]["task_id"] = name;
-    //     m["from"]["port_name"] = edge["fromNodeOutput"];
-    //     // remove domian namespace
-    //     name << edge["toNode"];
-    //     if (!nameMap.hasKey(name))
-    //       continue;
-    //     m["to"]["task_id"] = name;
-    //     m["to"]["port_name"] = edge["toNodeInput"];
-    //     char buffer[100];
-    //     // todo: use snprintf
-    //     sprintf(buffer, "%d", i++);
-    //     output["connections"][std::string(buffer)] = m;
-    //   }
-    //   output.toYamlFile(filename);
-    //   if (haveMarsTask)
-    //   {
-    //     // generate pre cnd because we have to first load mars::Task then
-    //     // the plugin tasks
-    //     for (ConfigMap::iterator it = output["tasks"].beginMap();
-    //          it != output["tasks"].endMap(); ++it)
-    //     {
-    //       if (it->second["type"] != "mars::Task")
-    //       {
-    //         it->second["state"] = "PRE_OPERATIONAL";
-    //       }
-    //     }
-    //     std::string preFile = filename;
-    //     mars::utils::removeFilenameSuffix(&preFile);
-    //     if (output.hasKey("connections"))
-    //     {
-    //       output.erase("connections");
-    //     }
-    //     output.toYamlFile(preFile + "_pre.cnd");
-    //   }
-    //   // write shutdown cnd
-    //   std::string shutdownFile = mars::utils::pathJoin(mars::utils::getPathOfFile(filename), "shutdown.cnd");
-    //   FILE *f = fopen(shutdownFile.c_str(), "w");
-    //   fprintf(f, "deployments:\n\ntasks:\n\nconnections:\n\n");
-    //   fclose(f);
   }
 
   void ModelLib::importCND(const std::string &fileName)
@@ -1792,11 +1592,6 @@ namespace xrock_gui_model
     // save context name
     std::vector<std::string> r;
     r.push_back("change version");
-    // ConfigMap node = *(bagelGui->getNodeMap(name));
-    //  if(node["domain"] == "software") {
-    //   todo: identify rock nodes
-    //   if(node["softwareData"]["data"].hasKey("framework") &&
-    //      node["softwareData"]["data"]["framework"] == "Rock") {
     r.push_back("configure node");
     r.push_back("configure components");
     r.push_back("reset configuration");
@@ -1804,12 +1599,8 @@ namespace xrock_gui_model
     r.push_back("apply configuration");
     r.push_back("open model");
     r.push_back("show description");
-
     // todo: add bundle handling for node configuration
-    // r.push_back("edit bundle condiguration");
-
-    // }
-    //}
+ 
     contextNodeName = name;
     return r;
   }

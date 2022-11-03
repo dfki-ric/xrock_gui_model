@@ -141,29 +141,29 @@ namespace xrock_gui_model
     {
       const std::string icon = mars::utils::pathJoin(resourcesPath, "xrock_gui_model/resources/images/");
       std::cout << icon << std::endl;
-      gui->addGenericMenuAction("../File/Import/Model", 1, this);
-      gui->addGenericMenuAction("../File/Import/CNDModel", 20, this);
-      gui->addGenericMenuAction("../File/Export/Model", 2, this);
-      gui->addGenericMenuAction("../File/Export/CNDModel", 5, this);
-      gui->addGenericMenuAction("../File/Export/CNDModel With tf_enhance", 31, this);
-      gui->addGenericMenuAction("../Database/Add Component", 6, this);
-      gui->addGenericMenuAction("../Database/Store Model", 4, this);
-      gui->addGenericMenuAction("../Database/Load Model", 7, this);
-      gui->addGenericMenuAction("../Database/HardToSoft", 8, this);
-      gui->addGenericMenuAction("../Windows/ModelWidget", 3, this);
-      gui->addGenericMenuAction("../Expert/Edit Description", 14, this);
-      gui->addGenericMenuAction("../Expert/Edit Local Map", 10, this);
-      gui->addGenericMenuAction("../Expert/Create Bagel Model", 12, this);
-      gui->addGenericMenuAction("../Expert/Create Bagel Task", 13, this);
-      gui->addGenericMenuAction("../Expert/Launch CND", 15, this);
-      gui->addGenericMenuAction("../Expert/Stop CND", 16, this);
-      gui->addGenericMenuAction("../Actions/Load Model", 7, this, 0,
+      gui->addGenericMenuAction("../File/Import/Model", static_cast<int>(MenuActions::LOAD_MODEL), this);
+      gui->addGenericMenuAction("../File/Import/CNDModel", static_cast<int>(MenuActions::IMPORT_CND), this);
+      gui->addGenericMenuAction("../File/Export/Model", static_cast<int>(MenuActions::SAVE_MODEL), this);
+      gui->addGenericMenuAction("../File/Export/CNDModel", static_cast<int>(MenuActions::EXPORT_CND), this);
+      gui->addGenericMenuAction("../File/Export/CNDModel With tf_enhance", static_cast<int>(MenuActions::EXPORT_CND_TFENHANCE), this);
+      gui->addGenericMenuAction("../Database/Add Component", static_cast<int>(MenuActions::ADD_COMPONENT_FROM_DB), this);
+      gui->addGenericMenuAction("../Database/Store Model", static_cast<int>(MenuActions::STORE_MODEL_TO_DB), this);
+      gui->addGenericMenuAction("../Database/Load Model", static_cast<int>(MenuActions::LOAD_MODEL_FROM_DB), this);
+      gui->addGenericMenuAction("../Database/HardToSoft", static_cast<int>(MenuActions::IMPORT_HW_TO_BAGEL), this);
+      gui->addGenericMenuAction("../Windows/ModelWidget", static_cast<int>(MenuActions::TOGGLE_MODEL_WIDGET), this);
+      gui->addGenericMenuAction("../Expert/Edit Description", static_cast<int>(MenuActions::EDIT_MODEL_DESCRIPTION), this);
+      gui->addGenericMenuAction("../Expert/Edit Local Map", static_cast<int>(MenuActions::EDIT_LOCAL_MAP), this);
+      gui->addGenericMenuAction("../Expert/Create Bagel Model", static_cast<int>(MenuActions::CREATE_BAGEL_MODEL), this);
+      gui->addGenericMenuAction("../Expert/Create Bagel Task", static_cast<int>(MenuActions::CREATE_BAGEL_TASK), this);
+      gui->addGenericMenuAction("../Expert/Launch CND", static_cast<int>(MenuActions::EXPORT_CND_AND_LAUNCH), this);
+      gui->addGenericMenuAction("../Expert/Stop CND", static_cast<int>(MenuActions::STOP_CND), this);
+      gui->addGenericMenuAction("../Actions/Load Model", static_cast<int>(MenuActions::LOAD_MODEL_FROM_DB), this, 0,
                                 icon + "load.png", true);
-      gui->addGenericMenuAction("../Actions/Add Component", 6, this, 0,
+      gui->addGenericMenuAction("../Actions/Add Component", static_cast<int>(MenuActions::ADD_COMPONENT_FROM_DB), this, 0,
                                 icon + "add.png", true);
-      gui->addGenericMenuAction("../Actions/Save Model", 4, this, 0,
+      gui->addGenericMenuAction("../Actions/Save Model", static_cast<int>(MenuActions::STORE_MODEL_TO_DB), this, 0,
                                 icon + "save.png", true);
-      gui->addGenericMenuAction("../Actions/Reload", 30, this, 0,
+      gui->addGenericMenuAction("../Actions/Reload", static_cast<int>(MenuActions::RELOAD_MODEL_FROM_DB), this, 0,
                                 icon + "reload.png", true);
 
       mars::main_gui::MainGUI *main_gui = dynamic_cast<mars::main_gui::MainGUI *>(gui);
@@ -173,18 +173,18 @@ namespace xrock_gui_model
                                       std::cout << "backend changed  " << new_backend << std::endl;
                                       if(new_backend == "Serverless")
                                         {
-                                          menuAction(21);
+                                          menuAction(static_cast<int>(MenuActions::SELECT_SERVERLESS));
                                           main_gui->disableToolbarLineEdit({2,3});
                                           main_gui->enableToolbarLineEdit({1});
                                         }
                                       else if (new_backend == "Client")
                                         {
-                                          menuAction(22);
+                                          menuAction(static_cast<int>(MenuActions::SELECT_CLIENT));
                                           main_gui->disableToolbarLineEdit({1});
                                           main_gui->enableToolbarLineEdit({2,3,4});
                                         }
                                       else if (new_backend == "MultiDbClient")
-                                        menuAction(23); });
+                                        menuAction(static_cast<int>(MenuActions::SELECT_MULTIDB)); });
       main_gui->addLineEditToToolbar(1, "Actions", " db path: ", "modkom/component_db",
                                      [this](std::string text)
                                      {
@@ -383,7 +383,7 @@ namespace xrock_gui_model
           widget->saveModel();
           break;
         }
-        case MenuActions::TOGGLE_WIDGET:
+        case MenuActions::TOGGLE_MODEL_WIDGET:
         {
           if (widget->isHidden())
           {
@@ -395,7 +395,7 @@ namespace xrock_gui_model
           }
           break;
         }
-        case MenuActions::STORE_MODEL: // store model
+        case MenuActions::STORE_MODEL_TO_DB: // store model
         {
           widget->storeModel();
           break;
@@ -507,7 +507,7 @@ namespace xrock_gui_model
           widget->editDescription();
           break;
         }
-        case MenuActions::EXPORT_CND2:
+        case MenuActions::EXPORT_CND_AND_LAUNCH:
         {
             // 20221102 MS: Move to extra function ...
           ModelInterface *model = bagelGui->getCurrentModel();
@@ -574,9 +574,8 @@ namespace xrock_gui_model
           chdir(pwd.c_str());
           break;
         }
-        case MenuActions::EXPORT_CND3:
+        case MenuActions::STOP_CND:
         {
-            // 20221102 MS: Merge with EXPORT_CND2 and maybe use fall-through OR move to extra function
           ModelInterface *model = bagelGui->getCurrentModel();
           if (!model)
           {

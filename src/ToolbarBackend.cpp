@@ -23,6 +23,8 @@
 #include <QLabel>
 #include <QComboBox>
 #include <QVBoxLayout>
+#include <cstdlib>
+#include <mars/utils/misc.h>
 using namespace xrock_gui_model;
 
 ToolbarBackend::ToolbarBackend(ModelLib *modelLib, mars::main_gui::GuiInterface *gui, DBInterface *db)
@@ -106,7 +108,10 @@ void ToolbarBackend::on_backend_changed(const QString &new_backend)
 void ToolbarBackend::on_db_path_changed(const QString &db_path)
 {
   if (ServerlessDB* sdb = dynamic_cast<ServerlessDB*>(db))
-    sdb->set_dbPath(db_path.toStdString());
+  {
+    std::string dbPath = mars::utils::pathJoin(std::getenv("AUTOPROJ_CURRENT_ROOT"), db_path.toStdString());
+    sdb->set_dbPath(dbPath);
+  }
 }
 void ToolbarBackend::on_url_changed(const QString &url)
 {

@@ -47,6 +47,7 @@ set(SOURCES
   src/FileDB.cpp
   src/RestDB.cpp
   src/ServerlessDB.cpp
+  src/ToolbarBackend.cpp
 )
 
 set(HEADERS
@@ -60,6 +61,7 @@ set(HEADERS
   src/FileDB.hpp
   src/RestDB.hpp
   src/ServerlessDB.hpp
+  src/ToolbarBackend.hpp
 )
 
 set (QT_MOC_HEADER
@@ -67,6 +69,7 @@ set (QT_MOC_HEADER
   src/ImportDialog.hpp
   src/VersionDialog.hpp
   src/ConfigureDialog.hpp
+  src/ToolbarBackend.hpp
 )
 
 if (${USE_QT5})

@@ -300,7 +300,7 @@ namespace xrock_gui_model
       }
       else
       {
-        fprintf(stderr, "loadStartModel: no model given\n");
+        std::cerr << "loadStartModel: no model given" << std::endl;
       }
     }
   }

@@ -65,8 +65,6 @@ namespace xrock_gui_model {
     auto allowed = cm->get_allowed_property_values("domain");
     for(const auto a : allowed)
         domain->addItem(QString::fromStdString(a));
-    //QStringList allowed = {"SOFTWARE", "MECHANICS", "COMPUTATION", "ELECTRONICS", "BEHAVIOR", "ASSEMBLY", "NOT_SET"};
-    //domain->addItems(allowed);
     layout->addWidget(domain, i++, 1);
     connect(domain, SIGNAL(textChanged(const QString&)), this, SLOT(updateModelInfo()));
 
@@ -423,10 +421,7 @@ namespace xrock_gui_model {
       modelPath = ".";
     }
     bagelGui->setLoadPath(modelPath);
-    //fprintf(stderr, "set load path to: %s\n", modelPath.c_str());
     std::string domainData = "data";
-    //mars::utils::tolower(map["domain"]) + "Data";
-
     // create view clears this widget
     bagelGui->createView("xrock", map["name"]);
     bagelGui->setSmoothLineMode();
@@ -475,7 +470,6 @@ namespace xrock_gui_model {
     }
 
     if(map["versions"][0].hasKey("components")) {
-      //fprintf(stderr, "model graph:\n%s\n", map["versions"][0]["components"].c_str());
       ConfigMap &cMap = map["versions"][0]["components"];
       if(cMap.hasKey("nodes")) {
         loadGraph(cMap);
@@ -491,7 +485,6 @@ namespace xrock_gui_model {
       ConfigMap &dataMap = myMap["versions"][0][domainData];
       if(dataMap.hasKey("gui")) {
         std::string defLayout = dataMap["gui"]["defaultLayout"];
-        //ConfigVector::iterator it = dataMap["gui"]["layouts"].begin();
         bagelGui->setLoadPath(modelPath);
         layoutMap = dataMap["gui"]["layouts"];
         for(auto it : layoutMap) {
@@ -499,7 +492,6 @@ namespace xrock_gui_model {
           if(it.first == defLayout) {
             layouts->setCurrentItem(layouts->item(layouts->count()-1));
             currentLayout = defLayout;
-            //bagelGui->loadLayout(currentLayout + ".yml");
             bagelGui->applyLayout(it.second);
           }
         }
@@ -971,7 +963,7 @@ namespace xrock_gui_model {
       if(!interfaces_Yaml.empty())
         tmpInterfaces["i"] = ConfigItem::fromYamlString(interfaces_Yaml);
     } catch(...) {
-      fprintf(stderr, "ERROR: cannot load interfaces from text field at %s:%d\n", __FILE__, __LINE__);
+      std::cerr << "ERROR: cannot load interfaces from text field at " <<  __FILE__<<  __LINE__ << std::endl;
       tmpInterfaces = ConfigMap();
     }
 
@@ -1209,7 +1201,7 @@ namespace xrock_gui_model {
                              const std::string &version){
     try{
     if(domain == "software" && name == "Deployment") return;
-    fprintf(stderr, "check type: %s %s %s\n", domain.c_str(), name.c_str(), version.c_str());
+    std::cerr << "check type: " <<  domain.c_str() <<' '<< name.c_str() <<' ' << version.c_str() << std::endl;
     Model *model = dynamic_cast<Model*>(bagelGui->getCurrentModel());
     if (model) {
       ConfigMap modelMap, nodeInfo;

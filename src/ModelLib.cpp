@@ -55,8 +55,16 @@ namespace xrock_gui_model
 
   ModelLib::ModelLib(lib_manager::LibManager *theManager) : lib_manager::LibInterface(theManager), model(NULL)
   {
-    fprintf(stderr, "create model\n");
+    initConfig();
+    initBagelGui();
+    initMainGui();
+   
+    loadSettingsFromFile("generalsettings.yml");
+    loadModelFromParameter();
+  }
 
+  void ModelLib::initConfig()
+  {
     importToBagel = false;
     cfg = libManager->getLibraryAs<mars::cfg_manager::CFGManagerInterface>("cfg_manager", true);
     std::string confDir = ".";
@@ -123,6 +131,12 @@ namespace xrock_gui_model
       db->set_dbAddress(prop_dbAddress.sValue);
       dbAddress_paramId = prop_dbAddress.paramId;
     }
+    else 
+      std::cerr << "Error: Failed to load library cfg_manager!" << std::endl;
+  }
+
+  void ModelLib::initBagelGui()
+  {
     bagelGui = libManager->getLibraryAs<BagelGui>("bagel_gui");
     if (bagelGui)
     {
@@ -135,6 +149,10 @@ namespace xrock_gui_model
     {
       std::cerr << "ERROR: ModelLib: was not able to get bagel_gui!" << std::endl;
     }
+  }
+  
+  void ModelLib::initMainGui()
+  {
     gui = libManager->getLibraryAs<mars::main_gui::GuiInterface>("main_gui");
     if (gui)
     {

@@ -63,6 +63,11 @@ namespace xrock_gui_model
     explicit ModelLib(lib_manager::LibManager *theManager);
     ~ModelLib();
 
+    // Initializers
+    void initConfig();
+    void initBagelGui();
+    void initMainGui();
+    void initBackends();
     // LibInterface methods
     int getLibVersion() const
     {

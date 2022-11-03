@@ -117,7 +117,7 @@ namespace xrock_gui_model
     void addComponent(std::string domain, std::string modelName, std::string version, std::string nodeName = "");
     void loadComponent(std::string domain, std::string modelName, std::string version);
     void applyConfiguration(configmaps::ConfigMap &map);
-    DBInterface *db;
+    std::unique_ptr<DBInterface> db;
 
   private:
     std::map<std::string, configmaps::ConfigMap> modelCache;

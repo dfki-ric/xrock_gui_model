@@ -106,27 +106,25 @@ namespace xrock_gui_model
       mars::cfg_manager::cfgPropertyStruct prop_dbAddress;
       prop_dbAddress = cfg->getOrCreateProperty("XRockGUI", "dbAddress",
                                                 defaultAddress, this);
-      db = NULL;
       if (env.hasKey("dbType") and env["dbType"] == "RestDB")
       {
-        db = new RestDB();
+        db.reset(new RestDB());
         std::cout << "Using restdb" << std::endl;
       }
       else if (env.hasKey("dbType") and env["dbType"] == "ServerlessDB" and env.hasKey("dbPath"))
       {
         std::string dbAbsPath = mars::utils::pathJoin(env["AUTOPROJ_CURRENT_ROOT"], env["dbPath"].toString());
-        db = new ServerlessDB(dbAbsPath);
+        db.reset(new ServerlessDB(dbAbsPath));
         std::cout << "Using serverless where db path is: " << dbAbsPath << std::endl;
       }
       else if (env.hasKey("dbType") and env["dbType"] == "MultiDB")
       {
         // todo
       }
-      
       else
       {
         prop_dbAddress.sValue = mars::utils::pathJoin(confDir, prop_dbAddress.sValue);
-        db = new FileDB();
+        db.reset(new FileDB());
       }
       db->set_dbAddress(prop_dbAddress.sValue);
       dbAddress_paramId = prop_dbAddress.paramId;
@@ -157,7 +155,6 @@ namespace xrock_gui_model
     if (gui)
     {
       const std::string icon = mars::utils::pathJoin(resourcesPath, "xrock_gui_model/resources/images/");
-      std::cout << icon << std::endl;
       gui->addGenericMenuAction("../File/Import/Model", static_cast<int>(MenuActions::LOAD_MODEL), this);
       gui->addGenericMenuAction("../File/Import/CNDModel", static_cast<int>(MenuActions::IMPORT_CND), this);
       gui->addGenericMenuAction("../File/Export/Model", static_cast<int>(MenuActions::SAVE_MODEL), this);
@@ -245,8 +242,6 @@ namespace xrock_gui_model
     {
       std::cerr << "ModelLib: was not able to get main_gui" << std::endl;
     }
-    loadSettingsFromFile("generalsettings.yml");
-    loadModelFromParameter();
   }
 
   ModelLib::~ModelLib()
@@ -637,15 +632,13 @@ namespace xrock_gui_model
         }
         case MenuActions::SELECT_SERVERLESS: // Serverless
         {
-            // 20221102 MS: If db is already set who deletes the existing backend? Possible memory leak
-          db = new (db) ServerlessDB(mars::utils::pathJoin(env["AUTOPROJ_CURRENT_ROOT"], env["dbPath"].getString())); //Todo get this from a textfield
+          db.reset(new ServerlessDB(mars::utils::pathJoin(env["AUTOPROJ_CURRENT_ROOT"], env["dbPath"].getString()))); //Todo get this from a textfield
           break;
         }
         case MenuActions::SELECT_CLIENT: // Client
         {
-            // 20221102 MS: If db is already set who deletes the existing backend? Possible memory leak
-          db = new (db) RestDB();
-
+          db.reset(new RestDB());
+          // db.reset(new RestDB());
           if (!db->isConnected())
           {
             std::string msg = "Server is not running! Please run server using command:\njsondb -d "+main_gui->getToolbarLineEditText(1);
@@ -655,7 +648,6 @@ namespace xrock_gui_model
         }
         case MenuActions::SELECT_MULTIDB: // MultiDbClient
         {
-            // 20221102 MS: If db is already set who deletes the existing backend? Possible memory leak
           //TODO: implement
           std::cout << "integration of MultiDbClient still required" << std::endl;
           break;
@@ -1442,10 +1434,10 @@ namespace xrock_gui_model
     {
       cnd_export << " -t --tf_enhance -u " << urdf_file;
     }          
-    if(dynamic_cast<ServerlessDB*>(db)){
+    if(dynamic_cast<ServerlessDB*>(db.get())){
       cnd_export << " -b Serverless ";
     }
-    else if(dynamic_cast<RestDB*>(db)){
+    else if(dynamic_cast<RestDB*>(db.get())){
       cnd_export << " -b Client ";
     }
    // else if(dynamic_cast<MultiDB*>(db)){

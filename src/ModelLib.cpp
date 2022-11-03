@@ -179,50 +179,12 @@ namespace xrock_gui_model
                                 icon + "save.png", true);
       gui->addGenericMenuAction("../Actions/Reload", static_cast<int>(MenuActions::RELOAD_MODEL_FROM_DB), this, 0,
                                 icon + "reload.png", true);
-
+      
       mars::main_gui::MainGUI *main_gui = dynamic_cast<mars::main_gui::MainGUI *>(gui);
       main_gui->mainWindow_p()->setWindowIcon(QIcon(":/images/xrock_gui.ico"));
-      main_gui->addComboBoxToToolbar("Actions", DBInterface::loadBackends(), [this, main_gui](std::string new_backend)
-                                     {
-                                      std::cout << "backend changed  " << new_backend << std::endl;
-                                      if(new_backend == "Serverless")
-                                        {
-                                          menuAction(static_cast<int>(MenuActions::SELECT_SERVERLESS));
-                                          main_gui->disableToolbarLineEdit({2,3});
-                                          main_gui->enableToolbarLineEdit({1});
-                                        }
-                                      else if (new_backend == "Client")
-                                        {
-                                          menuAction(static_cast<int>(MenuActions::SELECT_CLIENT));
-                                          main_gui->disableToolbarLineEdit({1});
-                                          main_gui->enableToolbarLineEdit({2,3,4});
-                                        }
-                                      else if (new_backend == "MultiDbClient")
-                                        menuAction(static_cast<int>(MenuActions::SELECT_MULTIDB)); });
-      main_gui->addLineEditToToolbar(1, "Actions", " db path: ", "modkom/component_db",
-                                     [this](std::string text)
-                                     {
-                                       ServerlessDB *sdb = dynamic_cast<ServerlessDB *>(db);
-                                       sdb->set_dbPath(text);
-                                     });
-      main_gui->addLineEditToToolbar(2, "Actions", " URL: ", "http://0.0.0.0", [this, main_gui](std::string text)
-                                     {
-                                       RestDB *rdb = dynamic_cast<RestDB *>(db);
-                                       std::string port = main_gui->getToolbarLineEditText(3);
-                                       std::cout << " port no " << port << std::endl;
-                                       std::string dbAddress = text + ':' + port;
-                                       rdb->set_dbAddress(dbAddress);
-                                       std::cout << "URL changed  " << text << std::endl;
-                                     });
-      main_gui->addLineEditToToolbar(3, "Actions", " port: ", "8183", [this, main_gui](std::string text)
-                                     { 
-                                       RestDB *rdb = dynamic_cast<RestDB *>(db);
-                                       std::string url = main_gui->getToolbarLineEditText(2);
-                                       std::string dbAddress= url + ':' + text;
-                                       rdb->set_dbAddress(dbAddress); });
-      main_gui->addLineEditToToolbar(4, "Actions", " graph: ", "graph_test", [this](std::string text)
-                                     {db->set_dbGraph(text);});
-      main_gui->disableToolbarLineEdit({2, 3});
+     
+      toolbarBackend = new ToolbarBackend(this, gui, db.get());
+
 
       widget = new ModelWidget(cfg, bagelGui, this);
       if (!widget->getHiddenCloseState())
@@ -259,6 +221,7 @@ namespace xrock_gui_model
       cfg->writeConfig(confDir.c_str(), "XRockGUI");
       libManager->releaseLibrary("cfg_manager");
     }
+    delete toolbarBackend;
     writeStatus(0, "closed fine");
   }
 
@@ -1635,7 +1598,6 @@ namespace xrock_gui_model
        fprintf(f, "deployments:\n\ntasks:\n\nconnections:\n\n");
        fclose(f);
 }
-
   void ModelLib::importCND(const std::string &fileName)
   {
     ConfigMap map;

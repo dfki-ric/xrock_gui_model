@@ -17,6 +17,7 @@
 #include <bagel_gui/PluginInterface.hpp>
 #include <mars/cfg_manager/CFGManagerInterface.h>
 #include "DBInterface.hpp"
+#include "ToolbarBackend.hpp"
 
 namespace bagel_gui
 {
@@ -68,6 +69,7 @@ namespace xrock_gui_model
     void initBagelGui();
     void initMainGui();
     void initBackends();
+
     // LibInterface methods
     int getLibVersion() const
     {
@@ -134,6 +136,7 @@ namespace xrock_gui_model
     mars::cfg_manager::cfgParamId dbPassword_paramId;
     std::string lastExecFolder;
     std::string resourcesPath;
+    ToolbarBackend* toolbarBackend;
 
     void loadStartModel();
     void loadModelFromParameter();

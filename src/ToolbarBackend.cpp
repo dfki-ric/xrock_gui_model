@@ -82,6 +82,7 @@ ToolbarBackend::~ToolbarBackend()
   delete le_db_path;
   delete le_url;
   delete le_port;
+  delete le_graph;
 }
 
 void ToolbarBackend::on_backend_changed(const QString &new_backend)

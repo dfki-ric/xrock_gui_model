@@ -11,7 +11,7 @@
 
 #include <mars/utils/misc.h>
 #include <dirent.h>
-
+#include <iostream>
 using namespace bagel_gui;
 using namespace configmaps;
 using namespace mars::utils;
@@ -107,7 +107,6 @@ namespace xrock_gui_model {
 
         if (file.find(".yml", file.size() - 4, 4) != std::string::npos) {
           // try to load the yaml-file
-          //fprintf(stderr, "load: %s\n", file.c_str());
           ConfigMap map = ConfigMap::fromYamlFile(path + file);
           if(orogen) {
             addOrogenInfo(map);
@@ -125,8 +124,7 @@ namespace xrock_gui_model {
       closedir (dir);
     } else {
       // this is not a directory
-      fprintf(stderr, "Specified path '%s' is not a valid directory\n",
-              path.c_str());
+      std::cerr << "Specified path " <<  path.c_str() << " is not a valid directory" << std::endl;
     }
     return;
   }
@@ -152,8 +150,7 @@ namespace xrock_gui_model {
         ++i;
       }
       if(i>=model["versions"].size()) {
-        fprintf(stderr, "version \"%s\" is not part of model \"%s\"\n",
-                version.c_str(), type.c_str());
+        std::cerr << "version " << version.c_str() << "is not part of model" <<type.c_str() << std::endl;
         return false;
       }
       if(infoMap.find(type) != infoMap.end()) {
@@ -165,7 +162,6 @@ namespace xrock_gui_model {
     }
 
     if(infoMap.find(type) != infoMap.end()) return false;
-    //fprintf(stderr, "map:\n%s\n", map.toYamlString().c_str());
     ConfigMap map, tmpMap;
     {
       if(model.hasKey("type")) {
@@ -544,14 +540,10 @@ namespace xrock_gui_model {
       std::string domain = tolower((std::string)node["domain"]);
       if(!edition.empty()) {
         if(edition != domain && nodeName != it->second["name"].getString()) {
-          fprintf(stderr, "ERROR: change node name of non %s nodes is not allowed!", edition.c_str());
+          std::cerr << "ERROR: change node name of non " <<  edition.c_str() << " nodes is not allowed!" << std::endl;
           return false;
         }
       }
-
-      //if(domain.empty()) return false;
-      //domain += "::";
-      //if(nodeName.find(domain) != 0) return false;
       it->second = node;
       return true;
     }

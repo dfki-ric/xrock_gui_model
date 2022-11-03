@@ -116,7 +116,7 @@ namespace xrock_gui_model {
     try {
       serverless->update(db_models);
     } catch (...) {
-        fprintf(stderr, "ERROR: Problem with database communication\n");
+        std::cerr << "ERROR: Problem with database communication" << std::endl;
         return false;
     }
     return true;

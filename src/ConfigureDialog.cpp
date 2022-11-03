@@ -109,7 +109,7 @@ namespace xrock_gui_model {
           else path += "config/orogen/";
           if(path.back() != '/') path += "/";
           path += type + ".yml";
-          fprintf(stderr, "check for config file: %s\n", path.c_str());
+          std::cerr << "check for config file: " << path.c_str() << std::endl;
           if(mars::utils::pathExists(path)) {
             configFileName = path;
             std::ifstream t(path.c_str());
@@ -208,7 +208,7 @@ namespace xrock_gui_model {
           ConfigMap tmpMap = ConfigMap::fromYamlString(configMapEdit->toPlainText().toStdString());
           *configuration = tmpMap;
         } catch (...) {
-          fprintf(stderr, "Error converting config into yaml map!");
+          std::cerr << "Error converting config into yaml map!" << std::endl;
         }
       }
     }

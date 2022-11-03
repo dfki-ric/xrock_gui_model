@@ -16,7 +16,7 @@ namespace xrock_gui_model {
             target["submodel"][i]["data"] = ConfigMap::fromYamlString(it["data"]);
         }
         catch (...) {
-          fprintf(stderr, "ERROR: unpack submodel\n");
+          std::cerr << "ERROR: unpack submodel" << std::endl;
         }
       }
       if(it.hasKey("submodel")) {
@@ -34,7 +34,7 @@ namespace xrock_gui_model {
         try {
           target["submodel"][i]["data"] = it["data"].toYamlString();
         } catch(...) {
-          fprintf(stderr, "ERROR: pack submodel\n");
+          std::cerr << "ERROR: pack submodel" << std::endl;
         }
       }
       if(it.hasKey("submodel")) {
@@ -63,7 +63,7 @@ namespace xrock_gui_model {
         ptr = (*ptr)[key];
       }
       else {
-        fprintf(stderr, "ERROR: accessing submap: %s", key.c_str());
+        std::cerr << "ERROR: accessing submap: " << key.c_str() <<std::endl;
         return NULL;
       }
     }

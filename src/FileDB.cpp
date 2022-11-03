@@ -81,7 +81,6 @@ namespace xrock_gui_model {
     for(auto it: versionList) {
       std::string file = model + "/" + it + "/model.yml";
       handleFilenamePrefix(&file, dbAddress);
-      //fprintf(stderr, "load file: %s\n", file.c_str());
       ConfigMap map = configmaps::ConfigMap::fromYamlFile(file);
       if(first) {
         result = map;

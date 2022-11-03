@@ -102,7 +102,6 @@ namespace xrock_gui_model
       if (env.hasKey("dbType") and env["dbType"] == "RestDB")
       {
         db = new RestDB();
-        // db = libManager->getLibraryAs<DBInterface>(env["io_library"], true);
         std::cout << "Using restdb" << std::endl;
       }
       else if (env.hasKey("dbType") and env["dbType"] == "ServerlessDB" and env.hasKey("dbPath"))
@@ -134,7 +133,7 @@ namespace xrock_gui_model
     }
     else
     {
-      printf("ERROR: ModelLib: was not able to get bagel_gui!");
+      std::cerr << "ERROR: ModelLib: was not able to get bagel_gui!" << std::endl;
     }
     gui = libManager->getLibraryAs<mars::main_gui::GuiInterface>("main_gui");
     if (gui)
@@ -226,7 +225,7 @@ namespace xrock_gui_model
     }
     else
     {
-      fprintf(stderr, "ModelLib: was not able to get main_gui");
+      std::cerr << "ModelLib: was not able to get main_gui" << std::endl;
     }
     loadSettingsFromFile("generalsettings.yml");
     loadModelFromParameter();
@@ -314,7 +313,7 @@ namespace xrock_gui_model
       }
       else
       {
-        fprintf(stderr, "loadModel: no model given\n");
+        std::cerr << "loadStartModel: no model given" << std::endl;
       }
     }
   }
@@ -329,7 +328,6 @@ namespace xrock_gui_model
     }
     try
     {
-      // std::cout << "Loading config file from "<<workspace + "/" + filename << std::endl;
       ConfigMap gConfig = ConfigMap::fromYamlFile(workspace + "/" + filename);
       const std::string user = gConfig["database"]["username"];
       const std::string password = gConfig["database"]["password"];
@@ -529,7 +527,7 @@ namespace xrock_gui_model
           std::string cndName = name + ".cnd";
           std::string cndNamePre = name + "_pre.cnd";
           std::string cndPath = mars::utils::pathJoin(path, cndName);
-          exportCnd(map, cndPath);
+          exportCnd2(map, cndPath);
           if (!mars::utils::pathExists(cndPath))
           {
             printf("ERROR: CND file was not exported successfully!\n");
@@ -1157,7 +1155,7 @@ namespace xrock_gui_model
         {
           if (bagelType)
           {
-            fprintf(stderr, "configure bagel port..\n");
+            std::cerr << "configure bagel port" << std::endl;
             std::vector<std::string> keys = {"data", "configuration", "interfaces", contextPortName};
             subMap = ConfigMapHelper::getSubItem(node, keys);
             if (portType == "inputs" and subMap and subMap->isMap())
@@ -1443,6 +1441,190 @@ namespace xrock_gui_model
        QMessageBox::critical(nullptr, "Export", QString::fromStdString("Failed to export cnd with code: " + std::to_string(ret)), QMessageBox::Ok);
 
   }
+  void ModelLib::exportCnd2(const configmaps::ConfigMap &map_,
+                           const std::string &filename) 
+  {
+      ConfigMap map = map_;
+       ConfigMap output;
+       ConfigMap nameMap;
+       ConfigMap dNameMap;
+       bool haveMarsTask = false;
+       bool compileDeployments = false;
+       // handle file path and  node order
+       for (auto node : map["nodes"])
+       {
+         if (node["type"] == "software::Deployment")
+         {
+           std::string name = node["name"];
+           output["deployments"][name]["deployer"] = "orogen";
+           output["deployments"][name]["process_name"] = name;
+           output["deployments"][name]["hostID"] = "local";
+           if (node.hasKey("softwareData") and node["softwareData"].hasKey("data") and
+               node["softwareData"]["data"].hasKey("configuration"))
+           {
+             ConfigItem item(node["softwareData"]["data"]["configuration"]);
+             trimMap(item);
+             ConfigMap m = item;
+             if (m.hasKey("deployer"))
+             {
+               output["deployments"][name]["deployer"] = m["deployer"];
+             }
+             if (m.hasKey("process_name"))
+             {
+               output["deployments"][name]["process_name"] = m["process_name"];
+             }
+             if (m.hasKey("hostID"))
+             {
+               output["deployments"][name]["hostID"] = m["hostID"];
+             }
+           }
+           dNameMap[name] = output["deployments"][name]["process_name"];
+         }
+         else
+         {
+           if (node["domain"] == "software")
+           {
+             std::string name = node["name"];
+             nameMap[name] = 1;
+             ConfigItem item(node["softwareData"]["data"]);
+             trimMap(item);
+             ConfigMap m = item;
+             if (m.hasKey("properties"))
+             {
+               ConfigVector props;
+               for (auto prop : m["properties"])
+               {
+                 if (prop.hasKey("Value"))
+                 {
+                   props.push_back(prop);
+                 }
+               }
+               m.erase("properties");
+               if (props.size() > 0)
+               {
+                 m["properties"] = props;
+               }
+             }
+             if (m.hasKey("configuration"))
+             {
+               ConfigMap m2 = m["configuration"];
+               m.erase("configuration");
+               m.updateMap(m2);
+             }
+             if (m.hasKey("description"))
+             {
+               m.erase("description");
+             }
+             std::string type = node["modelName"];
+             if (type == "mars::Task")
+             {
+               haveMarsTask = true;
+             }
+             output["tasks"][name] = m;
+             output["tasks"][name]["type"] = type;
+             if (node.hasKey("parentName") and node["parentName"].getString().size() > 0)
+             {
+               std::string parent = node["parentName"];
+               std::vector<std::string> arrName = mars::utils::explodeString(':', node["type"]);
+               std::string process_name = "orogen_default_" + arrName[0] + "__" + arrName[2];
+               output["deployments"][parent]["taskList"][name] = process_name;
+               if (output["deployments"][parent]["taskList"].size() > 1)
+               {
+                 compileDeployments = true;
+                 output["deployments"][parent]["process_name"] = dNameMap[parent];
+               }
+               else
+               {
+                 output["deployments"][parent]["process_name"] = process_name;
+               }
+             }
+             else
+             {
+               std::string depName = name + "_deployment";
+               output["deployments"][depName]["deployer"] = "orogen";
+               output["deployments"][depName]["hostID"] = "local";
+               std::vector<std::string> arrName = mars::utils::explodeString(':', node["type"]);
+               std::string process_name = "orogen_default_" + arrName[0] + "__" + arrName[2];
+               output["deployments"][depName]["taskList"][name] = process_name;
+               output["deployments"][depName]["process_name"] = process_name;
+               dNameMap[depName] = depName;
+             }
+           }
+         }
+       }
+       if (compileDeployments)
+       {
+         for (ConfigMap::iterator it = output["deployments"].beginMap();
+              it != output["deployments"].endMap(); ++it)
+         {
+           for (ConfigMap::iterator nt = it->second["taskList"].beginMap();
+                nt != it->second["taskList"].endMap(); ++nt)
+           {
+             nt->second = nt->first;
+           }
+           output["deployments"][it->first]["process_name"] = dNameMap[it->first];
+         }
+       }
+       int i = 0;
+       for (auto edge : map["edges"])
+       {
+         ConfigMap m;
+         if (edge.hasKey("transport"))
+         {
+           m["transport"] = edge["transport"];
+         }
+         if (edge.hasKey("type"))
+         {
+           m["type"] = edge["type"];
+         }
+         if (edge.hasKey("size"))
+         {
+           m["size"] = edge["size"];
+         }
+         std::string name = edge["fromNode"];
+         if (!nameMap.hasKey(name))
+           continue;
+         // remove domian namespace
+         m["from"]["task_id"] = name;
+         m["from"]["port_name"] = edge["fromNodeOutput"];
+         // remove domian namespace
+         name << edge["toNode"];
+         if (!nameMap.hasKey(name))
+           continue;
+         m["to"]["task_id"] = name;
+         m["to"]["port_name"] = edge["toNodeInput"];
+         char buffer[100];
+         // todo: use snprintf
+         sprintf(buffer, "%d", i++);
+         output["connections"][std::string(buffer)] = m;
+       }
+       output.toYamlFile(filename);
+       if (haveMarsTask)
+       {
+         // generate pre cnd because we have to first load mars::Task then
+         // the plugin tasks
+         for (ConfigMap::iterator it = output["tasks"].beginMap();
+              it != output["tasks"].endMap(); ++it)
+         {
+           if (it->second["type"] != "mars::Task")
+           {
+             it->second["state"] = "PRE_OPERATIONAL";
+           }
+         }
+         std::string preFile = filename;
+         mars::utils::removeFilenameSuffix(&preFile);
+         if (output.hasKey("connections"))
+         {
+           output.erase("connections");
+         }
+         output.toYamlFile(preFile + "_pre.cnd");
+       }
+       // write shutdown cnd
+       std::string shutdownFile = mars::utils::pathJoin(mars::utils::getPathOfFile(filename), "shutdown.cnd");
+       FILE *f = fopen(shutdownFile.c_str(), "w");
+       fprintf(f, "deployments:\n\ntasks:\n\nconnections:\n\n");
+       fclose(f);
+}
 
   void ModelLib::importCND(const std::string &fileName)
   {
@@ -1464,7 +1646,7 @@ namespace xrock_gui_model
     {
       for (auto it : (ConfigMap)cnd["tasks"])
       {
-        fprintf(stderr, "task name: %s\n", it.first.c_str());
+        std::cerr << "task name: " << it.first.c_str() << std::endl;
         ConfigMap node;
         node["name"] = it.first.c_str();
         node["model"]["domain"] = "SOFTWARE";
@@ -1542,7 +1724,6 @@ namespace xrock_gui_model
             if (dataMap["description"].hasKey("markdown"))
             {
               std::string md = dataMap["description"]["markdown"];
-              // fprintf(stderr, "convert: %s\n", md.c_str());
               doc->setHtml(getHtml2(md).c_str());
             }
           }

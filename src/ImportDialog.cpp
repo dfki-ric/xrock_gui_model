@@ -148,9 +148,6 @@ namespace xrock_gui_model {
     selectedVersion = versionName.toStdString();
     dw->clearGUI();
     ConfigMap map = modelLib->db->requestModel(selectedDomain, selectedModel, selectedVersion, true);
-    //fprintf(stderr, "START ImportDialog::versionChanged()\n\n");
-    //fprintf(stderr, "%s\n\n", map.toYamlString().c_str());
-    //fprintf(stderr, "END ImportDialog\n\n");
     doc->setHtml("");
     if(map["versions"][0].hasKey("data")) {
       {
@@ -162,7 +159,6 @@ namespace xrock_gui_model {
         if(dataMap.hasKey("description")) {
           if(dataMap["description"].hasKey("markdown")) {
             std::string md = dataMap["description"]["markdown"];
-            //fprintf(stderr, "convert: %s\n", md.c_str());
             doc->setHtml(getHtml(md).c_str());
           }
         }
@@ -173,17 +169,14 @@ namespace xrock_gui_model {
 
 
   void ImportDialog::addModel() {
-    //fprintf(stderr, "add Model: %s %s %s", selectedDomain.c_str(), selectedModel.c_str(), selectedVersion.c_str());
     if(selectedDomain  != std::string("") &&
        selectedModel   != std::string("") &&
        selectedVersion != std::string(""))
     {
       if(load) {
         modelLib->loadComponent(selectedDomain, selectedModel, selectedVersion);
-        //emit sigLoadComponent(selectedDomain, selectedModel, selectedVersion);
       } else {
         modelLib->addComponent(selectedDomain, selectedModel, selectedVersion);
-        //emit sigAddComponent(selectedDomain, selectedModel, selectedVersion);
       }
       done(0);
     }

@@ -1,4 +1,4 @@
-#include "ModelWidget.hpp"
+#include "ComponentModelEditorWidget.hpp"
 #include "XRockGUI.hpp"
 #include "Model.hpp"
 #include "ConfigureDialog.hpp"
@@ -25,9 +25,9 @@ using namespace configmaps;
 namespace xrock_gui_model
 {
 
-    ModelWidget::ModelWidget(mars::cfg_manager::CFGManagerInterface *cfg,
+    ComponentModelEditorWidget::ComponentModelEditorWidget(mars::cfg_manager::CFGManagerInterface *cfg,
                              bagel_gui::BagelGui *bagelGui, XRockGUI *xrockGui,
-                             QWidget *parent) : mars::main_gui::BaseWidget(parent, cfg, "ModelWidget"), bagelGui(bagelGui),
+                             QWidget *parent) : mars::main_gui::BaseWidget(parent, cfg, "ComponentModelEditorWidget"), bagelGui(bagelGui),
                                                 xrockGui(xrockGui)
     {
         try
@@ -196,41 +196,41 @@ namespace xrock_gui_model
         }
     }
 
-    ModelWidget::~ModelWidget(void)
+    ComponentModelEditorWidget::~ComponentModelEditorWidget(void)
     {
     }
 
-    void ModelWidget::deinit(void)
+    void ComponentModelEditorWidget::deinit(void)
     {
         cfg->setPropertyValue("XRockGUI", "modelPath", "value", modelPath);
     }
 
-    void ModelWidget::checkMechanics(int v)
+    void ComponentModelEditorWidget::checkMechanics(int v)
     {
         bagelGui->setViewFilter("mechanics", v);
     }
 
-    void ModelWidget::checkElectronics(int v)
+    void ComponentModelEditorWidget::checkElectronics(int v)
     {
         bagelGui->setViewFilter("electronics", v);
     }
 
-    void ModelWidget::checkSoftware(int v)
+    void ComponentModelEditorWidget::checkSoftware(int v)
     {
         bagelGui->setViewFilter("software", v);
     }
 
-    void ModelWidget::checkBehavior(int v)
+    void ComponentModelEditorWidget::checkBehavior(int v)
     {
         bagelGui->setViewFilter("behavior", v);
     }
 
-    void ModelWidget::checkComputation(int v)
+    void ComponentModelEditorWidget::checkComputation(int v)
     {
         bagelGui->setViewFilter("computation", v);
     }
 
-    void ModelWidget::setEdition(const std::string &domain)
+    void ComponentModelEditorWidget::setEdition(const std::string &domain)
     {
         this->edition = domain;
         for (auto it : checkMap)
@@ -247,7 +247,7 @@ namespace xrock_gui_model
         handleEditionLayout();
     }
 
-    void ModelWidget::layoutsClicked(const QModelIndex &index)
+    void ComponentModelEditorWidget::layoutsClicked(const QModelIndex &index)
     {
 
         try
@@ -274,7 +274,7 @@ namespace xrock_gui_model
         }
     }
 
-    void ModelWidget::addRemoveLayout()
+    void ComponentModelEditorWidget::addRemoveLayout()
     {
         try
         {
@@ -326,7 +326,7 @@ namespace xrock_gui_model
         }
     }
 
-    void ModelWidget::updateCurrentLayout()
+    void ComponentModelEditorWidget::updateCurrentLayout()
     {
         if (!currentLayout.empty())
         {
@@ -335,7 +335,7 @@ namespace xrock_gui_model
         }
     }
 
-    void ModelWidget::storeModel()
+    void ComponentModelEditorWidget::storeModel()
     {
         // Validate fields
         //- validate for emptiness for name,domain..etc
@@ -405,7 +405,7 @@ namespace xrock_gui_model
         }
     }
 
-    void ModelWidget::requestModel()
+    void ComponentModelEditorWidget::requestModel()
     {
         try
         {
@@ -419,7 +419,7 @@ namespace xrock_gui_model
             QMessageBox::warning(nullptr, "Warning", QString::fromStdString(ss.str()), QMessageBox::Ok);
         }
     }
-    void ModelWidget::addComponent()
+    void ComponentModelEditorWidget::addComponent()
     {
         try
         {
@@ -434,7 +434,7 @@ namespace xrock_gui_model
         }
     }
 
-    void ModelWidget::loadModel()
+    void ComponentModelEditorWidget::loadModel()
     {
         try
         {
@@ -452,7 +452,7 @@ namespace xrock_gui_model
             QMessageBox::warning(nullptr, "Warning", QString::fromStdString(ss.str()), QMessageBox::Ok);
         }
     }
-    void ModelWidget::loadModel(const std::string &file)
+    void ComponentModelEditorWidget::loadModel(const std::string &file)
     {
         try
         {
@@ -476,7 +476,7 @@ namespace xrock_gui_model
         }
     }
 
-    void ModelWidget::loadModel(ConfigMap &map)
+    void ComponentModelEditorWidget::loadModel(ConfigMap &map)
     {
         try
         {
@@ -606,7 +606,7 @@ namespace xrock_gui_model
         }
     }
 
-    void ModelWidget::handleEditionLayout()
+    void ComponentModelEditorWidget::handleEditionLayout()
     {
         try
         {
@@ -665,7 +665,7 @@ namespace xrock_gui_model
      * todo:
      *       - how to handle visual properties
      */
-    void ModelWidget::loadGraph(ConfigMap &map)
+    void ComponentModelEditorWidget::loadGraph(ConfigMap &map)
     {
         try
         {
@@ -740,7 +740,7 @@ namespace xrock_gui_model
         }
     }
 
-    void ModelWidget::loadNode(ConfigMap &node, ConfigMap &config)
+    void ComponentModelEditorWidget::loadNode(ConfigMap &node, ConfigMap &config)
     {
         try
         {
@@ -946,7 +946,7 @@ namespace xrock_gui_model
         }
     }
 
-    ConfigMap ModelWidget::getDefaultConfig(const std::string &domain, const std::string &name, const std::string &version)
+    ConfigMap ComponentModelEditorWidget::getDefaultConfig(const std::string &domain, const std::string &name, const std::string &version)
     {
         try
         {
@@ -968,7 +968,7 @@ namespace xrock_gui_model
         }
     }
 
-    void ModelWidget::saveModel()
+    void ComponentModelEditorWidget::saveModel()
     {
         try
         {
@@ -1005,7 +1005,7 @@ namespace xrock_gui_model
         }
     }
 
-    void ModelWidget::createMap(ConfigMap *m)
+    void ComponentModelEditorWidget::createMap(ConfigMap *m)
     {
         try
         {
@@ -1129,7 +1129,7 @@ namespace xrock_gui_model
         }
     }
 
-    void ModelWidget::saveGraph(ConfigMap &output, ConfigMap &interfaceMap,
+    void ComponentModelEditorWidget::saveGraph(ConfigMap &output, ConfigMap &interfaceMap,
                                 ConfigMap &descriptionMap,
                                 const std::string &saveDomain)
     {
@@ -1413,7 +1413,7 @@ namespace xrock_gui_model
         }
     }
 
-    void ModelWidget::clear()
+    void ComponentModelEditorWidget::clear()
     {
         ignoreUpdate = true;
         edition = "";
@@ -1433,7 +1433,7 @@ namespace xrock_gui_model
         ignoreUpdate = false;
     }
 
-    void ModelWidget::loadType(const std::string &domain,
+    void ComponentModelEditorWidget::loadType(const std::string &domain,
                                const std::string &name,
                                const std::string &version)
     {
@@ -1476,7 +1476,7 @@ namespace xrock_gui_model
         }
     }
 
-    void ModelWidget::setModelInfo(configmaps::ConfigMap &model)
+    void ComponentModelEditorWidget::setModelInfo(configmaps::ConfigMap &model)
     {
         try
         {
@@ -1531,7 +1531,7 @@ namespace xrock_gui_model
         }
     }
 
-    void ModelWidget::updateModelInfo()
+    void ComponentModelEditorWidget::updateModelInfo()
     {
         try
         {
@@ -1611,7 +1611,7 @@ namespace xrock_gui_model
             QMessageBox::warning(nullptr, "Warning", QString::fromStdString(ss.str()), QMessageBox::Ok);
         }
     }
-    void ModelWidget::getModelInfo(std::string *domain, std::string *name,
+    void ComponentModelEditorWidget::getModelInfo(std::string *domain, std::string *name,
                                    std::string *version)
     {
         *name = this->name->text().toStdString();
@@ -1619,7 +1619,7 @@ namespace xrock_gui_model
         *version = this->version->text().toStdString();
     }
 
-    void ModelWidget::editLocalMap()
+    void ComponentModelEditorWidget::editLocalMap()
     {
         try
         {
@@ -1644,7 +1644,7 @@ namespace xrock_gui_model
         }
     }
 
-    void ModelWidget::editDescription()
+    void ComponentModelEditorWidget::editDescription()
     {
         try
         {
@@ -1681,12 +1681,12 @@ namespace xrock_gui_model
         }
     }
 
-    void ModelWidget::openUrl(const QUrl &link)
+    void ComponentModelEditorWidget::openUrl(const QUrl &link)
     {
         QDesktopServices::openUrl(link);
     }
 
-    void ModelWidget::validateYamlSyntax()
+    void ComponentModelEditorWidget::validateYamlSyntax()
     {
         const std::string data_text = annotations->toPlainText().toStdString();
         if (data_text.empty())

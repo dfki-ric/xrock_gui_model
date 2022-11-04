@@ -39,7 +39,7 @@ find_package( Boost COMPONENTS system thread REQUIRED)
 set(SOURCES 
   src/Model.cpp
   src/XRockGUI.cpp
-  src/ModelWidget.cpp
+  src/ComponentModelEditorWidget.cpp
   src/ImportDialog.cpp
   src/VersionDialog.cpp
   src/ConfigureDialog.cpp
@@ -53,7 +53,7 @@ set(SOURCES
 set(HEADERS
   src/Model.hpp
   src/XRockGUI.hpp
-  src/ModelWidget.hpp
+  src/ComponentModelEditorWidget.hpp
   src/ImportDialog.hpp
   src/VersionDialog.hpp
   src/ConfigureDialog.hpp
@@ -65,7 +65,7 @@ set(HEADERS
 )
 
 set (QT_MOC_HEADER
-  src/ModelWidget.hpp
+  src/ComponentModelEditorWidget.hpp
   src/ImportDialog.hpp
   src/VersionDialog.hpp
   src/ConfigureDialog.hpp

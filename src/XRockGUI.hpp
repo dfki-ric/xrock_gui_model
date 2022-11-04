@@ -28,7 +28,7 @@ namespace xrock_gui_model
 {
 
     class Model;
-    class ModelWidget;
+    class ComponentModelEditorWidget;
 
     enum struct MenuActions : int
     {
@@ -127,7 +127,7 @@ namespace xrock_gui_model
         Model *model;
         mars::main_gui::GuiInterface *gui;
         bagel_gui::BagelGui *bagelGui;
-        ModelWidget *widget;
+        ComponentModelEditorWidget *widget;
         bool importToBagel;
         std::string versionChangeName, configureNodeName, contextNodeName, contextPortName;
         mars::cfg_manager::CFGManagerInterface *cfg;

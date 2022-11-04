@@ -1,5 +1,5 @@
 /**
- * \file ModelWidget.hpp
+ * \file ComponentModelEditorWidget.hpp
  * \author Malte Langosz
  * \brief
  **/
@@ -34,15 +34,15 @@ namespace xrock_gui_model
 {
     class XRockGUI;
 
-    class ModelWidget : public mars::main_gui::BaseWidget
+    class  ComponentModelEditorWidget : public mars::main_gui::BaseWidget
     {
         Q_OBJECT
 
     public:
-        ModelWidget(mars::cfg_manager::CFGManagerInterface *cfg,
+        ComponentModelEditorWidget(mars::cfg_manager::CFGManagerInterface *cfg,
                     bagel_gui::BagelGui *bagelGui, XRockGUI *xrockGui,
                     QWidget *parent = 0);
-        ~ModelWidget();
+        ~ComponentModelEditorWidget();
         void createMap(configmaps::ConfigMap *m);
         void loadModel(const std::string &file);
         void loadModel(configmaps::ConfigMap &m);

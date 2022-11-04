@@ -6,7 +6,7 @@
 
 #include "XRockGUI.hpp"
 #include "Model.hpp"
-#include "ModelWidget.hpp"
+#include "ComponentModelEditorWidget.hpp"
 #include "ImportDialog.hpp"
 #include "FileDB.hpp"
 #include "RestDB.hpp"
@@ -166,7 +166,7 @@ namespace xrock_gui_model
             gui->addGenericMenuAction("../Database/Store Model", static_cast<int>(MenuActions::STORE_MODEL_TO_DB), this);
             gui->addGenericMenuAction("../Database/Load Model", static_cast<int>(MenuActions::LOAD_MODEL_FROM_DB), this);
             gui->addGenericMenuAction("../Database/HardToSoft", static_cast<int>(MenuActions::IMPORT_HW_TO_BAGEL), this);
-            gui->addGenericMenuAction("../Windows/ModelWidget", static_cast<int>(MenuActions::TOGGLE_MODEL_WIDGET), this);
+            gui->addGenericMenuAction("../Windows/ComponentModelEditorWidget", static_cast<int>(MenuActions::TOGGLE_MODEL_WIDGET), this);
             gui->addGenericMenuAction("../Expert/Edit Description", static_cast<int>(MenuActions::EDIT_MODEL_DESCRIPTION), this);
             gui->addGenericMenuAction("../Expert/Edit Local Map", static_cast<int>(MenuActions::EDIT_LOCAL_MAP), this);
             gui->addGenericMenuAction("../Expert/Create Bagel Model", static_cast<int>(MenuActions::CREATE_BAGEL_MODEL), this);
@@ -187,7 +187,7 @@ namespace xrock_gui_model
 
             toolbarBackend = new ToolbarBackend(this, gui, db.get());
 
-            widget = new ModelWidget(cfg, bagelGui, this);
+            widget = new ComponentModelEditorWidget(cfg, bagelGui, this);
             if (!widget->getHiddenCloseState())
             {
                 gui->addDockWidget((void *)widget, 1);

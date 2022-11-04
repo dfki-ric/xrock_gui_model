@@ -21,135 +21,136 @@
 
 namespace bagel_gui
 {
-  class BagelModel;
+    class BagelModel;
 }
 
 namespace xrock_gui_model
 {
 
-  class Model;
-  class ModelWidget;
+    class Model;
+    class ModelWidget;
 
-  enum struct MenuActions : int {
-    LOAD_MODEL = 1,
-    SAVE_MODEL = 2,
-    TOGGLE_MODEL_WIDGET = 3,
-    STORE_MODEL_TO_DB = 4,
-    EXPORT_CND = 5,
-    ADD_COMPONENT_FROM_DB = 6,
-    LOAD_MODEL_FROM_DB = 7,
-    IMPORT_HW_TO_BAGEL = 8,
-    EDIT_LOCAL_MAP = 10,
-    CREATE_BAGEL_MOTION_CONTROL_TASK = 11,
-    CREATE_BAGEL_MODEL = 12,
-    CREATE_BAGEL_TASK = 13,
-    EDIT_MODEL_DESCRIPTION = 14,
-    EXPORT_CND_AND_LAUNCH = 15,
-    STOP_CND = 16,
-    IMPORT_CND = 20,
-    SELECT_SERVERLESS = 21,
-    SELECT_CLIENT = 22,
-    SELECT_MULTIDB = 23,
-    RELOAD_MODEL_FROM_DB = 30,
-    EXPORT_CND_TFENHANCE = 31
-  };
-
-  class ModelLib : public lib_manager::LibInterface,
-                   public mars::main_gui::MenuInterface,
-                   public bagel_gui::PluginInterface,
-                   public mars::cfg_manager::CFGClient
-  {
-
-  public:
-    explicit ModelLib(lib_manager::LibManager *theManager);
-    ~ModelLib();
-
-    // Initializers
-    void initConfig();
-    void initBagelGui();
-    void initMainGui();
-    void initBackends();
-
-    // LibInterface methods
-    int getLibVersion() const
+    enum struct MenuActions : int
     {
-      return 1;
-    }
+        LOAD_MODEL = 1,
+        SAVE_MODEL = 2,
+        TOGGLE_MODEL_WIDGET = 3,
+        STORE_MODEL_TO_DB = 4,
+        EXPORT_CND = 5,
+        ADD_COMPONENT_FROM_DB = 6,
+        LOAD_MODEL_FROM_DB = 7,
+        IMPORT_HW_TO_BAGEL = 8,
+        EDIT_LOCAL_MAP = 10,
+        CREATE_BAGEL_MOTION_CONTROL_TASK = 11,
+        CREATE_BAGEL_MODEL = 12,
+        CREATE_BAGEL_TASK = 13,
+        EDIT_MODEL_DESCRIPTION = 14,
+        EXPORT_CND_AND_LAUNCH = 15,
+        STOP_CND = 16,
+        IMPORT_CND = 20,
+        SELECT_SERVERLESS = 21,
+        SELECT_CLIENT = 22,
+        SELECT_MULTIDB = 23,
+        RELOAD_MODEL_FROM_DB = 30,
+        EXPORT_CND_TFENHANCE = 31
+    };
 
-    const std::string getLibName() const
+    class ModelLib : public lib_manager::LibInterface,
+                     public mars::main_gui::MenuInterface,
+                     public bagel_gui::PluginInterface,
+                     public mars::cfg_manager::CFGClient
     {
-      return std::string("xrock_gui_model");
-    }
 
-    CREATE_MODULE_INFO();
+    public:
+        explicit ModelLib(lib_manager::LibManager *theManager);
+        ~ModelLib();
 
-    Model *getModelInstance();
+        // Initializers
+        void initConfig();
+        void initBagelGui();
+        void initMainGui();
+        void initBackends();
 
-    // CFGClient methods
-    virtual void cfgUpdateProperty(mars::cfg_manager::cfgPropertyStruct _property);
+        // LibInterface methods
+        int getLibVersion() const
+        {
+            return 1;
+        }
 
-    // MenuInterface methods
-    void menuAction(int action, bool checked = false);
-    void loadNodes(bagel_gui::BagelModel *model, configmaps::ConfigMap &nodes, std::string path,
-                   std::vector<std::string> *nodesFound);
-    void handleModelMap(bagel_gui::BagelModel *model, configmaps::ConfigMap &map, std::string path);
-    void mechanicsToBagel(configmaps::ConfigMap &map);
-    void currentModelChanged(bagel_gui::ModelInterface *model);
-    void changeNodeVersion(const std::string &name);
-    void configureNode(const std::string &name);
-    void openConfigFile(const std::string &name);
-    void configureInPort(const std::string &nodeName, const std::string &portName);
-    void configureOutPort(const std::string &nodeName, const std::string &portName);
-    void selectVersion(const std::string &version);
-    void exportCnd(const configmaps::ConfigMap &map_, const std::string &filename,  const std::string &urdf_file = "");
-    void exportCnd2(const configmaps::ConfigMap &map_, const std::string &filename);
-    void importCND(const std::string &filename);
-    void nodeContextClicked(const std::string name);
-    void inPortContextClicked(const std::string name);
-    void outPortContextClicked(const std::string name);
-    std::vector<std::string> getNodeContextStrings(const std::string &name);
-    std::vector<std::string> getInPortContextStrings(const std::string &nodeName,
-                                                     const std::string &portName);
-    std::vector<std::string> getOutPortContextStrings(const std::string &nodeName,
-                                                      const std::string &portName);
-    void requestModel();
-    void addComponent();
+        const std::string getLibName() const
+        {
+            return std::string("xrock_gui_model");
+        }
 
-    // public slots:
-    void addComponent(std::string domain, std::string modelName, std::string version, std::string nodeName = "");
-    void loadComponent(std::string domain, std::string modelName, std::string version);
-    void applyConfiguration(configmaps::ConfigMap &map);
-    std::unique_ptr<DBInterface> db;
+        CREATE_MODULE_INFO();
 
-  private:
-    std::map<std::string, configmaps::ConfigMap> modelCache;
-    Model *model;
-    mars::main_gui::GuiInterface *gui;
-    bagel_gui::BagelGui *bagelGui;
-    ModelWidget *widget;
-    bool importToBagel;
-    std::string versionChangeName, configureNodeName, contextNodeName, contextPortName;
-    mars::cfg_manager::CFGManagerInterface *cfg;
-    configmaps::ConfigMap env;
-    mars::cfg_manager::cfgParamId dbAddress_paramId;
-    mars::cfg_manager::cfgParamId dbUser_paramId;
-    mars::cfg_manager::cfgParamId dbPassword_paramId;
-    std::string lastExecFolder;
-    std::string resourcesPath;
-    ToolbarBackend* toolbarBackend;
+        Model *getModelInstance();
 
-    void loadStartModel();
-    void loadModelFromParameter();
-    bool loadCart();
-    void loadSettingsFromFile(const std::string &filename);
-    void writeStatus(const int statusId, const std::string &message);
-    void openConfigureInterfaceDialog(const std::string &nodeName,
-                                      const std::string &portName,
-                                      const std::string &portType);
-    void configureComponents(const std::string &name);
-    void createBagelModel();
-    void createBagelTask();
-  };
+        // CFGClient methods
+        virtual void cfgUpdateProperty(mars::cfg_manager::cfgPropertyStruct _property);
+
+        // MenuInterface methods
+        void menuAction(int action, bool checked = false);
+        void loadNodes(bagel_gui::BagelModel *model, configmaps::ConfigMap &nodes, std::string path,
+                       std::vector<std::string> *nodesFound);
+        void handleModelMap(bagel_gui::BagelModel *model, configmaps::ConfigMap &map, std::string path);
+        void mechanicsToBagel(configmaps::ConfigMap &map);
+        void currentModelChanged(bagel_gui::ModelInterface *model);
+        void changeNodeVersion(const std::string &name);
+        void configureNode(const std::string &name);
+        void openConfigFile(const std::string &name);
+        void configureInPort(const std::string &nodeName, const std::string &portName);
+        void configureOutPort(const std::string &nodeName, const std::string &portName);
+        void selectVersion(const std::string &version);
+        void exportCnd(const configmaps::ConfigMap &map_, const std::string &filename, const std::string &urdf_file = "");
+        void exportCnd2(const configmaps::ConfigMap &map_, const std::string &filename);
+        void importCND(const std::string &filename);
+        void nodeContextClicked(const std::string name);
+        void inPortContextClicked(const std::string name);
+        void outPortContextClicked(const std::string name);
+        std::vector<std::string> getNodeContextStrings(const std::string &name);
+        std::vector<std::string> getInPortContextStrings(const std::string &nodeName,
+                                                         const std::string &portName);
+        std::vector<std::string> getOutPortContextStrings(const std::string &nodeName,
+                                                          const std::string &portName);
+        void requestModel();
+        void addComponent();
+
+        // public slots:
+        void addComponent(std::string domain, std::string modelName, std::string version, std::string nodeName = "");
+        void loadComponent(std::string domain, std::string modelName, std::string version);
+        void applyConfiguration(configmaps::ConfigMap &map);
+        std::unique_ptr<DBInterface> db;
+
+    private:
+        std::map<std::string, configmaps::ConfigMap> modelCache;
+        Model *model;
+        mars::main_gui::GuiInterface *gui;
+        bagel_gui::BagelGui *bagelGui;
+        ModelWidget *widget;
+        bool importToBagel;
+        std::string versionChangeName, configureNodeName, contextNodeName, contextPortName;
+        mars::cfg_manager::CFGManagerInterface *cfg;
+        configmaps::ConfigMap env;
+        mars::cfg_manager::cfgParamId dbAddress_paramId;
+        mars::cfg_manager::cfgParamId dbUser_paramId;
+        mars::cfg_manager::cfgParamId dbPassword_paramId;
+        std::string lastExecFolder;
+        std::string resourcesPath;
+        ToolbarBackend *toolbarBackend;
+
+        void loadStartModel();
+        void loadModelFromParameter();
+        bool loadCart();
+        void loadSettingsFromFile(const std::string &filename);
+        void writeStatus(const int statusId, const std::string &message);
+        void openConfigureInterfaceDialog(const std::string &nodeName,
+                                          const std::string &portName,
+                                          const std::string &portType);
+        void configureComponents(const std::string &name);
+        void createBagelModel();
+        void createBagelTask();
+    };
 
 } // end of namespace xrock_gui_model
 

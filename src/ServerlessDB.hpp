@@ -20,7 +20,7 @@ namespace xrock_gui_model
     {
 
     public:
-        ServerlessDB(const fs::path &db_path);
+        explicit ServerlessDB(const fs::path &db_path);
         ~ServerlessDB();
 
         virtual std::vector<std::pair<std::string, std::string>> requestModelListByDomain(const std::string &domain) override;

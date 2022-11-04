@@ -49,11 +49,11 @@ namespace xrock_gui_model
         props["domain"] = mars::utils::toupper(domain);
         const std::vector<XTypePtr> models = client->find("ComponentModel", props, 0);
         std::vector<std::string> out;
-        for (const auto &model : models)
+        for (const auto &m : models)
         {
-            if (!model->has_property("version"))
+            if (!m->has_property("version"))
                 throw std::runtime_error("Model of ComponentModel type has no 'version' property!");
-            out.push_back(model->get_property("version"));
+            out.push_back(m->get_property("version"));
         }
         return out;
     }
@@ -127,9 +127,9 @@ namespace xrock_gui_model
         return true;
     }
 
-    void RestDB::set_dbAddress(const std::string &_db_Address)
+    void RestDB::set_dbAddress(const std::string &_dbAddress)
     {
-        client->setDbAddress(_db_Address);
+        client->setDbAddress(_dbAddress);
     }
 
     void RestDB::set_dbUser(const std::string &_dbUser)

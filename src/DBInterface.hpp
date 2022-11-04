@@ -18,7 +18,7 @@ namespace xrock_gui_model
 
     public:
         DBInterface() {}
-        ~DBInterface() {}
+        virtual ~DBInterface() {}
 
         virtual std::vector<std::pair<std::string, std::string>> requestModelListByDomain(const std::string &domain) = 0;
         virtual std::vector<std::string> requestVersions(const std::string &domain, const std::string &model) = 0;

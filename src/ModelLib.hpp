@@ -60,7 +60,6 @@ namespace xrock_gui_model
                      public bagel_gui::PluginInterface,
                      public mars::cfg_manager::CFGClient
     {
-
     public:
         explicit ModelLib(lib_manager::LibManager *theManager);
         ~ModelLib();
@@ -124,7 +123,7 @@ namespace xrock_gui_model
 
     private:
         std::map<std::string, configmaps::ConfigMap> modelCache;
-        Model *model;
+        Model *model; // 20221103 MS: This is currently used by one function only. Others use bagelGui->getCurrentModel(). Can it be removed?
         mars::main_gui::GuiInterface *gui;
         bagel_gui::BagelGui *bagelGui;
         ModelWidget *widget;

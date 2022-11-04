@@ -28,17 +28,12 @@ namespace xrock_gui_model {
     props["domain"] = mars::utils::toupper(domain);
     const std::vector<XTypePtr> models = serverless->find("ComponentModel", props, 0);
     std::vector<std::pair<std::string, std::string>> out;
-    for (const auto &model : models)
-    {
-      if (!model->has_property("version"))
-        throw std::runtime_error("Model of ComponentModel type has no 'version' property!");
       for (const auto &model : models)
       {
         if (!model->has_property("version"))
           throw std::runtime_error("Model of componentModel type has no 'version' property!");
         out.push_back(std::make_pair(model->get_property("name"), model->get_property("type")));
       }
-    }
     return out;
   }
 

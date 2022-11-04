@@ -22,7 +22,7 @@ class QComboBox;
 
 namespace xrock_gui_model
 {
-    class ModelLib;
+    class XRockGUI;
 
     /**
      * \brief ToolbarBackend creates all the menu items related to backend manipulation.
@@ -32,7 +32,7 @@ namespace xrock_gui_model
         Q_OBJECT
     public:
         /** \brief The constructor adds the actions to the File menu */
-        ToolbarBackend(ModelLib *modelLib, mars::main_gui::GuiInterface *gui, DBInterface *db);
+        ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface *gui, DBInterface *db);
         virtual ~ToolbarBackend();
 
     private slots:
@@ -43,7 +43,7 @@ namespace xrock_gui_model
         void on_graph_changed(const QString &graph);
 
     private:
-        ModelLib *model_lib;
+        XRockGUI *xrockGui;
         DBInterface *db;
         mars::main_gui::MainGUI *main_gui;
         QComboBox *cb_backends;

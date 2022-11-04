@@ -29,7 +29,7 @@ namespace xrock_gui_model
     std::string ImportDialog::lastDomain = "software";
     std::string ImportDialog::lastFilter = "";
 
-    ImportDialog::ImportDialog(ModelLib *modelLib, bool load) : modelLib(modelLib), load(load),
+    ImportDialog::ImportDialog(XRockGUI *xrockGui, bool load) : xrockGui(xrockGui), load(load),
                                                                 selectedDomain(""),
                                                                 selectedModel(""),
                                                                 selectedVersion("")
@@ -140,7 +140,7 @@ namespace xrock_gui_model
             selectedVersion = std::string("");
             dw->clearGUI();
             versionSelect->clear();
-            std::vector<std::string> versionList = modelLib->db->requestVersions(selectedDomain, selectedModel);
+            std::vector<std::string> versionList = xrockGui->db->requestVersions(selectedDomain, selectedModel);
             for (std::vector<std::string>::iterator it = versionList.begin(); it != versionList.end(); ++it)
             {
                 if (firstVersion.empty())
@@ -163,7 +163,7 @@ namespace xrock_gui_model
             return;
         selectedVersion = versionName.toStdString();
         dw->clearGUI();
-        ConfigMap map = modelLib->db->requestModel(selectedDomain, selectedModel, selectedVersion, true);
+        ConfigMap map = xrockGui->db->requestModel(selectedDomain, selectedModel, selectedVersion, true);
         doc->setHtml("");
         if (map["versions"][0].hasKey("data"))
         {
@@ -194,11 +194,11 @@ namespace xrock_gui_model
         {
             if (load)
             {
-                modelLib->loadComponent(selectedDomain, selectedModel, selectedVersion);
+                xrockGui->loadComponent(selectedDomain, selectedModel, selectedVersion);
             }
             else
             {
-                modelLib->addComponent(selectedDomain, selectedModel, selectedVersion);
+                xrockGui->addComponent(selectedDomain, selectedModel, selectedVersion);
             }
             done(0);
         }
@@ -228,7 +228,7 @@ namespace xrock_gui_model
         selectedDomain = domain.toStdString();
         selectedModel = std::string("");
         selectedVersion = std::string("");
-        modelList = modelLib->db->requestModelListByDomain(selectedDomain);
+        modelList = xrockGui->db->requestModelListByDomain(selectedDomain);
         std::sort(modelList.begin(), modelList.end());
         auto last = std::unique(modelList.begin(), modelList.end());
         modelList.erase(last, modelList.end());

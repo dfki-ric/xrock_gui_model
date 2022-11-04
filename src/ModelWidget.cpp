@@ -1,5 +1,5 @@
 #include "ModelWidget.hpp"
-#include "ModelLib.hpp"
+#include "XRockGUI.hpp"
 #include "Model.hpp"
 #include "ConfigureDialog.hpp"
 #include "ConfigMapHelper.hpp"
@@ -26,9 +26,9 @@ namespace xrock_gui_model
 {
 
     ModelWidget::ModelWidget(mars::cfg_manager::CFGManagerInterface *cfg,
-                             bagel_gui::BagelGui *bagelGui, ModelLib *mainLib,
+                             bagel_gui::BagelGui *bagelGui, XRockGUI *xrockGui,
                              QWidget *parent) : mars::main_gui::BaseWidget(parent, cfg, "ModelWidget"), bagelGui(bagelGui),
-                                                mainLib(mainLib)
+                                                xrockGui(xrockGui)
     {
         try
         {
@@ -377,7 +377,7 @@ namespace xrock_gui_model
             updateCurrentLayout();
             ConfigMap map;
             createMap(&map);
-            bool success = mainLib->db->storeModel(map);
+            bool success = xrockGui->db->storeModel(map);
             bagel_gui::BagelModel *model = dynamic_cast<bagel_gui::BagelModel *>(bagelGui->getCurrentModel());
             if (model)
             {
@@ -409,7 +409,7 @@ namespace xrock_gui_model
     {
         try
         {
-            mainLib->requestModel();
+            xrockGui->requestModel();
         }
         catch (const std::exception &e)
         {
@@ -423,7 +423,7 @@ namespace xrock_gui_model
     {
         try
         {
-            mainLib->addComponent();
+            xrockGui->addComponent();
         }
         catch (const std::exception &e)
         {
@@ -951,7 +951,7 @@ namespace xrock_gui_model
         try
         {
             ConfigMap defaultConfig;
-            ConfigMap fullMap = mainLib->db->requestModel(domain, name, version);
+            ConfigMap fullMap = xrockGui->db->requestModel(domain, name, version);
             if (fullMap["versions"][0].hasKey("defaultConfiguration"))
             {
                 defaultConfig = fullMap["versions"][0]["defaultConfiguration"];
@@ -1449,7 +1449,7 @@ namespace xrock_gui_model
                 std::string type = name;
                 if (!model->hasNodeInfo(type))
                 {
-                    modelMap = mainLib->db->requestModel(domain, name, version, !version.empty());
+                    modelMap = xrockGui->db->requestModel(domain, name, version, !version.empty());
                     model->addNodeInfo(modelMap); //, version);
                     bagelGui->updateNodeTypes();
                     return;
@@ -1460,7 +1460,7 @@ namespace xrock_gui_model
                     type += "::" + version;
                     if (!model->hasNodeInfo(type))
                     {
-                        modelMap = mainLib->db->requestModel(domain, name, version, !version.empty());
+                        modelMap = xrockGui->db->requestModel(domain, name, version, !version.empty());
                         model->addNodeInfo(modelMap, version);
                         bagelGui->updateNodeTypes();
                     }

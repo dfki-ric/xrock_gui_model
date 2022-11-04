@@ -1,10 +1,10 @@
 /**
- * \file ModelLib.cpp
+ * \file XRockGUI.cpp
  * \author Malte Langosz
  * \brief
  */
 
-#include "ModelLib.hpp"
+#include "XRockGUI.hpp"
 #include "Model.hpp"
 #include "ModelWidget.hpp"
 #include "ImportDialog.hpp"
@@ -52,7 +52,7 @@ namespace xrock_gui_model
         return result;
     }
 
-    ModelLib::ModelLib(lib_manager::LibManager *theManager) : lib_manager::LibInterface(theManager), model(NULL)
+    XRockGUI::XRockGUI(lib_manager::LibManager *theManager) : lib_manager::LibInterface(theManager), model(NULL)
     {
         initConfig();
         initBagelGui();
@@ -62,7 +62,7 @@ namespace xrock_gui_model
         loadModelFromParameter();
     }
 
-    void ModelLib::initConfig()
+    void XRockGUI::initConfig()
     {
         importToBagel = false;
         cfg = libManager->getLibraryAs<mars::cfg_manager::CFGManagerInterface>("cfg_manager", true);
@@ -135,7 +135,7 @@ namespace xrock_gui_model
             std::cerr << "Error: Failed to load library cfg_manager!" << std::endl;
     }
 
-    void ModelLib::initBagelGui()
+    void XRockGUI::initBagelGui()
     {
         bagelGui = libManager->getLibraryAs<BagelGui>("bagel_gui");
         if (bagelGui)
@@ -147,11 +147,11 @@ namespace xrock_gui_model
         }
         else
         {
-            std::cerr << "ERROR: ModelLib: was not able to get bagel_gui!" << std::endl;
+            std::cerr << "ERROR: XRockGUI: was not able to get bagel_gui!" << std::endl;
         }
     }
 
-    void ModelLib::initMainGui()
+    void XRockGUI::initMainGui()
     {
         gui = libManager->getLibraryAs<mars::main_gui::GuiInterface>("main_gui");
         if (gui)
@@ -203,11 +203,11 @@ namespace xrock_gui_model
         }
         else
         {
-            std::cerr << "ModelLib: was not able to get main_gui" << std::endl;
+            std::cerr << "XRockGUI: was not able to get main_gui" << std::endl;
         }
     }
 
-    ModelLib::~ModelLib()
+    XRockGUI::~XRockGUI()
     {
         widget->deinit();
         if (gui)
@@ -226,7 +226,7 @@ namespace xrock_gui_model
         writeStatus(0, "closed fine");
     }
 
-    void ModelLib::loadStartModel()
+    void XRockGUI::loadStartModel()
     {
         if (cfg)
         {
@@ -263,7 +263,7 @@ namespace xrock_gui_model
         }
     }
 
-    void ModelLib::loadModelFromParameter()
+    void XRockGUI::loadModelFromParameter()
     {
         if (cfg)
         {
@@ -294,7 +294,7 @@ namespace xrock_gui_model
         }
     }
 
-    void ModelLib::loadSettingsFromFile(const std::string &filename)
+    void XRockGUI::loadSettingsFromFile(const std::string &filename)
     {
         std::string workspace = "";
         if (cfg)
@@ -328,7 +328,7 @@ namespace xrock_gui_model
         }
     }
 
-    void ModelLib::writeStatus(const int statusId, const std::string &message)
+    void XRockGUI::writeStatus(const int statusId, const std::string &message)
     {
         std::ofstream outputFile("status.yml");
         outputFile << "status : " << statusId << std::endl;
@@ -336,12 +336,12 @@ namespace xrock_gui_model
         outputFile.close();
     }
 
-    Model *ModelLib::getModelInstance()
+    Model *XRockGUI::getModelInstance()
     {
         return model;
     }
 
-    void ModelLib::menuAction(int action, bool checked)
+    void XRockGUI::menuAction(int action, bool checked)
     {
         mars::main_gui::MainGUI *main_gui = dynamic_cast<mars::main_gui::MainGUI *>(gui);
         switch (static_cast<MenuActions>(action))
@@ -658,7 +658,7 @@ namespace xrock_gui_model
         }
     }
 
-    void ModelLib::createBagelTask()
+    void XRockGUI::createBagelTask()
     {
         ModelInterface *model = bagelGui->getCurrentModel();
         if (model)
@@ -705,7 +705,7 @@ namespace xrock_gui_model
         }
     }
 
-    void ModelLib::createBagelModel()
+    void XRockGUI::createBagelModel()
     {
         ModelInterface *model = bagelGui->getCurrentModel();
         if (model)
@@ -807,20 +807,20 @@ namespace xrock_gui_model
         }
     }
 
-    void ModelLib::requestModel()
+    void XRockGUI::requestModel()
     {
         importToBagel = false;
         ImportDialog id(this, true);
         id.exec();
     }
-    void ModelLib::addComponent()
+    void XRockGUI::addComponent()
     {
         importToBagel = false;
         ImportDialog id(this, false);
         id.exec();
     }
 
-    void ModelLib::addComponent(std::string domain, std::string modelName, std::string version, std::string nodeName)
+    void XRockGUI::addComponent(std::string domain, std::string modelName, std::string version, std::string nodeName)
     {
         // create type name by using domain as namespace
         domain = mars::utils::tolower(domain);
@@ -842,7 +842,7 @@ namespace xrock_gui_model
         }
     }
 
-    void ModelLib::loadComponent(std::string domain, std::string modelName, std::string version)
+    void XRockGUI::loadComponent(std::string domain, std::string modelName, std::string version)
     {
         ConfigMap map = db->requestModel(domain, modelName, version, !version.empty());
         std::cout << "loadComponent: " << map.toJsonString() << std::endl;
@@ -856,7 +856,7 @@ namespace xrock_gui_model
         }
     }
 
-    void ModelLib::loadNodes(bagel_gui::BagelModel *model,
+    void XRockGUI::loadNodes(bagel_gui::BagelModel *model,
                              configmaps::ConfigMap &nodes, std::string path,
                              std::vector<std::string> *nodesFound)
     {
@@ -898,7 +898,7 @@ namespace xrock_gui_model
         }
     }
 
-    void ModelLib::handleModelMap(bagel_gui::BagelModel *model,
+    void XRockGUI::handleModelMap(bagel_gui::BagelModel *model,
                                   configmaps::ConfigMap &map,
                                   std::string path)
     {
@@ -972,7 +972,7 @@ namespace xrock_gui_model
         }
     }
 
-    void ModelLib::mechanicsToBagel(configmaps::ConfigMap &map)
+    void XRockGUI::mechanicsToBagel(configmaps::ConfigMap &map)
     {
         bagel_gui::BagelModel *model = dynamic_cast<bagel_gui::BagelModel *>(bagelGui->getCurrentModel());
         if (!model)
@@ -990,7 +990,7 @@ namespace xrock_gui_model
         handleModelMap(model, map, "");
     }
 
-    void ModelLib::currentModelChanged(bagel_gui::ModelInterface *model)
+    void XRockGUI::currentModelChanged(bagel_gui::ModelInterface *model)
     {
         widget->clear();
         if (model)
@@ -999,7 +999,7 @@ namespace xrock_gui_model
         }
     }
 
-    void ModelLib::changeNodeVersion(const std::string &name)
+    void XRockGUI::changeNodeVersion(const std::string &name)
     {
         versionChangeName = name;
         const ConfigMap *node_ = bagelGui->getNodeMap(name);
@@ -1013,7 +1013,7 @@ namespace xrock_gui_model
         vd.exec();
     }
 
-    void ModelLib::configureNode(const std::string &name)
+    void XRockGUI::configureNode(const std::string &name)
     {
         ConfigMap node = *(bagelGui->getNodeMap(name));
         ConfigMap config;
@@ -1034,7 +1034,7 @@ namespace xrock_gui_model
         bagelGui->updateNodeMap(name, node);
     }
 
-    void ModelLib::openConfigFile(const std::string &name)
+    void XRockGUI::openConfigFile(const std::string &name)
     {
         ConfigMap node = *(bagelGui->getNodeMap(name));
         ConfigMap config;
@@ -1074,7 +1074,7 @@ namespace xrock_gui_model
         }
     }
 
-    void ModelLib::configureComponents(const std::string &name)
+    void XRockGUI::configureComponents(const std::string &name)
     {
         ConfigMap node = *(bagelGui->getNodeMap(name));
         ConfigMap config;
@@ -1091,24 +1091,24 @@ namespace xrock_gui_model
         bagelGui->updateNodeMap(name, node);
     }
 
-    void ModelLib::configureOutPort(const std::string &nodeName, const std::string &portName)
+    void XRockGUI::configureOutPort(const std::string &nodeName, const std::string &portName)
     {
         openConfigureInterfaceDialog(nodeName, portName, "outputs");
     }
 
-    void ModelLib::configureInPort(const std::string &nodeName, const std::string &portName)
+    void XRockGUI::configureInPort(const std::string &nodeName, const std::string &portName)
     {
         openConfigureInterfaceDialog(nodeName, portName, "inputs");
     }
 
-    void ModelLib::openConfigureInterfaceDialog(const std::string &nodeName,
+    void XRockGUI::openConfigureInterfaceDialog(const std::string &nodeName,
                                                 const std::string &portName,
                                                 const std::string &portType)
     {
         if (portType != "outputs" &&
             portType != "inputs")
         {
-            std::cout << "ModelLib::openConfigureInterfaceDialog: wrong portType!" << std::endl;
+            std::cout << "XRockGUI::openConfigureInterfaceDialog: wrong portType!" << std::endl;
             return;
         }
         ConfigMap node = *(bagelGui->getNodeMap(nodeName));
@@ -1204,7 +1204,7 @@ namespace xrock_gui_model
      * todo: handle node configuration
      *       warn if edges can not be reconnected (dropdown optional)
      */
-    void ModelLib::selectVersion(const std::string &version)
+    void XRockGUI::selectVersion(const std::string &version)
     {
         Model *model = dynamic_cast<Model *>(bagelGui->getCurrentModel());
         if (model)
@@ -1381,7 +1381,7 @@ namespace xrock_gui_model
         }
     }
 
-    void ModelLib::exportCnd(const configmaps::ConfigMap &map_,
+    void XRockGUI::exportCnd(const configmaps::ConfigMap &map_,
                              const std::string &filename, const std::string &urdf_file)
     {
         // ask user to pick a urdf file
@@ -1413,7 +1413,7 @@ namespace xrock_gui_model
         else
             QMessageBox::critical(nullptr, "Export", QString::fromStdString("Failed to export cnd with code: " + std::to_string(ret)), QMessageBox::Ok);
     }
-    void ModelLib::exportCnd2(const configmaps::ConfigMap &map_,
+    void XRockGUI::exportCnd2(const configmaps::ConfigMap &map_,
                               const std::string &filename)
     {
         ConfigMap map = map_;
@@ -1597,7 +1597,7 @@ namespace xrock_gui_model
         fprintf(f, "deployments:\n\ntasks:\n\nconnections:\n\n");
         fclose(f);
     }
-    void ModelLib::importCND(const std::string &fileName)
+    void XRockGUI::importCND(const std::string &fileName)
     {
         ConfigMap map;
         ConfigMap cnd = ConfigMap::fromYamlFile(fileName);
@@ -1635,7 +1635,7 @@ namespace xrock_gui_model
         widget->loadModel(map);
     }
 
-    void ModelLib::nodeContextClicked(const std::string name)
+    void XRockGUI::nodeContextClicked(const std::string name)
     {
 
         if (name == "change version")
@@ -1709,7 +1709,7 @@ namespace xrock_gui_model
         }
     }
 
-    void ModelLib::inPortContextClicked(const std::string name)
+    void XRockGUI::inPortContextClicked(const std::string name)
     {
         if (name == "configure interface")
         {
@@ -1744,7 +1744,7 @@ namespace xrock_gui_model
         bagelGui->updateNodeMap(contextNodeName, node);
     }
 
-    void ModelLib::outPortContextClicked(const std::string name)
+    void XRockGUI::outPortContextClicked(const std::string name)
     {
         if (name == "configure interface")
         {
@@ -1752,7 +1752,7 @@ namespace xrock_gui_model
         }
     }
 
-    std::vector<std::string> ModelLib::getNodeContextStrings(const std::string &name)
+    std::vector<std::string> XRockGUI::getNodeContextStrings(const std::string &name)
     {
         // get node map
         // check domain foo
@@ -1772,7 +1772,7 @@ namespace xrock_gui_model
         return r;
     }
 
-    std::vector<std::string> ModelLib::getInPortContextStrings(const std::string &nodeName, const std::string &portName)
+    std::vector<std::string> XRockGUI::getInPortContextStrings(const std::string &nodeName, const std::string &portName)
     {
         // get node map
         // check domain foo
@@ -1793,7 +1793,7 @@ namespace xrock_gui_model
         return r;
     }
 
-    std::vector<std::string> ModelLib::getOutPortContextStrings(const std::string &nodeName, const std::string &portName)
+    std::vector<std::string> XRockGUI::getOutPortContextStrings(const std::string &nodeName, const std::string &portName)
     {
         // get node map
         // check domain foo
@@ -1805,7 +1805,7 @@ namespace xrock_gui_model
         return r;
     }
 
-    void ModelLib::applyConfiguration(configmaps::ConfigMap &map)
+    void XRockGUI::applyConfiguration(configmaps::ConfigMap &map)
     {
         if (map["domain"] != "software")
             return;
@@ -1880,7 +1880,7 @@ namespace xrock_gui_model
         selectVersion(version);
     }
 
-    void ModelLib::cfgUpdateProperty(mars::cfg_manager::cfgPropertyStruct p)
+    void XRockGUI::cfgUpdateProperty(mars::cfg_manager::cfgPropertyStruct p)
     {
         if (p.paramId == dbAddress_paramId)
         {
@@ -1893,5 +1893,5 @@ namespace xrock_gui_model
 
 } // end of namespace xrock_gui_model
 
-DESTROY_LIB(xrock_gui_model::ModelLib)
-CREATE_LIB(xrock_gui_model::ModelLib)
+DESTROY_LIB(xrock_gui_model::XRockGUI)
+CREATE_LIB(xrock_gui_model::XRockGUI)

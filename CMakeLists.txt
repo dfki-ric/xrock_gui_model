@@ -38,7 +38,7 @@ find_package( Boost COMPONENTS system thread REQUIRED)
 
 set(SOURCES 
   src/Model.cpp
-  src/ModelLib.cpp
+  src/XRockGUI.cpp
   src/ModelWidget.cpp
   src/ImportDialog.cpp
   src/VersionDialog.cpp
@@ -52,7 +52,7 @@ set(SOURCES
 
 set(HEADERS
   src/Model.hpp
-  src/ModelLib.hpp
+  src/XRockGUI.hpp
   src/ModelWidget.hpp
   src/ImportDialog.hpp
   src/VersionDialog.hpp

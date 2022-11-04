@@ -4,7 +4,7 @@
 
 
 #include "ToolbarBackend.hpp"
-#include "ModelLib.hpp"
+#include "XRockGUI.hpp"
 #include "Model.hpp"
 #include "ModelWidget.hpp"
 #include "ImportDialog.hpp"
@@ -27,8 +27,8 @@
 #include <mars/utils/misc.h>
 using namespace xrock_gui_model;
 
-ToolbarBackend::ToolbarBackend(ModelLib *modelLib, mars::main_gui::GuiInterface *gui, DBInterface *db)
-    : model_lib(modelLib), db(db), main_gui(dynamic_cast<mars::main_gui::MainGUI *>(gui))
+ToolbarBackend::ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface *gui, DBInterface *db)
+    : xrockGui(xrockGui), db(db), main_gui(dynamic_cast<mars::main_gui::MainGUI *>(gui))
 {
   QToolBar *toolbar = main_gui->getToolbar("Actions");
 
@@ -91,18 +91,18 @@ void ToolbarBackend::on_backend_changed(const QString &new_backend)
 {
   if (new_backend == "Serverless")
   {
-    model_lib->menuAction(static_cast<int>(MenuActions::SELECT_SERVERLESS));
+    xrockGui->menuAction(static_cast<int>(MenuActions::SELECT_SERVERLESS));
     main_gui->disableToolbarLineEdit({2, 3});
     main_gui->enableToolbarLineEdit({1});
   }
   else if (new_backend == "Client")
   {
-    model_lib->menuAction(static_cast<int>(MenuActions::SELECT_CLIENT));
+    xrockGui->menuAction(static_cast<int>(MenuActions::SELECT_CLIENT));
     main_gui->disableToolbarLineEdit({1});
     main_gui->enableToolbarLineEdit({2, 3, 4});
   }
   else if (new_backend == "MultiDbClient")
-    model_lib->menuAction(static_cast<int>(MenuActions::SELECT_MULTIDB));
+    xrockGui->menuAction(static_cast<int>(MenuActions::SELECT_MULTIDB));
 }
 
 void ToolbarBackend::on_db_path_changed(const QString &db_path)

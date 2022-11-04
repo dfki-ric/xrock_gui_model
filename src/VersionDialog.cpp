@@ -1,5 +1,5 @@
 #include "VersionDialog.hpp"
-#include "ModelLib.hpp"
+#include "XRockGUI.hpp"
 #include <mars/config_map_gui/DataWidget.h>
 #include <mars/utils/misc.h>
 
@@ -12,7 +12,7 @@ using namespace configmaps;
 namespace xrock_gui_model
 {
 
-    VersionDialog::VersionDialog(ModelLib *modelLib) : modelLib(modelLib)
+    VersionDialog::VersionDialog(XRockGUI *xrockGui) : xrockGui(xrockGui)
     {
         // get data from database
         QSplitter *split = new QSplitter();
@@ -48,7 +48,7 @@ namespace xrock_gui_model
     {
         selectedDomain = domain;
         selectedModel = name;
-        std::vector<std::string> versionList = modelLib->db->requestVersions(domain, name);
+        std::vector<std::string> versionList = xrockGui->db->requestVersions(domain, name);
         versions->clear();
         for (std::vector<std::string>::iterator it = versionList.begin(); it != versionList.end(); ++it)
         {
@@ -63,7 +63,7 @@ namespace xrock_gui_model
         {
             selectedVersion = v.toString().toStdString();
             dw->clearGUI();
-            ConfigMap map = modelLib->db->requestModel(selectedDomain, selectedModel, selectedVersion);
+            ConfigMap map = xrockGui->db->requestModel(selectedDomain, selectedModel, selectedVersion);
             dw->setConfigMap("", map);
         }
     }
@@ -82,7 +82,7 @@ namespace xrock_gui_model
     {
         if (selectedVersion != std::string(""))
         {
-            modelLib->selectVersion(selectedVersion);
+            xrockGui->selectVersion(selectedVersion);
         }
         done(0);
     }

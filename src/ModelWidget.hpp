@@ -32,7 +32,7 @@ public:
 
 namespace xrock_gui_model
 {
-    class ModelLib;
+    class XRockGUI;
 
     class ModelWidget : public mars::main_gui::BaseWidget
     {
@@ -40,7 +40,7 @@ namespace xrock_gui_model
 
     public:
         ModelWidget(mars::cfg_manager::CFGManagerInterface *cfg,
-                    bagel_gui::BagelGui *bagelGui, ModelLib *mainLib,
+                    bagel_gui::BagelGui *bagelGui, XRockGUI *xrockGui,
                     QWidget *parent = 0);
         ~ModelWidget();
         void createMap(configmaps::ConfigMap *m);
@@ -80,13 +80,10 @@ namespace xrock_gui_model
 
     private:
         bagel_gui::BagelGui *bagelGui;
-        ModelLib *mainLib;
+        XRockGUI *xrockGui;
         QListWidget *layouts;
         std::string currentLayout, modelPath, edition;
         std::map<std::string, QCheckBox *> checkMap;
-        // QListWidget *nodeTypeView;
-        // std::vector<std::string> nodeTypes;
-        // std::string newNode;
         configmaps::ConfigMap localMap, layoutMap;
         QLineEdit *name, *type, *version, *layoutName, *maturity;
         QComboBox *domain;

@@ -7,7 +7,7 @@
 #ifndef XROCK_GUI_MODEL_IMPORT_DIALOG_HPP
 #define XROCK_GUI_MODEL_IMPORT_DIALOG_HPP
 
-#include "ModelLib.hpp"
+#include "XRockGUI.hpp"
 
 #include <QDialog>
 #include <QListWidget>
@@ -26,14 +26,14 @@ namespace mars
 
 namespace xrock_gui_model
 {
-    class ModelLib;
+    class XRockGUI;
 
     class ImportDialog : public QDialog
     {
         Q_OBJECT
 
     public:
-        explicit ImportDialog(ModelLib *modelLib, bool load = false);
+        explicit ImportDialog(XRockGUI *xrockGui, bool load = false);
         ~ImportDialog();
 
         static std::string lastDomain, lastFilter;
@@ -51,7 +51,7 @@ namespace xrock_gui_model
         void sigAddComponent(std::string domain, std::string model, std::string version);
 
     private:
-        ModelLib *modelLib;
+        XRockGUI *xrockGui;
         bool load, ignoreUpdate;
         std::string selectedDomain;
         std::string selectedModel;

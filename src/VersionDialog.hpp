@@ -22,14 +22,14 @@ namespace mars
 
 namespace xrock_gui_model
 {
-    class ModelLib;
+    class XRockGUI;
 
     class VersionDialog : public QDialog
     {
         Q_OBJECT
 
     public:
-        explicit VersionDialog(ModelLib *modelLib);
+        explicit VersionDialog(XRockGUI *xrockGui);
         ~VersionDialog();
         void requestComponent(const std::string &domain, const std::string &name);
 
@@ -44,7 +44,7 @@ namespace xrock_gui_model
         std::string selectedDomain;
         std::string selectedModel;
         std::string selectedVersion;
-        ModelLib *modelLib;
+        XRockGUI *xrockGui;
         configmaps::ConfigMap component;
     };
 } // end of namespace xrock_gui_model

@@ -55,15 +55,15 @@ namespace xrock_gui_model
         EXPORT_CND_TFENHANCE = 31
     };
 
-    class ModelLib : public lib_manager::LibInterface,
+    class XRockGUI : public lib_manager::LibInterface,
                      public mars::main_gui::MenuInterface,
                      public bagel_gui::PluginInterface,
                      public mars::cfg_manager::CFGClient
     {
 
     public:
-        explicit ModelLib(lib_manager::LibManager *theManager);
-        ~ModelLib();
+        explicit XRockGUI(lib_manager::LibManager *theManager);
+        ~XRockGUI();
 
         // Initializers
         void initConfig();

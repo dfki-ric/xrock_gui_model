@@ -1,9 +1,9 @@
 /**
- * \file Model.cpp
+ * \file ComponentModelInterface.cpp
  * \author Malte Langosz
  */
 
-#include "Model.hpp"
+#include "ComponentModelInterface.hpp"
 #include "ConfigMapHelper.hpp"
 #include <osg_graph_viz/Node.hpp>
 #include <bagel_gui/BagelGui.hpp>
@@ -19,7 +19,7 @@ using namespace mars::utils;
 namespace xrock_gui_model
 {
 
-    Model::Model(BagelGui *bagelGui) : ModelInterface(bagelGui)
+    ComponentModelInterface::ComponentModelInterface(BagelGui *bagelGui) : ModelInterface(bagelGui)
     {
         std::string confDir = bagelGui->getConfigDir();
         ConfigMap config = ConfigMap::fromYamlFile(confDir + "/config_default.yml", true);
@@ -60,13 +60,6 @@ namespace xrock_gui_model
         info.type = "DES";
         info.map["NodeClass"] = "GUINode";
         infoMap[info.type] = info;
-        // info.map["NodeClass"] = "Rock";
-        // info.map["type"] = "software::Deployment";
-        // info.map["modelName"] = "Deployment";
-        // info.map["domain"] = "software";
-        // info.map["font_size"] = 14.;
-        // info.type = "software::Deployment";
-        // infoMap[info.type] = info;
         if (config.hasKey("OrogenFolder"))
         {
             std::string orogenFolder = confDir + "/";
@@ -88,28 +81,28 @@ namespace xrock_gui_model
         edition = "";
     }
 
-    Model::Model(const Model *other) : ModelInterface(other->bagelGui),
+    ComponentModelInterface::ComponentModelInterface(const ComponentModelInterface *other) : ModelInterface(other->bagelGui),
                                        infoMap(other->infoMap), edition("")
     {
     }
 
-    Model::~Model()
+    ComponentModelInterface::~ComponentModelInterface()
     {
     }
 
-    ModelInterface *Model::clone()
+    ModelInterface *ComponentModelInterface::clone()
     {
-        Model *newModel = new Model(this);
+        ComponentModelInterface *newModel = new ComponentModelInterface(this);
         //*newModel = *this;
         return newModel;
     }
 
-    void Model::setEdition(const std::string v)
+    void ComponentModelInterface::setEdition(const std::string v)
     {
         edition = tolower(v);
     }
 
-    void Model::loadNodeInfo(std::string path, bool orogen)
+    void ComponentModelInterface::loadNodeInfo(std::string path, bool orogen)
     {
         if (path[path.size() - 1] != '/')
         {
@@ -157,7 +150,7 @@ namespace xrock_gui_model
         return;
     }
 
-    bool Model::addNodeInfo(ConfigMap &model, std::string version)
+    bool ComponentModelInterface::addNodeInfo(ConfigMap &model, std::string version)
     {
         if (!model.hasKey("domain"))
             return false;
@@ -335,7 +328,7 @@ namespace xrock_gui_model
         return true;
     }
 
-    bool Model::addOrogenInfo(ConfigMap &model)
+    bool ComponentModelInterface::addOrogenInfo(ConfigMap &model)
     {
         // try to use the template to generate bagel node info
         osg_graph_viz::NodeInfo info;
@@ -396,7 +389,7 @@ namespace xrock_gui_model
     }
 
     // todo: document in what cases which addNode function is used
-    bool Model::addNode(unsigned long nodeId, configmaps::ConfigMap *node)
+    bool ComponentModelInterface::addNode(unsigned long nodeId, configmaps::ConfigMap *node)
     {
         ConfigMap &map = *node;
         std::string nodeType = map["type"];
@@ -427,14 +420,14 @@ namespace xrock_gui_model
         return false;
     }
 
-    bool Model::addNode(unsigned long nodeId,
+    bool ComponentModelInterface::addNode(unsigned long nodeId,
                         const configmaps::ConfigMap &node)
     {
         ConfigMap map = node;
         return addNode(nodeId, &map);
     }
 
-    bool Model::addEdge(unsigned long edgeId, configmaps::ConfigMap *edge)
+    bool ComponentModelInterface::addEdge(unsigned long edgeId, configmaps::ConfigMap *edge)
     {
         ConfigMap &map = *edge;
 
@@ -544,14 +537,14 @@ namespace xrock_gui_model
         return true;
     }
 
-    bool Model::addEdge(unsigned long edgeId,
+    bool ComponentModelInterface::addEdge(unsigned long edgeId,
                         const configmaps::ConfigMap &edge)
     {
         ConfigMap map = edge;
         return addEdge(edgeId, &map);
     }
 
-    bool Model::hasEdge(configmaps::ConfigMap *edge)
+    bool ComponentModelInterface::hasEdge(configmaps::ConfigMap *edge)
     {
         ConfigMap &map = *edge;
 
@@ -568,13 +561,13 @@ namespace xrock_gui_model
         return false;
     }
 
-    bool Model::hasEdge(const configmaps::ConfigMap &edge)
+    bool ComponentModelInterface::hasEdge(const configmaps::ConfigMap &edge)
     {
         ConfigMap map = edge;
         return hasEdge(&map);
     }
 
-    bool Model::groupNodes(unsigned long groupNodeId, unsigned long nodeId)
+    bool ComponentModelInterface::groupNodes(unsigned long groupNodeId, unsigned long nodeId)
     {
         // todo: handle deployments
         std::map<unsigned long, ConfigMap>::iterator it = nodeMap.find(groupNodeId);
@@ -588,12 +581,12 @@ namespace xrock_gui_model
         return false;
     }
 
-    const std::map<std::string, osg_graph_viz::NodeInfo> &Model::getNodeInfoMap()
+    const std::map<std::string, osg_graph_viz::NodeInfo> &ComponentModelInterface::getNodeInfoMap()
     {
         return infoMap;
     }
 
-    bool Model::removeNode(unsigned long nodeId)
+    bool ComponentModelInterface::removeNode(unsigned long nodeId)
     {
         if (!edition.empty())
         {
@@ -634,7 +627,7 @@ namespace xrock_gui_model
         return true;
     }
 
-    bool Model::removeEdge(unsigned long edgeId)
+    bool ComponentModelInterface::removeEdge(unsigned long edgeId)
     {
         if (edgeMap.find(edgeId) == edgeMap.end())
         {
@@ -651,7 +644,7 @@ namespace xrock_gui_model
         return true;
     }
 
-    bool Model::updateNode(unsigned long nodeId,
+    bool ComponentModelInterface::updateNode(unsigned long nodeId,
                            configmaps::ConfigMap node)
     {
         if (node["type"] == "DES")
@@ -676,7 +669,7 @@ namespace xrock_gui_model
         return false;
     }
 
-    bool Model::hasNodeInfo(const std::string &type)
+    bool ComponentModelInterface::hasNodeInfo(const std::string &type)
     {
         std::map<std::string, osg_graph_viz::NodeInfo>::iterator it = infoMap.begin();
         for (; it != infoMap.end(); ++it)
@@ -689,7 +682,7 @@ namespace xrock_gui_model
         return false;
     }
 
-    configmaps::ConfigMap Model::getNodeInfo(const std::string &type)
+    configmaps::ConfigMap ComponentModelInterface::getNodeInfo(const std::string &type)
     {
         std::map<std::string, osg_graph_viz::NodeInfo>::iterator it = infoMap.begin();
         for (; it != infoMap.end(); ++it)
@@ -702,17 +695,17 @@ namespace xrock_gui_model
         return ConfigMap();
     }
 
-    void Model::setModelInfo(configmaps::ConfigMap &map)
+    void ComponentModelInterface::setModelInfo(configmaps::ConfigMap &map)
     {
         modelInfo = map;
     }
 
-    configmaps::ConfigMap &Model::getModelInfo()
+    configmaps::ConfigMap &ComponentModelInterface::getModelInfo()
     {
         return modelInfo;
     }
 
-    void Model::resetConfig(configmaps::ConfigMap &map)
+    void ComponentModelInterface::resetConfig(configmaps::ConfigMap &map)
     {
         std::string modelName = map["modelName"];
         osg_graph_viz::NodeInfo ndi = infoMap[modelName];

@@ -1,6 +1,6 @@
 #include "ComponentModelEditorWidget.hpp"
 #include "XRockGUI.hpp"
-#include "Model.hpp"
+#include "ComponentModelInterface.hpp"
 #include "ConfigureDialog.hpp"
 #include "ConfigMapHelper.hpp"
 
@@ -758,7 +758,8 @@ namespace xrock_gui_model
 
             std::string type = modelName;
             // todo: only add version if it is not the first default one
-            Model *model = dynamic_cast<Model *>(bagelGui->getCurrentModel());
+            //PC: review 761
+            ComponentModelInterface *model = dynamic_cast<ComponentModelInterface *>(bagelGui->getCurrentModel());
             if (model)
             {
                 if (!modelVersion.empty())
@@ -1442,7 +1443,7 @@ namespace xrock_gui_model
             if (domain == "software" && name == "Deployment")
                 return;
             std::cerr << "check type: " << domain.c_str() << ' ' << name.c_str() << ' ' << version.c_str() << std::endl;
-            Model *model = dynamic_cast<Model *>(bagelGui->getCurrentModel());
+            ComponentModelInterface *model = dynamic_cast<ComponentModelInterface *>(bagelGui->getCurrentModel());
             if (model)
             {
                 ConfigMap modelMap, nodeInfo;

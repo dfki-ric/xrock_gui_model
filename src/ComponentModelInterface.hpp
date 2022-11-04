@@ -1,5 +1,5 @@
 /**
- * \file Model.hpp
+ * \file ComponentModelInterface.hpp
  * \author Malte Langosz
  * \brief
  */
@@ -12,12 +12,12 @@
 namespace xrock_gui_model
 {
 
-    class Model : public bagel_gui::ModelInterface
+    class ComponentModelInterface : public bagel_gui::ModelInterface
     {
     public:
-        explicit Model(bagel_gui::BagelGui *bagelGui);
-        Model(const Model *other);
-        ~Model();
+        explicit ComponentModelInterface(bagel_gui::BagelGui *bagelGui);
+        ComponentModelInterface(const ComponentModelInterface *other);
+        ~ComponentModelInterface();
 
         bagel_gui::ModelInterface *clone();
 
@@ -46,7 +46,6 @@ namespace xrock_gui_model
         std::map<unsigned long, std::vector<std::string>> getCompatiblePorts(unsigned long nodeId, std::string outPortName) { return std::map<unsigned long, std::vector<std::string>>(); }
         bool handlePortCompatibility() { return false; }
         const std::map<std::string, osg_graph_viz::NodeInfo> &getNodeInfoMap();
-        // void displayWidget( QWidget *pParent );
         bool addNodeInfo(configmaps::ConfigMap &model, std::string version = "");
         bool hasNodeInfo(const std::string &type);
         configmaps::ConfigMap getNodeInfo(const std::string &type);

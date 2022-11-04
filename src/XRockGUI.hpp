@@ -27,7 +27,7 @@ namespace bagel_gui
 namespace xrock_gui_model
 {
 
-    class Model;
+    class ComponentModelInterface;
     class ComponentModelEditorWidget;
 
     enum struct MenuActions : int
@@ -83,7 +83,7 @@ namespace xrock_gui_model
 
         CREATE_MODULE_INFO();
 
-        Model *getModelInstance();
+        ComponentModelInterface *getModelInstance();
 
         // CFGClient methods
         virtual void cfgUpdateProperty(mars::cfg_manager::cfgPropertyStruct _property);
@@ -123,7 +123,7 @@ namespace xrock_gui_model
 
     private:
         std::map<std::string, configmaps::ConfigMap> modelCache;
-        Model *model; // 20221103 MS: This is currently used by one function only. Others use bagelGui->getCurrentModel(). Can it be removed?
+        ComponentModelInterface *model; // 20221103 MS: This is currently used by one function only. Others use bagelGui->getCurrentModel(). Can it be removed?
         mars::main_gui::GuiInterface *gui;
         bagel_gui::BagelGui *bagelGui;
         ComponentModelEditorWidget *widget;

@@ -37,7 +37,7 @@ find_package(xtypes REQUIRED)
 find_package( Boost COMPONENTS system thread REQUIRED)
 
 set(SOURCES 
-  src/Model.cpp
+  src/ComponentModelInterface.cpp
   src/XRockGUI.cpp
   src/ComponentModelEditorWidget.cpp
   src/ImportDialog.cpp
@@ -51,7 +51,7 @@ set(SOURCES
 )
 
 set(HEADERS
-  src/Model.hpp
+  src/ComponentModelInterface.hpp
   src/XRockGUI.hpp
   src/ComponentModelEditorWidget.hpp
   src/ImportDialog.hpp

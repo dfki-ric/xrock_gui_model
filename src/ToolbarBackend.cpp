@@ -5,7 +5,7 @@
 
 #include "ToolbarBackend.hpp"
 #include "XRockGUI.hpp"
-#include "Model.hpp"
+#include "ComponentModelInterface.hpp"
 #include "ComponentModelEditorWidget.hpp"
 #include "ImportDialog.hpp"
 #include "FileDB.hpp"

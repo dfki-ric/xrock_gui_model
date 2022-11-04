@@ -5,7 +5,7 @@
  */
 
 #include "XRockGUI.hpp"
-#include "Model.hpp"
+#include "ComponentModelInterface.hpp"
 #include "ComponentModelEditorWidget.hpp"
 #include "ImportDialog.hpp"
 #include "FileDB.hpp"
@@ -140,7 +140,7 @@ namespace xrock_gui_model
         bagelGui = libManager->getLibraryAs<BagelGui>("bagel_gui");
         if (bagelGui)
         {
-            model = new Model(bagelGui);
+            model = new ComponentModelInterface(bagelGui);
             bagelGui->addModelInterface("xrock", model);
             bagelGui->createView("xrock", "Model");
             bagelGui->addPlugin(this);
@@ -280,7 +280,7 @@ namespace xrock_gui_model
                 version != std::string(""))
             {
                 loadComponent(domain, modelName, version);
-                Model *model = dynamic_cast<Model *>(bagelGui->getCurrentModel());
+                ComponentModelInterface *model = dynamic_cast<ComponentModelInterface *>(bagelGui->getCurrentModel());
                 if (model)
                 {
                     model->setEdition(edition);
@@ -336,7 +336,7 @@ namespace xrock_gui_model
         outputFile.close();
     }
 
-    Model *XRockGUI::getModelInstance()
+    ComponentModelInterface *XRockGUI::getModelInstance()
     {
         return model;
     }
@@ -616,7 +616,7 @@ namespace xrock_gui_model
         case MenuActions::RELOAD_MODEL_FROM_DB: // Reload
         {
             // 20221102 MS: We also have a class variable model. Shadowing issues can arise.
-            Model *model = dynamic_cast<Model *>(bagelGui->getCurrentModel());
+            ComponentModelInterface *model = dynamic_cast<ComponentModelInterface *>(bagelGui->getCurrentModel());
             if (model)
             {
                 bagelGui->closeCurrentTab();
@@ -827,7 +827,7 @@ namespace xrock_gui_model
         std::string type = modelName;
 
         widget->loadType(domain, modelName, version);
-        Model *model = dynamic_cast<Model *>(bagelGui->getCurrentModel());
+        ComponentModelInterface *model = dynamic_cast<ComponentModelInterface *>(bagelGui->getCurrentModel());
         if (model)
         {
             if (model->hasNodeInfo(type + "::" + version))
@@ -1206,7 +1206,7 @@ namespace xrock_gui_model
      */
     void XRockGUI::selectVersion(const std::string &version)
     {
-        Model *model = dynamic_cast<Model *>(bagelGui->getCurrentModel());
+        ComponentModelInterface *model = dynamic_cast<ComponentModelInterface *>(bagelGui->getCurrentModel());
         if (model)
         {
             std::vector<ConfigMap> edgeList;
@@ -1652,7 +1652,7 @@ namespace xrock_gui_model
         }
         else if (name == "reset configuration")
         {
-            Model *model = dynamic_cast<Model *>(bagelGui->getCurrentModel());
+            ComponentModelInterface *model = dynamic_cast<ComponentModelInterface *>(bagelGui->getCurrentModel());
             if (model)
             {
                 ConfigMap map = *(bagelGui->getNodeMap(contextNodeName));
@@ -1809,7 +1809,7 @@ namespace xrock_gui_model
     {
         if (map["domain"] != "software")
             return;
-        Model *model = dynamic_cast<Model *>(bagelGui->getCurrentModel());
+        ComponentModelInterface *model = dynamic_cast<ComponentModelInterface *>(bagelGui->getCurrentModel());
         if (!model)
             return;
         std::string configFile = "temp_task_config.yml";

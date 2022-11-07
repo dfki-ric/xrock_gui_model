@@ -34,6 +34,10 @@ namespace xrock_gui_model
         /** \brief The constructor adds the actions to the File menu */
         ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface *gui, DBInterface *db);
         virtual ~ToolbarBackend();
+       /** \brief getters */
+        std::string get_dbPath();
+        std::string get_dbAddress();
+        std::string get_graph();
 
     private slots:
         void on_backend_changed(const QString &new_backend);

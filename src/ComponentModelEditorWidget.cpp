@@ -335,6 +335,7 @@ namespace xrock_gui_model
         }
     }
 
+    // 20221107 MS: This function should be removed
     void ComponentModelEditorWidget::storeModel()
     {
         // Validate fields
@@ -405,6 +406,7 @@ namespace xrock_gui_model
         }
     }
 
+    // 20221107 MS: This function should be removed
     void ComponentModelEditorWidget::requestModel()
     {
         try
@@ -419,6 +421,7 @@ namespace xrock_gui_model
             QMessageBox::warning(nullptr, "Warning", QString::fromStdString(ss.str()), QMessageBox::Ok);
         }
     }
+    // 20221107 MS: This function should be removed
     void ComponentModelEditorWidget::addComponent()
     {
         try
@@ -434,6 +437,7 @@ namespace xrock_gui_model
         }
     }
 
+    // 20221107 MS: This function should be removed
     void ComponentModelEditorWidget::loadModel()
     {
         try
@@ -452,6 +456,7 @@ namespace xrock_gui_model
             QMessageBox::warning(nullptr, "Warning", QString::fromStdString(ss.str()), QMessageBox::Ok);
         }
     }
+    // 20221107 MS: This function should be removed
     void ComponentModelEditorWidget::loadModel(const std::string &file)
     {
         try
@@ -476,6 +481,7 @@ namespace xrock_gui_model
         }
     }
 
+    // 20221107 MS: This function should be removed
     void ComponentModelEditorWidget::loadModel(ConfigMap &map)
     {
         try
@@ -665,6 +671,7 @@ namespace xrock_gui_model
      * todo:
      *       - how to handle visual properties
      */
+    // 20221107 MS: This function should be removed
     void ComponentModelEditorWidget::loadGraph(ConfigMap &map)
     {
         try
@@ -740,6 +747,7 @@ namespace xrock_gui_model
         }
     }
 
+    // 20221107 MS: This function should be removed
     void ComponentModelEditorWidget::loadNode(ConfigMap &node, ConfigMap &config)
     {
         try
@@ -947,6 +955,7 @@ namespace xrock_gui_model
         }
     }
 
+    // 20221107 MS: This function should be removed
     ConfigMap ComponentModelEditorWidget::getDefaultConfig(const std::string &domain, const std::string &name, const std::string &version)
     {
         try
@@ -969,6 +978,7 @@ namespace xrock_gui_model
         }
     }
 
+    // 20221107 MS: This function should be removed
     void ComponentModelEditorWidget::saveModel()
     {
         try
@@ -1006,6 +1016,7 @@ namespace xrock_gui_model
         }
     }
 
+    // 20221107 MS: This function should be removed
     void ComponentModelEditorWidget::createMap(ConfigMap *m)
     {
         try
@@ -1130,6 +1141,7 @@ namespace xrock_gui_model
         }
     }
 
+    // 20221107 MS: This function should be removed
     void ComponentModelEditorWidget::saveGraph(ConfigMap &output, ConfigMap &interfaceMap,
                                 ConfigMap &descriptionMap,
                                 const std::string &saveDomain)
@@ -1434,6 +1446,7 @@ namespace xrock_gui_model
         ignoreUpdate = false;
     }
 
+    // 20221107 MS: This function should be removed
     void ComponentModelEditorWidget::loadType(const std::string &domain,
                                const std::string &name,
                                const std::string &version)
@@ -1477,6 +1490,7 @@ namespace xrock_gui_model
         }
     }
 
+    // 20221107 MS: This function should work on the original data
     void ComponentModelEditorWidget::setModelInfo(configmaps::ConfigMap &model)
     {
         try
@@ -1532,6 +1546,7 @@ namespace xrock_gui_model
         }
     }
 
+    // 20221107 MS: This function should work on the original data
     void ComponentModelEditorWidget::updateModelInfo()
     {
         try

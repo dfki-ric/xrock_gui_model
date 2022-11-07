@@ -20,7 +20,6 @@ namespace xrock_gui_model
 
         vLayout->addWidget(split);
         versions = new QListWidget(this);
-        // nodes->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         split->addWidget(versions);
         connect(versions, SIGNAL(clicked(const QModelIndex &)),
                 this, SLOT(versionClicked(const QModelIndex &)));

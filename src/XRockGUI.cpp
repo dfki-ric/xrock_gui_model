@@ -343,7 +343,6 @@ namespace xrock_gui_model
 
     void XRockGUI::menuAction(int action, bool checked)
     {
-        mars::main_gui::MainGUI *main_gui = dynamic_cast<mars::main_gui::MainGUI *>(gui);
         switch (static_cast<MenuActions>(action))
         {
         case MenuActions::LOAD_MODEL:
@@ -602,7 +601,7 @@ namespace xrock_gui_model
             db.reset(new RestDB());
             if (!db->isConnected())
             {
-                std::string msg = "Server is not running! Please run server using command:\njsondb -d " + main_gui->getToolbarLineEditText(1);
+                std::string msg = "Server is not running! Please run server using command:\njsondb -d " + toolbarBackend->get_dbPath();
                 QMessageBox::warning(nullptr, "Warning", msg.c_str(), QMessageBox::Ok);
             }
             break;
@@ -615,12 +614,10 @@ namespace xrock_gui_model
         }
         case MenuActions::RELOAD_MODEL_FROM_DB: // Reload
         {
-            // 20221102 MS: We also have a class variable model. Shadowing issues can arise.
-            ComponentModelInterface *model = dynamic_cast<ComponentModelInterface *>(bagelGui->getCurrentModel());
-            if (model)
+            if (ModelInterface* m = bagelGui->getCurrentModel())
             {
                 bagelGui->closeCurrentTab();
-                ConfigMap currentModel = model->getModelInfo();
+                ConfigMap currentModel = m->getModelInfo();
 
                 if (currentModel.hasKey("name"))
                 {

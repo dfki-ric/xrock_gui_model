@@ -93,7 +93,6 @@ namespace xrock_gui_model
     ModelInterface *ComponentModelInterface::clone()
     {
         ComponentModelInterface *newModel = new ComponentModelInterface(this);
-        //*newModel = *this;
         return newModel;
     }
 

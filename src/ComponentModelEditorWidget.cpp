@@ -35,8 +35,6 @@ namespace xrock_gui_model
             ignoreUpdate = false;
             QGridLayout *layout = new QGridLayout();
             QVBoxLayout *vLayout = new QVBoxLayout();
-            // QPushButton *button = new QPushButton("add node", this);
-            // connect(button, SIGNAL(clicked()), this, SLOT(addNode()));
             edition = "";
             size_t i = 0;
             modelPath = cfg->getOrCreateProperty("XRockGUI", "modelPath", ".", this).sValue;
@@ -89,10 +87,6 @@ namespace xrock_gui_model
             layout->addWidget(designedBy, i++, 1);
             connect(designedBy, SIGNAL(textChanged(const QString &)), this, SLOT(updateModelInfo()));
 
-            // l = new QLabel("includes");
-            // layout->addWidget(l, i, 0);
-            // includes = new QTextEdit();
-            // layout->addWidget(includes, i++, 1);
 
             l = new QLabel("annotations");
             layout->addWidget(l, i, 0);
@@ -185,7 +179,7 @@ namespace xrock_gui_model
             xrockConfigFilter.push_back("state");
             xrockConfigFilter.push_back("config_names");
             xrockConfigFilter.push_back("parentName");
-            // nodeTypeView->setSelectionMode(QAbstractItemView::SingleSelection);
+
         }
         catch (const std::exception &e)
         {
@@ -313,7 +307,6 @@ namespace xrock_gui_model
             layouts->setCurrentItem(layouts->item(layouts->count() - 1));
             currentLayout = name;
             updateCurrentLayout();
-            // bagelGui->saveLayout(currentLayout + ".yml");
             updateModelInfo();
         }
 
@@ -337,8 +330,6 @@ namespace xrock_gui_model
 
     void ComponentModelEditorWidget::storeModel()
     {
-        // Validate fields
-        //- validate for emptiness for name,domain..etc
         if (name->text().isEmpty())
         {
             QMessageBox::warning(this, "Warning", "name is empty!", QMessageBox::Ok);
@@ -354,7 +345,6 @@ namespace xrock_gui_model
             QMessageBox::warning(this, "Warning", "version is empty!", QMessageBox::Ok);
             return;
         };
-        // if(domain->text().isEmpty())      { QMessageBox::warning(this, "Warning", "domain is empty!",  QMessageBox::Ok); return; };
         if (projectName->text().isEmpty())
         {
             QMessageBox::warning(this, "Warning", "projectName is empty!", QMessageBox::Ok);
@@ -846,8 +836,6 @@ namespace xrock_gui_model
             ConfigVector::iterator itNodeMap = nodeMap["inputs"].begin();
             for (; itNodeMap != nodeMap["inputs"].end(); ++itNodeMap)
             {
-                // todo: handle origname correctly due to domain
-                // std::string iname = origName + ":" + (std::string)(*itNodeMap)["name"];
                 ConfigVector::iterator it2 = interfaceMap["interfaces"].begin();
                 for (; it2 != interfaceMap["interfaces"].end(); ++it2)
                 {
@@ -878,8 +866,6 @@ namespace xrock_gui_model
             itNodeMap = nodeMap["outputs"].begin();
             for (; itNodeMap != nodeMap["outputs"].end(); ++itNodeMap)
             {
-                // todo: handle origname correctly due to domain
-                // std::string iname = origName + ":" + (std::string)(*itNodeMap)["name"];
                 ConfigVector::iterator it2 = interfaceMap["interfaces"].begin();
                 for (; it2 != interfaceMap["interfaces"].end(); ++it2)
                 {
@@ -895,43 +881,6 @@ namespace xrock_gui_model
                     }
                 }
             }
-
-            // add DefaultConfiguration to interfaces
-
-            // ConfigMap defaultConfig = getDefaultConfig(domain, modelName, modelVersion);
-            // itNodeMap = nodeMap["outputs"].begin();
-            // for(;itNodeMap != nodeMap["outputs"].end(); ++itNodeMap) {
-            //   if(defaultConfig.hasKey("submodel")) {
-            //     ConfigVector::iterator it2 = defaultConfig["submodel"].begin();
-            //     for(; it2 != defaultConfig["submodel"].end(); ++it2) {
-            //       if(it2->hasKey("name") &&
-            //          (std::string)(*it2)["name"] == (std::string)(*itNodeMap)["name"] &&
-            //          it2->hasKey("data"))
-            //       {
-            //         (*itNodeMap)["defaultConfig"] = (*it2)["data"];
-            //         updateMap = true;
-            //         break;
-            //       }
-            //     }
-            //   }
-            // }
-
-            // itNodeMap = nodeMap["inputs"].begin();
-            // for(;itNodeMap != nodeMap["inputs"].end(); ++itNodeMap) {
-            //   if(defaultConfig.hasKey("submodel")) {
-            //     ConfigVector::iterator it2 = defaultConfig["submodel"].begin();
-            //     for(; it2 != defaultConfig["submodel"].end(); ++it2) {
-            //       if(it2->hasKey("name") &&
-            //          (std::string)(*it2)["name"] == (std::string)(*itNodeMap)["name"] &&
-            //          it2->hasKey("data"))
-            //       {
-            //         (*itNodeMap)["defaultConfig"] = (*it2)["data"];
-            //         updateMap = true;
-            //         break;
-            //       }
-            //     }
-            //   }
-            // }
 
             if (updateMap)
             {
@@ -1031,11 +980,6 @@ namespace xrock_gui_model
             {
                 map["versions"][0][domainData]["annotations"] = ConfigMap::fromYamlString(t);
             }
-            // if(map["versions"][0].hasKey(domainData)) {
-            //   std::string dataMap = map["versions"][0][domainData].toYamlString();
-            //   ConfigMap &tmpMap = map["versions"][0][domainData];
-            //   map["versions"][0][domainData] = dataMap;
-            // }
             ConfigMap components;
             ConfigMap interfaceMap;
             ConfigMap descriptionMap;
@@ -1211,12 +1155,10 @@ namespace xrock_gui_model
                     config["edges"].push_back(edgeData);
                 }
                 ConfigMap node;
-                node["name"] = name; //.substr(domain.size()+2);
+                node["name"] = name; 
                 node["model"]["domain"] = mars::utils::toupper(domain);
                 // remove domain from type
                 std::string type = (*it)["modelName"];
-                // type = type.substr(domain.size()+2);
-                // size_t pos = type.find_last_of(':');
                 if (it->hasKey("modelVersion"))
                 {
                     node["model"]["version"] = (*it)["modelVersion"];
@@ -1286,7 +1228,7 @@ namespace xrock_gui_model
                         {
                             if ((int)((*it2)["interface"]) == 1 || (int)((*it2)["interface"]) == 2)
                             {
-                                // if((*it2)["direction"] == "bidirectional") continue;
+
                                 ConfigMap i;
                                 std::string interfaceName;
                                 if (it2->hasKey("interfaceExportName"))
@@ -1403,7 +1345,6 @@ namespace xrock_gui_model
                 }
                 output["edges"].push_back(edge);
             }
-            // output.toYamlFile("da2.yml");
         }
         catch (const std::exception &e)
         {
@@ -1420,12 +1361,10 @@ namespace xrock_gui_model
         edition = "";
         name->clear();
         type->clear();
-        // domain->clear();
         maturity->clear();
         projectName->clear();
         designedBy->clear();
         version->clear();
-        // includes->clear();
         annotations->clear();
         interfaces->clear();
         layouts->clear();
@@ -1451,7 +1390,7 @@ namespace xrock_gui_model
                 if (!model->hasNodeInfo(type))
                 {
                     modelMap = xrockGui->db->requestModel(domain, name, version, !version.empty());
-                    model->addNodeInfo(modelMap); //, version);
+                    model->addNodeInfo(modelMap); 
                     bagelGui->updateNodeTypes();
                     return;
                 }
@@ -1486,7 +1425,7 @@ namespace xrock_gui_model
             type->setText(localMap["type"].getString().c_str());
             const std::string domain_str = mars::utils::toupper(localMap["domain"].getString());
             domain->setCurrentIndex((domain->findText(domain_str.c_str(), Qt::MatchExactly)));
-            // domain->setText(localMap["domain"].getString().c_str());
+
             name->setText(localMap["name"].getString().c_str());
             version->setText(localMap["versions"][0]["name"].getString().c_str());
             if (localMap["versions"][0].hasKey("projectName"))
@@ -1504,7 +1443,6 @@ namespace xrock_gui_model
             if (localMap["versions"][0].hasKey("data") and
                 localMap["versions"][0]["data"].hasKey("annotations"))
             {
-                // todo: check if getString() is correct
                 annotations->setText(localMap["versions"][0]["data"]["annotations"].toYamlString().c_str());
             }
             if (localMap.hasKey("interfaces"))
@@ -1545,7 +1483,6 @@ namespace xrock_gui_model
                 localMap["name"] = name->text().toStdString();
                 localMap["type"] = type->text().toStdString();
                 localMap["versions"][0]["name"] = version->text().toStdString();
-                // localMap["domain"]   = domain->text().toStdString();
                 localMap["domain"] = domain->currentText().toStdString();
                 if (maturity->text().toStdString() != "")
                 {
@@ -1572,7 +1509,7 @@ namespace xrock_gui_model
                 if (annotations->toPlainText().toStdString() == "")
                 {
                     ConfigMap &tmpMap = localMap["versions"][0];
-                    // todo: check if we realy have to erase the whole data
+                    // todo: check if we really have to erase the whole data
                     tmpMap.erase("data");
                 }
                 else
@@ -1652,8 +1589,8 @@ namespace xrock_gui_model
             ConfigMap env;
             ConfigMap copy = localMap;
             std::string description;
-            std::string domainData = "data"; // copy["domain"];
-            // domainData += "Data";
+            std::string domainData = "data";
+
             {
                 if (copy["versions"][0].hasKey(domainData))
                 {

@@ -193,12 +193,12 @@ namespace xrock_gui_model
                 gui->addDockWidget((void *)widget, 1);
                 bagelGui->updateViewSize();
             }
-            std::string loadGraph;
-            cfg->getPropertyValue("Config", "model", "value", &loadGraph);
-            if (!loadGraph.empty())
-            {
-                widget->loadModel(loadGraph);
-            }
+            //std::string loadGraph;
+            //cfg->getPropertyValue("Config", "model", "value", &loadGraph);
+            //if (!loadGraph.empty())
+            //{
+            //    widget->loadModel(loadGraph);
+            //}
             bagelGui->setSmoothLineMode();
         }
         else
@@ -254,7 +254,7 @@ namespace xrock_gui_model
                 modelInfo["interfaces"] = std::string("");
                 modelInfo["editable_interfaces"] = false;
                 modelInfo["layouts"] = std::string("");
-                widget->setModelInfo(modelInfo);
+                //widget->update(modelInfo);
             }
             else
             {
@@ -347,12 +347,14 @@ namespace xrock_gui_model
         {
         case MenuActions::LOAD_MODEL:
         {
-            widget->loadModel();
+            // TODO: Create function in XRockGUI or in DBInterface or somewhere else
+            //widget->loadModel();
             break;
         }
         case MenuActions::SAVE_MODEL:
         {
-            widget->saveModel();
+            // TODO: Create function in XRockGUI or in DBInterface or somewhere else
+            //widget->saveModel();
             break;
         }
         case MenuActions::TOGGLE_MODEL_WIDGET:
@@ -369,7 +371,8 @@ namespace xrock_gui_model
         }
         case MenuActions::STORE_MODEL_TO_DB: // store model
         {
-            widget->storeModel();
+            // TODO: Create function in XRockGUI or in DBInterface or somewhere else
+            //widget->storeModel();
             break;
         }
         case MenuActions::EXPORT_CND:
@@ -406,7 +409,8 @@ namespace xrock_gui_model
         case MenuActions::EDIT_LOCAL_MAP:
         {
             // 20221102 MS: Did not work for me. Is this relevant?
-            widget->editLocalMap();
+            // TODO: Create function in XRockGUI or in DBInterface or somewhere else
+            //widget->editLocalMap();
             break;
         }
         case MenuActions::CREATE_BAGEL_MOTION_CONTROL_TASK:
@@ -457,7 +461,8 @@ namespace xrock_gui_model
                     map["interfaces"] = interfaces["i"].toYamlString();
 
                     map["versions"][0]["defaultConfiguration"]["data"]["config"]["graphFilename"] = graphFile;
-                    widget->setModelInfo(map);
+                    // TODO: Call different function for that
+                    //widget->setModelInfo(map);
                 }
             }
             break;
@@ -476,7 +481,8 @@ namespace xrock_gui_model
         }
         case MenuActions::EDIT_MODEL_DESCRIPTION:
         {
-            widget->editDescription();
+            // TODO: What is this for?
+            //widget->editDescription();
             break;
         }
         case MenuActions::EXPORT_CND_AND_LAUNCH:
@@ -623,7 +629,8 @@ namespace xrock_gui_model
                 {
                     ConfigMap newModel = db->requestModel(currentModel["domain"], currentModel["name"], currentModel["versions"][0]["name"], true);
                     // load updated model in new tab
-                    widget->loadModel(newModel);
+                    // TODO: Create function in XRockGUI for this
+                    //widget->loadModel(newModel);
                 }
                 else
                     QMessageBox::warning(nullptr, "Warning", "Nothing to reload.", QMessageBox::Ok);
@@ -723,7 +730,8 @@ namespace xrock_gui_model
                 map["versions"][0]["name"] = version;
                 map["versions"][0]["maturity"] = "INPROGRESS";
             }
-            widget->loadModel(map);
+            // TODO: Create function for this at XRockGUI
+            //widget->loadModel(map);
 
             // load smurf file and add components if not already included
             std::string smurfPath = "tmp/models/assembly/";
@@ -789,18 +797,19 @@ namespace xrock_gui_model
                     n -= step;
                 }
             }
-            widget->loadType("software", "PIPE", "v1.0.0");
-            widget->loadType("software", "SIN", "v1.0.0");
-            widget->loadType("software", "ASIN", "v1.0.0");
-            widget->loadType("software", "MOD", "v1.0.0");
-            widget->loadType("software", "POW", "v1.0.0");
-            widget->loadType("software", "TAN", "v1.0.0");
-            widget->loadType("software", "COS", "v1.0.0");
-            widget->loadType("software", "ABS", "v1.0.0");
-            widget->loadType("software", "DIV", "v1.0.0");
-            widget->loadType("software", "Timer", "v1.0.0");
-            widget->loadType("software", "Modulated_Sine", "v1.0.0");
-            widget->setEdition("software");
+            // TODO: This whole function is irrelevant
+            //widget->loadType("software", "PIPE", "v1.0.0");
+            //widget->loadType("software", "SIN", "v1.0.0");
+            //widget->loadType("software", "ASIN", "v1.0.0");
+            //widget->loadType("software", "MOD", "v1.0.0");
+            //widget->loadType("software", "POW", "v1.0.0");
+            //widget->loadType("software", "TAN", "v1.0.0");
+            //widget->loadType("software", "COS", "v1.0.0");
+            //widget->loadType("software", "ABS", "v1.0.0");
+            //widget->loadType("software", "DIV", "v1.0.0");
+            //widget->loadType("software", "Timer", "v1.0.0");
+            //widget->loadType("software", "Modulated_Sine", "v1.0.0");
+            //widget->setEdition("software");
         }
     }
 
@@ -823,7 +832,7 @@ namespace xrock_gui_model
         domain = mars::utils::tolower(domain);
         std::string type = modelName;
 
-        widget->loadType(domain, modelName, version);
+        //widget->loadType(domain, modelName, version);
         ComponentModelInterface *model = dynamic_cast<ComponentModelInterface *>(bagelGui->getCurrentModel());
         if (model)
         {
@@ -839,6 +848,7 @@ namespace xrock_gui_model
         }
     }
 
+    // TODO: Should be renamed to loadComponentModel()
     void XRockGUI::loadComponent(std::string domain, std::string modelName, std::string version)
     {
         ConfigMap map = db->requestModel(domain, modelName, version, !version.empty());
@@ -849,7 +859,8 @@ namespace xrock_gui_model
         }
         else
         {
-            widget->loadModel(map);
+            // TODO: Create function for this at XRockGUI
+            //widget->loadModel(map);
         }
     }
 
@@ -990,10 +1001,7 @@ namespace xrock_gui_model
     void XRockGUI::currentModelChanged(bagel_gui::ModelInterface *model)
     {
         widget->clear();
-        if (model)
-        {
-            widget->setModelInfo(model->getModelInfo());
-        }
+        widget->currentModelChanged(model);
     }
 
     void XRockGUI::changeNodeVersion(const std::string &name)
@@ -1225,7 +1233,7 @@ namespace xrock_gui_model
             std::string name = node["modelName"];
             std::string versionName = version;
             std::string type = name + "::" + versionName;
-            widget->loadType(domain, name, versionName);
+            //widget->loadType(domain, name, versionName);
             if (!model->hasNodeInfo(type))
             {
                 type = name;
@@ -1629,7 +1637,8 @@ namespace xrock_gui_model
         }
         map["modelPath"] = mars::utils::getPathOfFile(fileName);
         map.toYamlFile("da.yml");
-        widget->loadModel(map);
+        // TODO: Create function in XRockGUI for that
+        //widget->loadModel(map);
     }
 
     void XRockGUI::nodeContextClicked(const std::string name)

@@ -9,6 +9,7 @@
 
 #include <mars/main_gui/BaseWidget.h>
 #include <configmaps/ConfigMap.hpp>
+#include "ComponentModelInterface.hpp"
 
 #include <QWidget>
 #include <QListWidget>
@@ -43,62 +44,42 @@ namespace xrock_gui_model
                     bagel_gui::BagelGui *bagelGui, XRockGUI *xrockGui,
                     QWidget *parent = 0);
         ~ComponentModelEditorWidget();
-        void createMap(configmaps::ConfigMap *m);
-        void loadModel(const std::string &file);
-        void loadModel(configmaps::ConfigMap &m);
-        void loadGraph(configmaps::ConfigMap &map);
-        void saveGraph(configmaps::ConfigMap &output,
-                       configmaps::ConfigMap &interfaceMap,
-                       configmaps::ConfigMap &descriptionMap,
-                       const std::string &saveDomain);
         void clear();
-        void setModelInfo(configmaps::ConfigMap &model);
         void deinit();
         void setEdition(const std::string &domain);
-        void editLocalMap();
-        void editDescription();
 
     public slots:
-        void checkMechanics(int v);
-        void checkElectronics(int v);
-        void checkSoftware(int v);
-        void checkBehavior(int v);
-        void checkComputation(int v);
+        // This function/slot should get called whenever the current model has been changed externally
+        void currentModelChanged(bagel_gui::ModelInterface *model);
+        // This function/slot should get called whenever we have edited some of the model data (in e.g. the fields)
+        void updateModel();
+
+        void setViewFilter(int v);
         void layoutsClicked(const QModelIndex &index);
         void addRemoveLayout();
-        void addComponent();
-        void loadModel();
-        void saveModel();
-        void storeModel();
-        void requestModel();
-        void loadType(const std::string &domain, const std::string &name,
-                      const std::string &version);
-        void updateModelInfo();
-        void getModelInfo(std::string *domain, std::string *name, std::string *verison);
         void openUrl(const QUrl &);
         void validateYamlSyntax();
+
+    // TODO: Need a signal to notify others about changes in the fields. Used to update the current model values.
 
     private:
         bagel_gui::BagelGui *bagelGui;
         XRockGUI *xrockGui;
+        bagel_gui::ModelInterface* currentModel;
+
         QListWidget *layouts;
-        std::string currentLayout, modelPath, edition;
-        std::map<std::string, QCheckBox *> checkMap;
-        configmaps::ConfigMap localMap, layoutMap;
+        configmaps::ConfigMap layoutMap;
+        std::string currentLayout, edition;
+        std::map<std::string, QCheckBox *> layoutCheckBoxes;
         QLineEdit *name, *type, *version, *layoutName, *maturity;
         QComboBox *domain;
         QLineEdit *projectName, *designedBy;
         QTextEdit *includes, *annotations, *interfaces;
         QLabel *dataStatusLabel;
-        configmaps::ConfigMap interfaceMap;
+
         bool ignoreUpdate;
-        std::vector<std::string> xrockConfigFilter;
         void handleEditionLayout();
         void updateCurrentLayout();
-
-        // this function is called from loadGraph()
-        void loadNode(configmaps::ConfigMap &node, configmaps::ConfigMap &config);
-        configmaps::ConfigMap getDefaultConfig(const std::string &domain, const std::string &name, const std::string &version);
     };
 
 } // end of namespace xrock_gui_model

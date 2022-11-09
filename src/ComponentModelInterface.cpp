@@ -81,8 +81,13 @@ namespace xrock_gui_model
         edition = "";
     }
 
-    ComponentModelInterface::ComponentModelInterface(const ComponentModelInterface *other) : ModelInterface(other->bagelGui),
-                                       infoMap(other->infoMap), edition("")
+    ComponentModelInterface::ComponentModelInterface(const ComponentModelInterface *other)
+        : ModelInterface(other->bagelGui),
+          nodeMap(other->nodeMap),
+          edgeMap(other->edgeMap),
+          infoMap(other->infoMap),
+          modelInfo(other->modelInfo),
+          edition("")
     {
     }
 

@@ -38,6 +38,8 @@ namespace xrock_gui_model
             size_t i = 0;
             // 20221107 MS: Why does this widget set a model path?
 
+
+            // 20221109 MS: TODO: Make the creation of the labels/editable fields generic (by parsing the toplvl ComponentModel properties)
             QLabel* l = new QLabel("domain");
             layout->addWidget(l, i, 0);
             domain = new QComboBox();
@@ -172,15 +174,20 @@ namespace xrock_gui_model
 
     void ComponentModelEditorWidget::currentModelChanged(bagel_gui::ModelInterface *model)
     {
-        currentModel = dynamic_cast<ComponentModelInterface *>(model);
+        ComponentModelInterface* newModel = dynamic_cast<ComponentModelInterface *>(model);
+        if (!newModel) return;
+        currentModel = nullptr;
         // TODO: Update all fields with the info given by the map. We should NOT trigger textChanged() though!
-        // where is the original data in ComponentModelInterface?
+        auto info = newModel->getModelInfo();
+        name->setText(QString::fromStdString(info["name"]));
+        // Set the newModel to be the current model
+        currentModel = newModel;
     }
 
     void ComponentModelEditorWidget::updateModel()
     {
+        if (!currentModel) return;
         // TODO: Read out the fields and update the model properties of the currentModel
-        // where is the original data in ComponentModelInterface?
     }
 
     void ComponentModelEditorWidget::setViewFilter(int v)

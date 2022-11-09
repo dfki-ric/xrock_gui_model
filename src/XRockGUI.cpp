@@ -52,7 +52,7 @@ namespace xrock_gui_model
         return result;
     }
 
-    XRockGUI::XRockGUI(lib_manager::LibManager *theManager) : lib_manager::LibInterface(theManager), model(NULL)
+    XRockGUI::XRockGUI(lib_manager::LibManager *theManager) : lib_manager::LibInterface(theManager)
     {
         initConfig();
         initBagelGui();
@@ -140,9 +140,9 @@ namespace xrock_gui_model
         bagelGui = libManager->getLibraryAs<BagelGui>("bagel_gui");
         if (bagelGui)
         {
-            model = new ComponentModelInterface(bagelGui);
+            // NOTE: addModelInterface() is actually a registerModelInterface() function to setup a factory
+            ComponentModelInterface* model = new ComponentModelInterface(bagelGui);
             bagelGui->addModelInterface("xrock", model);
-            bagelGui->createView("xrock", "Model");
             bagelGui->addPlugin(this);
         }
         else
@@ -279,7 +279,7 @@ namespace xrock_gui_model
                 modelName != std::string("") &&
                 version != std::string(""))
             {
-                loadComponent(domain, modelName, version);
+                loadComponentModel(domain, modelName, version);
                 ComponentModelInterface *model = dynamic_cast<ComponentModelInterface *>(bagelGui->getCurrentModel());
                 if (model)
                 {
@@ -334,11 +334,6 @@ namespace xrock_gui_model
         outputFile << "status : " << statusId << std::endl;
         outputFile << "message : " << message << std::endl;
         outputFile.close();
-    }
-
-    ComponentModelInterface *XRockGUI::getModelInstance()
-    {
-        return model;
     }
 
     void XRockGUI::menuAction(int action, bool checked)
@@ -848,19 +843,25 @@ namespace xrock_gui_model
         }
     }
 
-    // TODO: Should be renamed to loadComponentModel()
-    void XRockGUI::loadComponent(std::string domain, std::string modelName, std::string version)
+    void XRockGUI::loadComponentModel(std::string domain, std::string modelName, std::string version)
     {
         ConfigMap map = db->requestModel(domain, modelName, version, !version.empty());
-        std::cout << "loadComponent: " << map.toJsonString() << std::endl;
+        std::cout << "loadComponentModel: " << map.toJsonString() << std::endl;
+        // 20221109 MS: What is this importToBagel? Can this be removed?
         if (importToBagel)
         {
             mechanicsToBagel(map);
         }
         else
         {
-            // TODO: Create function for this at XRockGUI
-            //widget->loadModel(map);
+            // Create view will setup a NEW instance of a component model interface
+            bagelGui->createView("xrock", map["name"]);
+            ComponentModelInterface* model = dynamic_cast<ComponentModelInterface*>(bagelGui->getCurrentModel());
+            // Set the model info of the ComponentModelInterface
+            // TODO: Do we handle the inner structure or should setModelInfo() do it?
+            model->setModelInfo(map);
+            // Afterwards we have to (re-)trigger the currentModelChanged() function
+            currentModelChanged(model);
         }
     }
 
@@ -1676,7 +1677,7 @@ namespace xrock_gui_model
             std::string domain = node["domain"];
             std::string version = node["modelVersion"];
             std::string model_name = node["modelName"];
-            loadComponent(domain, model_name, version);
+            loadComponentModel(domain, model_name, version);
         }
         else if (name == "show description")
         {

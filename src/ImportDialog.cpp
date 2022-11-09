@@ -194,7 +194,7 @@ namespace xrock_gui_model
         {
             if (load)
             {
-                xrockGui->loadComponent(selectedDomain, selectedModel, selectedVersion);
+                xrockGui->loadComponentModel(selectedDomain, selectedModel, selectedVersion);
             }
             else
             {

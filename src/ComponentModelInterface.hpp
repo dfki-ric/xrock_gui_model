@@ -58,6 +58,7 @@ namespace xrock_gui_model
         std::map<unsigned long, configmaps::ConfigMap> nodeMap;
         std::map<unsigned long, configmaps::ConfigMap> edgeMap;
         std::map<std::string, osg_graph_viz::NodeInfo> infoMap;
+        // This config map should contain the ORIGINAL info of the component model.
         configmaps::ConfigMap modelInfo;
         std::string edition;
 

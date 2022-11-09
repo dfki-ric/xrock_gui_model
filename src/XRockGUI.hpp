@@ -83,8 +83,6 @@ namespace xrock_gui_model
 
         CREATE_MODULE_INFO();
 
-        ComponentModelInterface *getModelInstance();
-
         // CFGClient methods
         virtual void cfgUpdateProperty(mars::cfg_manager::cfgPropertyStruct _property);
 
@@ -117,13 +115,12 @@ namespace xrock_gui_model
 
         // public slots:
         void addComponent(std::string domain, std::string modelName, std::string version, std::string nodeName = "");
-        void loadComponent(std::string domain, std::string modelName, std::string version);
+        void loadComponentModel(std::string domain, std::string modelName, std::string version);
         void applyConfiguration(configmaps::ConfigMap &map);
         std::unique_ptr<DBInterface> db;
 
     private:
         std::map<std::string, configmaps::ConfigMap> modelCache;
-        ComponentModelInterface *model; // 20221103 MS: This is currently used by one function only. Others use bagelGui->getCurrentModel(). Can it be removed?
         mars::main_gui::GuiInterface *gui;
         bagel_gui::BagelGui *bagelGui;
         ComponentModelEditorWidget *widget;

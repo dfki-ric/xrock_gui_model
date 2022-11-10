@@ -342,6 +342,7 @@ namespace xrock_gui_model
             ConfigMapHelper::unpackSubmodel(info.map["data"], model["versions"][versionIndex]["components"]["configuration"]["nodes"]);
         }
         info.type = type;
+        // NOTE: This info is really needed such that other plugins can distinguish the maps.
         info.map["NodeClass"] = "xrock";
         infoMap[info.type] = info;
 
@@ -724,13 +725,28 @@ namespace xrock_gui_model
         return ConfigMap();
     }
 
+    // This function gets called whenever the XRockGui has updates for the current model.
+    // E.g. initially the loadComponentModel() function will pass all data to here.
     void ComponentModelInterface::setModelInfo(configmaps::ConfigMap &map)
     {
+        // NOTE: modelInfo holds the original data. So we just copy over.
         modelInfo = map;
+        // NOTE: bagelInfo holds the transformed version of the original data to be passed down to the bagelGui.
+        ConfigMap bi(modelInfo);
+        // TODO: Perform transformations
+        // When finished, pass the data to bagelInfo
+        bagelInfo = bi;
     }
 
+    // This function gets called whenever the XRockGui wants to know the current status of the model.
+    // It could be that the model has been altered by the bagelGui, so we have to perform inverse trafos here
     configmaps::ConfigMap &ComponentModelInterface::getModelInfo()
     {
+        // NOTE: bagelInfo holds the data which might have been altered.
+        ConfigMap mi(modelInfo);
+        // TODO: Peform inverse transformations to update modelInfo based on (possibly altered) bagelInfo
+        // When finished, update modelInfo and return it
+        modelInfo = mi;
         return modelInfo;
     }
 

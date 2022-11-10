@@ -65,7 +65,7 @@ namespace xrock_gui_model
     private:
         bagel_gui::BagelGui *bagelGui;
         XRockGUI *xrockGui;
-        bagel_gui::ModelInterface* currentModel;
+        bagel_gui::ModelInterface* currentModel = nullptr;
 
         QListWidget *layouts;
         configmaps::ConfigMap layoutMap;

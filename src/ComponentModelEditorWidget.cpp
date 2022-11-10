@@ -99,13 +99,13 @@ namespace xrock_gui_model
             l = new QLabel("Layout:");
             gridLayout->addWidget(l, 0, 0);
             i = 0;
-            for (const auto a : allowed)
+            for (const auto allowed : cm->get_allowed_property_values("domain"))
             {
-                QCheckBox *check = new QCheckBox(QString::fromStdString(a));
+                QCheckBox *check = new QCheckBox(QString::fromStdString(allowed));
                 check->setChecked(true);
                 connect(check, SIGNAL(stateChanged(int)), this, SLOT(setViewFilter(int)));
                 gridLayout->addWidget(check, i / 2, i % 2 + 1);
-                layoutCheckBoxes[a] = check;
+                layoutCheckBoxes[allowed] = check;
                 i++;
             }
             vLayout->addLayout(gridLayout);

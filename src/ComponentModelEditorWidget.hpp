@@ -72,9 +72,7 @@ namespace xrock_gui_model
         configmaps::ConfigMap layoutMap;
         std::string currentLayout, edition;
         std::map<std::string, QCheckBox *> layoutCheckBoxes;
-        QLineEdit *name, *type, *version, *layoutName, *maturity;
-        QComboBox *domain;
-        QLineEdit *projectName, *designedBy;
+        QLineEdit *layoutName;
         QTextEdit *includes, *annotations, *interfaces;
         QLabel *dataStatusLabel;
 

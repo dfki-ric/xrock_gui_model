@@ -59,6 +59,10 @@ namespace xrock_gui_model
         void addRemoveLayout();
         void openUrl(const QUrl &);
         void validateYamlSyntax();
+        // update property widget with the name and value
+        void update_prop_widget(const std::string &prop_name, const std::string &value);
+        // get the text by name
+        std::string get_prop_widget_text(const std::string &prop_name);
 
     // TODO: Need a signal to notify others about changes in the fields. Used to update the current model values.
 

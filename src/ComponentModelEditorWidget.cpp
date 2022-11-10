@@ -161,17 +161,42 @@ namespace xrock_gui_model
         currentModel = nullptr;
         // TODO: Update all fields with the info given by the map. We should NOT trigger textChanged() though!
         auto info = newModel->getModelInfo();
-        name->setText(QString::fromStdString(info["name"]));
+        this->update_prop_widget("name", info["name"]);
         // Set the newModel to be the current model
         // which will also allow updates to the model via updateModel()
         currentModel = newModel;
     }
 
+    void ComponentModelEditorWidget::update_prop_widget(const std::string &prop_name, const std::string &value)
+    {
+        for (auto &[label, widget] : widgets)
+        {
+            if (label->text().toStdString() == prop_name)
+            {
+                dynamic_cast<QLineEdit *>(widget)->setText(QString::fromStdString(value));
+                break;
+            }
+        }
+    }
+    std::string ComponentModelEditorWidget::get_prop_widget_text(const std::string &prop_name)
+    {
+        for (auto &[label, widget] : widgets)
+        {
+            if (label->text().toStdString() == prop_name)
+            {
+                if (QComboBox *cb = dynamic_cast<QComboBox *>(widget))
+                    return cb->currentText().toStdString();
+
+                return dynamic_cast<QLineEdit *>(widget)->text().toStdString();
+            }
+        }
+        throw std::runtime_error("no prop found with name " + prop_name);
+    }
     void ComponentModelEditorWidget::updateModel()
     {
         if (!currentModel) return;
         ConfigMap updatedMap(currentModel->getModelInfo());
-        updatedMap["name"] = name->text().toStdString();
+        updatedMap["name"] = get_prop_widget_text("name");
         // TODO: Read out the other fields and update the model properties of the currentModel
         currentModel->setModelInfo(updatedMap);
     }

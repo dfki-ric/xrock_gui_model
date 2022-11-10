@@ -670,7 +670,7 @@ namespace xrock_gui_model
       if (!urdf_file.isNull())
       {
         ConfigMap map = bagelGui->createConfigMap();
-        exportCnd(map , urdf_file.toStdString(),fileName.toStdString());
+        exportCnd(map , fileName.toStdString(),urdf_file.toStdString());
       }
       break;
     }

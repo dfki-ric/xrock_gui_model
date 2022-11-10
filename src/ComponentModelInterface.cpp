@@ -27,6 +27,7 @@ namespace xrock_gui_model
         {
             config.append(ConfigMap::fromYamlFile(confDir + "/config.yml", true));
         }
+        // 20221110 MS: What are xrock_node_definitions?
         ConfigVector::iterator it = config["xrock_node_definitions"].begin();
         std::vector<std::string> searchPaths;
         for (; it != config["xrock_node_definitions"].end(); ++it)
@@ -49,7 +50,8 @@ namespace xrock_gui_model
                 loadNodeInfo(*it2);
             }
         }
-
+        
+        // 20221110 MS: Is this node still needed? It is a description node? Why do we need it? We can add a description property to the XType(s) instead.
         osg_graph_viz::NodeInfo info;
         info.numInputs = 0;
         info.numOutputs = 0;
@@ -60,6 +62,9 @@ namespace xrock_gui_model
         info.type = "DES";
         info.map["NodeClass"] = "GUINode";
         infoMap[info.type] = info;
+
+
+        // 20221110 MS: This functionality is not needed and clutters this class. We use orogen_to_xrock for this.
         if (config.hasKey("OrogenFolder"))
         {
             std::string orogenFolder = confDir + "/";
@@ -81,6 +86,7 @@ namespace xrock_gui_model
         edition = "";
     }
 
+    // TODO: Check whether all of this config maps need to be copied over.
     ComponentModelInterface::ComponentModelInterface(const ComponentModelInterface *other)
         : ModelInterface(other->bagelGui),
           nodeMap(other->nodeMap),
@@ -101,11 +107,13 @@ namespace xrock_gui_model
         return newModel;
     }
 
+    // 20221110 MS: What is this edition stuff doing?
     void ComponentModelInterface::setEdition(const std::string v)
     {
-        edition = tolower(v);
+        edition = v;
     }
 
+    // 20221110 MS: As far as i can see it, this stuff is needed for bagel only. It has nothing to do with XRock, right?
     void ComponentModelInterface::loadNodeInfo(std::string path, bool orogen)
     {
         if (path[path.size() - 1] != '/')
@@ -154,6 +162,9 @@ namespace xrock_gui_model
         return;
     }
 
+    // This function adds a node inside the GUI? This whole function is undocumented and a mystery!
+    // As far as i see it it generates/updates an infoMap entry from the original model
+    // So it should be named updateInfoMap()
     bool ComponentModelInterface::addNodeInfo(ConfigMap &model, std::string version)
     {
         if (!model.hasKey("domain"))
@@ -164,7 +175,8 @@ namespace xrock_gui_model
         int numOutputs = 0;
         int versionIndex = 0;
         std::string domain = model["domain"];
-        domain = tolower(domain);
+        //domain = tolower(domain); // 20221110 MS: Has been removed. We want the domain to be exactly the same as in the original model
+        // 20221110 MS: Why is the name the type here? Why don't we use the URI to identify the node?
         std::string type = model["name"];
 
         if (!version.empty())
@@ -186,6 +198,7 @@ namespace xrock_gui_model
             }
             if (infoMap.find(type) != infoMap.end())
             {
+                // 20221110 MS: Why is the version appended to the 'type' ? (which is 'name::version' in the end)
                 type += "::" + version;
             }
         }
@@ -196,12 +209,15 @@ namespace xrock_gui_model
 
         if (infoMap.find(type) != infoMap.end())
             return false;
+
         ConfigMap map, tmpMap;
         {
+            // 20221110 MS: This is shitty. We want 'type' to remain 'type'. Is this possible?
             if (model.hasKey("type"))
             {
                 map["xrock_type"] = model["type"];
             }
+            // 20221110 MS: Why is this not kept as 'version'?
             map["modelVersion"] = model["versions"][versionIndex]["name"];
             ConfigVector::iterator it = model["versions"][versionIndex]["interfaces"].begin();
             for (; it != model["versions"][versionIndex]["interfaces"].end(); ++it)
@@ -239,7 +255,7 @@ namespace xrock_gui_model
                     interface_["direction"] = "incoming";
                     if (!iDomain.empty())
                     {
-                        interface_["domain"] = tolower(iDomain);
+                        interface_["domain"] = iDomain;
                     }
                     tmpMap["inputs"].push_back(interface_);
                     ++numInputs;
@@ -252,7 +268,7 @@ namespace xrock_gui_model
                     interface_["direction"] = "outgoing";
                     if (!iDomain.empty())
                     {
-                        interface_["domain"] = tolower(iDomain);
+                        interface_["domain"] = iDomain;
                     }
                     tmpMap["outputs"].push_back(interface_);
                     ++numOutputs;
@@ -265,7 +281,7 @@ namespace xrock_gui_model
                     interface_["direction"] = "bidirectional";
                     if (!iDomain.empty())
                     {
-                        interface_["domain"] = tolower(iDomain);
+                        interface_["domain"] = iDomain;
                     }
                     map["inputs"].push_back(interface_);
                     map["outputs"].push_back(interface_);
@@ -332,6 +348,7 @@ namespace xrock_gui_model
         return true;
     }
 
+    // TODO: Is this function deprecated? Because we normally import orogen models from orogen_to_xrock script
     bool ComponentModelInterface::addOrogenInfo(ConfigMap &model)
     {
         // try to use the template to generate bagel node info
@@ -392,6 +409,7 @@ namespace xrock_gui_model
         return true;
     }
 
+    // 20221110 MS: This function adds an entry into the nodeMap
     // todo: document in what cases which addNode function is used
     bool ComponentModelInterface::addNode(unsigned long nodeId, configmaps::ConfigMap *node)
     {
@@ -431,6 +449,7 @@ namespace xrock_gui_model
         return addNode(nodeId, &map);
     }
 
+    // This function adds an entry in the edgeMap (while also checking compatibility)
     bool ComponentModelInterface::addEdge(unsigned long edgeId, configmaps::ConfigMap *edge)
     {
         ConfigMap &map = *edge;
@@ -590,34 +609,38 @@ namespace xrock_gui_model
         return infoMap;
     }
 
+    // This function removes a node from the nodeMap
     bool ComponentModelInterface::removeNode(unsigned long nodeId)
     {
         if (!edition.empty())
         {
             ConfigMap node = nodeMap[nodeId];
-            std::string nodeDomain = tolower((std::string)node["domain"]);
+            // 20221110 MS: We want the domain to be exactly the same as in the original
+            std::string nodeDomain = node["domain"];
             std::string nodeName = node["name"];
+            // 20221110 MS: What is this edition stuff?
             if (nodeDomain != edition)
             {
-                if (nodeDomain != "assembly")
+                if (nodeDomain != "ASSEMBLY") // TODO: Use XType domain info for that?
                 {
                     return false;
                 }
                 else
                 {
+                    // 20221110 MS: Why can we not remove a node if there are edges into other domains?
                     // check if there are no edges in other domains
                     for (auto it : edgeMap)
                     {
                         if ((std::string)it.second["fromNode"] == nodeName)
                         {
-                            if (tolower((std::string)it.second["domain"]) != edition)
+                            if ((std::string)it.second["domain"] != edition)
                             {
                                 return false;
                             }
                         }
                         if ((std::string)it.second["toNode"] == nodeName)
                         {
-                            if (tolower((std::string)it.second["domain"]) != edition)
+                            if ((std::string)it.second["domain"] != edition)
                             {
                                 return false;
                             }
@@ -631,6 +654,7 @@ namespace xrock_gui_model
         return true;
     }
 
+    // This function removed an edge from the edgeMap
     bool ComponentModelInterface::removeEdge(unsigned long edgeId)
     {
         if (edgeMap.find(edgeId) == edgeMap.end())
@@ -639,7 +663,7 @@ namespace xrock_gui_model
         }
 
         ConfigMap &edge = edgeMap[edgeId];
-        if (!edition.empty() && tolower((std::string)edge["domain"]) != edition)
+        if (!edition.empty() && (std::string)edge["domain"] != edition)
         {
             return false;
         }
@@ -648,6 +672,7 @@ namespace xrock_gui_model
         return true;
     }
 
+    // This function updates an existing node in the nodeMap.
     bool ComponentModelInterface::updateNode(unsigned long nodeId,
                            configmaps::ConfigMap node)
     {
@@ -658,7 +683,7 @@ namespace xrock_gui_model
         {
             // todo: handle domain namespace in name
             std::string nodeName = node["name"];
-            std::string domain = tolower((std::string)node["domain"]);
+            std::string domain = (std::string)node["domain"];
             if (!edition.empty())
             {
                 if (edition != domain && nodeName != it->second["name"].getString())

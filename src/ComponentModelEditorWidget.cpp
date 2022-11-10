@@ -181,13 +181,17 @@ namespace xrock_gui_model
         auto info = newModel->getModelInfo();
         name->setText(QString::fromStdString(info["name"]));
         // Set the newModel to be the current model
+        // which will also allow updates to the model via updateModel()
         currentModel = newModel;
     }
 
     void ComponentModelEditorWidget::updateModel()
     {
         if (!currentModel) return;
-        // TODO: Read out the fields and update the model properties of the currentModel
+        ConfigMap updatedMap(currentModel->getModelInfo());
+        updatedMap["name"] = name->text().toStdString();
+        // TODO: Read out the other fields and update the model properties of the currentModel
+        currentModel->setModelInfo(updatedMap);
     }
 
     void ComponentModelEditorWidget::setViewFilter(int v)

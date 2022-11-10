@@ -285,7 +285,7 @@ namespace xrock_gui_model
                 {
                     model->setEdition(edition);
                 }
-                widget->setEdition(mars::utils::tolower(edition));
+                widget->setEdition(edition);
             }
             else
             {
@@ -824,7 +824,6 @@ namespace xrock_gui_model
     void XRockGUI::addComponent(std::string domain, std::string modelName, std::string version, std::string nodeName)
     {
         // create type name by using domain as namespace
-        domain = mars::utils::tolower(domain);
         std::string type = modelName;
 
         //widget->loadType(domain, modelName, version);

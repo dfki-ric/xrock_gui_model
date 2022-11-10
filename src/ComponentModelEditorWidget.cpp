@@ -37,55 +37,37 @@ namespace xrock_gui_model
             edition = "";
             size_t i = 0;
             // 20221107 MS: Why does this widget set a model path?
-
-
-            // 20221109 MS: TODO: Make the creation of the labels/editable fields generic (by parsing the toplvl ComponentModel properties)
-            QLabel* l = new QLabel("domain");
-            layout->addWidget(l, i, 0);
-            domain = new QComboBox();
             auto cm = std::make_shared<ComponentModel>();
-            auto allowed = cm->get_allowed_property_values("domain");
-            for (const auto a : allowed)
-                domain->addItem(QString::fromStdString(a));
-            layout->addWidget(domain, i++, 1);
-            connect(domain, SIGNAL(textChanged(const QString &)), this, SLOT(updateModel()));
+            const nl::json props = cm->get_properties();
+            for (auto it = props.begin(); it != props.end(); ++it)
+            {
+                if (it->is_null())
+                    continue; // skip for now..
 
-            l = new QLabel("name");
-            layout->addWidget(l, i, 0);
-            name = new QLineEdit("");
-            layout->addWidget(name, i++, 1);
-            connect(name, SIGNAL(textChanged(const QString &)), this, SLOT(updateModel()));
-
-            l = new QLabel("version");
-            layout->addWidget(l, i, 0);
-            version = new QLineEdit("");
-            layout->addWidget(version, i++, 1);
-            connect(version, SIGNAL(textChanged(const QString &)), this, SLOT(updateModel()));
-
-            l = new QLabel("type");
-            layout->addWidget(l, i, 0);
-            type = new QLineEdit("");
-            layout->addWidget(type, i++, 1);
-            connect(type, SIGNAL(textChanged(const QString &)), this, SLOT(updateModel()));
-
-            l = new QLabel("maturity");
-            layout->addWidget(l, i, 0);
-            maturity = new QLineEdit("");
-            maturity->setEnabled(false);
-            layout->addWidget(maturity, i++, 1);
-            connect(maturity, SIGNAL(textChanged(const QString &)), this, SLOT(updateModel()));
-
-            l = new QLabel("projectName");
-            layout->addWidget(l, i, 0);
-            projectName = new QLineEdit("");
-            layout->addWidget(projectName, i++, 1);
-            connect(projectName, SIGNAL(textChanged(const QString &)), this, SLOT(updateModel()));
-
-            l = new QLabel("designedBy");
-            layout->addWidget(l, i, 0);
-            designedBy = new QLineEdit("");
-            layout->addWidget(designedBy, i++, 1);
-            connect(designedBy, SIGNAL(textChanged(const QString &)), this, SLOT(updateModel()));
+                const QString key = QString::fromStdString(it.key());
+                const QString value = QString::fromStdString(it.value());
+                QLabel *label = new QLabel(key);
+                layout->addWidget(label, i, 0);
+                const auto allowed_values = cm->get_allowed_property_values(key.toStdString());
+                if (allowed_values.size() > 0)
+                {
+                    // if property has some allowed values, its a combobox
+                    QComboBox *combobox = new QComboBox();
+                    for (const auto &allowed : allowed_values)
+                        combobox->addItem(QString::fromStdString(allowed));
+                    layout->addWidget(combobox, i++, 1);
+                    connect(combobox, SIGNAL(textChanged(const QString &)), this, SLOT(updateModel()));
+                    widgets[label] = combobox;
+                }
+                else
+                {
+                    // if property has no allowed values, its a qlineedit
+                    QLineEdit *linedit = new QLineEdit();
+                    layout->addWidget(linedit, i++, 1);
+                    connect(linedit, SIGNAL(textChanged(const QString &)), this, SLOT(updateModel()));
+                    widgets[label] = linedit;
+                }
+            }
 
             // 20221107 MS: What are annotations?
             //l = new QLabel("annotations");
@@ -102,7 +84,7 @@ namespace xrock_gui_model
             //    connect(annotations, SIGNAL(textChanged()), this, SLOT(validateYamlSyntax()));
             //}
 
-            l = new QLabel("interfaces");
+            QLabel *l = new QLabel("interfaces");
             layout->addWidget(l, i, 0);
             interfaces = new QTextEdit();
             interfaces->setReadOnly(true);

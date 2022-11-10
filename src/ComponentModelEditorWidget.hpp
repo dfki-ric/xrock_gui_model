@@ -63,6 +63,7 @@ namespace xrock_gui_model
     // TODO: Need a signal to notify others about changes in the fields. Used to update the current model values.
 
     private:
+        std::map<QLabel *, QWidget *> widgets; // Generic list of label:
         bagel_gui::BagelGui *bagelGui;
         XRockGUI *xrockGui;
         bagel_gui::ModelInterface* currentModel = nullptr;

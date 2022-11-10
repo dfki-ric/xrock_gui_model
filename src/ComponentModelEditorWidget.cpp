@@ -373,13 +373,15 @@ namespace xrock_gui_model
     {
         ignoreUpdate = true;
         edition = "";
-        name->clear();
-        type->clear();
-        maturity->clear();
-        projectName->clear();
-        designedBy->clear();
-        version->clear();
-        //annotations->clear();
+
+        for (auto &[label, widget] : widgets)
+        {
+            if (QLineEdit *field = dynamic_cast<QLineEdit *>(widget))
+            {
+                field->clear();
+            }
+        }
+        // annotations->clear();
         interfaces->clear();
         layouts->clear();
         layoutMap = ConfigMap();

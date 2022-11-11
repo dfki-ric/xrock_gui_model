@@ -640,7 +640,6 @@ namespace xrock_gui_model
         default:
         {
             throw std::out_of_range("Cannot handle action " + std::to_string(action));
-            break;
         }
         }
     }
@@ -1227,6 +1226,7 @@ namespace xrock_gui_model
             }
 
             bagelGui->addNode(type, versionChangeName);
+            //PC 11.11.2022 : Why are we returning here? Can we omit the rest of the code for this method?
             return;
             ConfigMap nodeMap = *(bagelGui->getNodeMap(versionChangeName));
             // update node configuration
@@ -1586,7 +1586,6 @@ namespace xrock_gui_model
         // write shutdown cnd
         std::string shutdownFile = mars::utils::pathJoin(mars::utils::getPathOfFile(filename), "shutdown.cnd");
         FILE *f = fopen(shutdownFile.c_str(), "w");
-        fprintf(f, "deployments:\n\ntasks:\n\nconnections:\n\n");
         fclose(f);
     }
     void XRockGUI::importCND(const std::string &fileName)
@@ -1873,13 +1872,13 @@ namespace xrock_gui_model
         selectVersion(version);
     }
 
-    void XRockGUI::cfgUpdateProperty(mars::cfg_manager::cfgPropertyStruct p)
+    void XRockGUI::cfgUpdateProperty(mars::cfg_manager::cfgPropertyStruct property)
     {
-        if (p.paramId == dbAddress_paramId)
+        if (property.paramId == dbAddress_paramId)
         {
-            db->set_dbAddress(p.sValue);
+            db->set_dbAddress(property.sValue);
         }
-        else if (p.paramId == dbUser_paramId)
+        else if (property.paramId == dbUser_paramId)
         {
         }
     }

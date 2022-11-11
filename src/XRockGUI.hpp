@@ -84,7 +84,7 @@ namespace xrock_gui_model
         CREATE_MODULE_INFO();
 
         // CFGClient methods
-        virtual void cfgUpdateProperty(mars::cfg_manager::cfgPropertyStruct _property);
+        virtual void cfgUpdateProperty(mars::cfg_manager::cfgPropertyStruct property);
 
         // MenuInterface methods
         void menuAction(int action, bool checked = false);
@@ -101,7 +101,7 @@ namespace xrock_gui_model
         void selectVersion(const std::string &version);
         void exportCnd(const configmaps::ConfigMap &map_, const std::string &filename, const std::string &urdf_file = "");
         void exportCnd2(const configmaps::ConfigMap &map_, const std::string &filename);
-        void importCND(const std::string &filename);
+        void importCND(const std::string &fileName);
         void nodeContextClicked(const std::string name);
         void inPortContextClicked(const std::string name);
         void outPortContextClicked(const std::string name);

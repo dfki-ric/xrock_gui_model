@@ -29,7 +29,7 @@ namespace xrock_gui_model
                                                    const std::string &model,
                                                    const std::string &version,
                                                    const bool limit = false) override;
-        virtual bool storeModel(const configmaps::ConfigMap &map);
+        virtual bool storeModel(const configmaps::ConfigMap &map) override;
 
         virtual void set_dbGraph(const std::string &_dbGraph) override;
         virtual void set_dbPath(const fs::path &_dbPath);

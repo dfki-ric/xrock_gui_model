@@ -105,9 +105,6 @@ void ToolbarBackend::on_backend_changed(const QString &new_backend)
         le_url->setEnabled(true);
         le_port->setEnabled(true);
         le_db_path->setDisabled(true);
-
-        //main_gui->disableToolbarLineEdit({1});
-        //main_gui->enableToolbarLineEdit({2, 3, 4});
     }
     else if (new_backend == "MultiDbClient")
         xrockGui->menuAction(static_cast<int>(MenuActions::SELECT_MULTIDB));

@@ -41,7 +41,7 @@ namespace xrock_gui_model
 
     private slots:
         void on_backend_changed(const QString &new_backend);
-        void on_db_path_changed(const QString &str);
+        void on_db_path_changed(const QString &db_path);
         void on_url_changed(const QString &url);
         void on_port_changed(const QString &port);
         void on_graph_changed(const QString &graph);

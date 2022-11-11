@@ -16,7 +16,7 @@ namespace xrock_gui_model
     {
     public:
         explicit ComponentModelInterface(bagel_gui::BagelGui *bagelGui);
-        ComponentModelInterface(const ComponentModelInterface *other);
+        explicit ComponentModelInterface(const ComponentModelInterface *other);
         ~ComponentModelInterface();
 
         bagel_gui::ModelInterface *clone();

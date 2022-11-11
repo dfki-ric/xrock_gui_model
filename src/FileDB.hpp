@@ -26,7 +26,7 @@ namespace xrock_gui_model
                                            const std::string &model,
                                            const std::string &version,
                                            const bool limit = false) override;
-        bool storeModel(const configmaps::ConfigMap &map_);
+        bool storeModel(const configmaps::ConfigMap &map_) override;;
 
         void set_dbAddress(const std::string & db_Address) override;
 

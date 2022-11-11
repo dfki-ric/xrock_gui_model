@@ -60,9 +60,6 @@ namespace xrock_gui_model
         void setModelInfo(configmaps::ConfigMap &map);
         configmaps::ConfigMap &getModelInfo();
 
-        // TODO: Remove ALL edition stuff as this is deprecated (old DROCK stuff)
-        void setEdition(std::string v);
-
         // NOTE: If requested by the user, this function resets the node configuration to be the default config of the associated component model
         void resetConfig(configmaps::ConfigMap &map);
 
@@ -78,9 +75,6 @@ namespace xrock_gui_model
         // This config map stores the derived bagel model (based on the original model)
         // If this has changed by editing the model in the GUI the orignal model has to be updated
         configmaps::ConfigMap bagelInfo;
-
-        // TODO: What is edition?
-        std::string edition;
 
         void loadNodeInfo(std::string path, bool orogen = false); // NOTE: Needed for bagel/shader stuff. Could be moved to XRockGui itself
         bool addOrogenInfo(configmaps::ConfigMap &model); // DEPRECATED

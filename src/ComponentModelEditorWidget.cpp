@@ -31,10 +31,8 @@ namespace xrock_gui_model
     {
         try
         {
-            ignoreUpdate = false;
             QGridLayout *layout = new QGridLayout();
             QVBoxLayout *vLayout = new QVBoxLayout();
-            edition = "";
             size_t i = 0;
             // 20221107 MS: Why does this widget set a model path?
             auto cm = std::make_shared<ComponentModel>();
@@ -158,7 +156,6 @@ namespace xrock_gui_model
     {
         ComponentModelInterface* newModel = dynamic_cast<ComponentModelInterface *>(model);
         if (!newModel) return;
-        currentModel = nullptr;
         // TODO: Update all fields with the info given by the map. We should NOT trigger textChanged() though!
         auto info = newModel->getModelInfo();
         this->update_prop_widget("name", info["name"]);
@@ -207,23 +204,6 @@ namespace xrock_gui_model
         {
             bagelGui->setViewFilter(label, checkbox->isChecked());
         }
-    }
-
-    void ComponentModelEditorWidget::setEdition(const std::string &domain)
-    {
-        this->edition = domain;
-        for (auto it : layoutCheckBoxes)
-        {
-            if (it.first == domain)
-            {
-                it.second->setChecked(true);
-            }
-            else
-            {
-                it.second->setChecked(false);
-            }
-        }
-        handleEditionLayout();
     }
 
     void ComponentModelEditorWidget::layoutsClicked(const QModelIndex &index)
@@ -313,67 +293,10 @@ namespace xrock_gui_model
         }
     }
 
-    void ComponentModelEditorWidget::handleEditionLayout()
-    {
-        try
-        {
-            // if possible set the layout depending on the edition
-            if (!edition.empty())
-            {
-                bool found = false;
-                if (layoutMap.size())
-                {
-                    for (auto it : layoutMap)
-                    {
-                        if (it.first == edition)
-                        {
-                            found = true;
-                            currentLayout = edition;
-                            bagelGui->applyLayout(it.second);
-                            for (int i = 0; i < layouts->count(); ++i)
-                            {
-                                QVariant v = layouts->item(i)->data(0);
-                                if (v.isValid())
-                                {
-                                    std::string layout = v.toString().toStdString();
-                                    if (layout == edition)
-                                    {
-                                        layouts->setCurrentItem(layouts->item(i));
-                                        break;
-                                    }
-                                }
-                            }
-                            break;
-                        }
-                    }
-                }
-                if (!found)
-                {
-                    // create a layout for the used edition
-                    updateCurrentLayout();
-                    layouts->addItem(edition.c_str());
-                    layouts->setCurrentItem(layouts->item(layouts->count() - 1));
-                    currentLayout = edition;
-                    updateCurrentLayout();
-                    updateModel();
-                }
-            }
-        }
-        catch (const std::exception &e)
-        {
-            std::stringstream ss;
-            ss << "Exception thrown: " << e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n'
-               << "\tAt " << __PRETTY_FUNCTION__ << '\n';
-            QMessageBox::warning(nullptr, "Warning", QString::fromStdString(ss.str()), QMessageBox::Ok);
-        }
-    }
-
-
     void ComponentModelEditorWidget::clear()
     {
-        ignoreUpdate = true;
-        edition = "";
-
+        // NOTE: Before clearing the fields, we have to set currentModel to null to prevent updateModel() to be triggered
+        currentModel = nullptr;
         for (auto &[label, widget] : widgets)
         {
             if (QLineEdit *field = dynamic_cast<QLineEdit *>(widget))
@@ -385,7 +308,6 @@ namespace xrock_gui_model
         interfaces->clear();
         layouts->clear();
         layoutMap = ConfigMap();
-        ignoreUpdate = false;
     }
 
 

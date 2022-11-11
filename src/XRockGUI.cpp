@@ -233,22 +233,18 @@ namespace xrock_gui_model
             std::string domain = "";
             std::string modelName = "";
             std::string version = "";
-            std::string edition = "";
             cfg->getPropertyValue("Config", "domain", "value", &domain);
             cfg->getPropertyValue("Config", "model", "value", &modelName);
             cfg->getPropertyValue("Config", "version", "value", &version);
-            cfg->getPropertyValue("Config", "edition", "value", &edition);
-            edition = mars::utils::toupper(edition);
             if (domain != std::string("") &&
                 modelName != std::string("") &&
-                version != std::string("") &&
-                edition != std::string(""))
+                version != std::string("")) 
             {
                 // set modelInfo with given information
                 ConfigMap modelInfo;
                 modelInfo["name"] = modelName;
-                modelInfo["type"] = std::string("system_modelling::") + (edition == "COMPUTATION" ? std::string("hardware_graph") : std::string("task_graph")) + std::string("::Network");
-                modelInfo["domain"] = edition;
+                modelInfo["type"] = std::string("system_modelling::") +  std::string("::Network");
+                modelInfo["domain"] = domain;
                 modelInfo["data"] = std::string("");
                 modelInfo["version"] = version;
                 modelInfo["interfaces"] = std::string("");
@@ -270,22 +266,14 @@ namespace xrock_gui_model
             std::string domain = "";
             std::string modelName = "";
             std::string version = "";
-            std::string edition = "";
             cfg->getPropertyValue("Config", "domain", "value", &domain);
             cfg->getPropertyValue("Config", "model", "value", &modelName);
             cfg->getPropertyValue("Config", "version", "value", &version);
-            cfg->getPropertyValue("Config", "edition", "value", &edition);
             if (domain != std::string("") &&
                 modelName != std::string("") &&
                 version != std::string(""))
             {
                 loadComponentModel(domain, modelName, version);
-                ComponentModelInterface *model = dynamic_cast<ComponentModelInterface *>(bagelGui->getCurrentModel());
-                if (model)
-                {
-                    model->setEdition(edition);
-                }
-                widget->setEdition(edition);
             }
             else
             {
@@ -804,7 +792,6 @@ namespace xrock_gui_model
             //widget->loadType("software", "DIV", "v1.0.0");
             //widget->loadType("software", "Timer", "v1.0.0");
             //widget->loadType("software", "Modulated_Sine", "v1.0.0");
-            //widget->setEdition("software");
         }
     }
 

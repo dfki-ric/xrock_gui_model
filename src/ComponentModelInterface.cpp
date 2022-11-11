@@ -83,7 +83,6 @@ namespace xrock_gui_model
             orogenFolder += (std::string)config["OrogenFolder"];
             loadNodeInfo(orogenFolder, true);
         }
-        edition = "";
     }
 
     // TODO: Check whether all of this config maps need to be copied over.
@@ -92,8 +91,7 @@ namespace xrock_gui_model
           nodeMap(other->nodeMap),
           edgeMap(other->edgeMap),
           infoMap(other->infoMap),
-          modelInfo(other->modelInfo),
-          edition("")
+          modelInfo(other->modelInfo)
     {
     }
 
@@ -105,12 +103,6 @@ namespace xrock_gui_model
     {
         ComponentModelInterface *newModel = new ComponentModelInterface(this);
         return newModel;
-    }
-
-    // 20221110 MS: What is this edition stuff doing?
-    void ComponentModelInterface::setEdition(const std::string v)
-    {
-        edition = v;
     }
 
     // 20221110 MS: As far as i can see it, this stuff is needed for bagel only. It has nothing to do with XRock, right?
@@ -613,44 +605,6 @@ namespace xrock_gui_model
     // This function removes a node from the nodeMap
     bool ComponentModelInterface::removeNode(unsigned long nodeId)
     {
-        if (!edition.empty())
-        {
-            ConfigMap node = nodeMap[nodeId];
-            // 20221110 MS: We want the domain to be exactly the same as in the original
-            std::string nodeDomain = node["domain"];
-            std::string nodeName = node["name"];
-            // 20221110 MS: What is this edition stuff?
-            if (nodeDomain != edition)
-            {
-                if (nodeDomain != "ASSEMBLY") // TODO: Use XType domain info for that?
-                {
-                    return false;
-                }
-                else
-                {
-                    // 20221110 MS: Why can we not remove a node if there are edges into other domains?
-                    // check if there are no edges in other domains
-                    for (auto it : edgeMap)
-                    {
-                        if ((std::string)it.second["fromNode"] == nodeName)
-                        {
-                            if ((std::string)it.second["domain"] != edition)
-                            {
-                                return false;
-                            }
-                        }
-                        if ((std::string)it.second["toNode"] == nodeName)
-                        {
-                            if ((std::string)it.second["domain"] != edition)
-                            {
-                                return false;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         nodeMap.erase(nodeId);
         return true;
     }
@@ -661,12 +615,6 @@ namespace xrock_gui_model
         if (edgeMap.find(edgeId) == edgeMap.end())
         {
             return true;
-        }
-
-        ConfigMap &edge = edgeMap[edgeId];
-        if (!edition.empty() && (std::string)edge["domain"] != edition)
-        {
-            return false;
         }
 
         edgeMap.erase(edgeId);
@@ -685,14 +633,6 @@ namespace xrock_gui_model
             // todo: handle domain namespace in name
             std::string nodeName = node["name"];
             std::string domain = (std::string)node["domain"];
-            if (!edition.empty())
-            {
-                if (edition != domain && nodeName != it->second["name"].getString())
-                {
-                    std::cerr << "ERROR: change node name of non " << edition.c_str() << " nodes is not allowed!" << std::endl;
-                    return false;
-                }
-            }
             it->second = node;
             return true;
         }

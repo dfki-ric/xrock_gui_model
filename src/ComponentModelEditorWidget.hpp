@@ -46,7 +46,6 @@ namespace xrock_gui_model
         ~ComponentModelEditorWidget();
         void clear();
         void deinit();
-        void setEdition(const std::string &domain);
 
     public slots:
         // This function/slot should get called whenever the current model has been changed externally
@@ -74,14 +73,12 @@ namespace xrock_gui_model
 
         QListWidget *layouts;
         configmaps::ConfigMap layoutMap;
-        std::string currentLayout, edition;
+        std::string currentLayout;
         std::map<std::string, QCheckBox *> layoutCheckBoxes;
         QLineEdit *layoutName;
         QTextEdit *includes, *annotations, *interfaces;
         QLabel *dataStatusLabel;
 
-        bool ignoreUpdate;
-        void handleEditionLayout();
         void updateCurrentLayout();
     };
 

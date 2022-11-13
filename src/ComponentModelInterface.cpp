@@ -61,7 +61,7 @@ namespace xrock_gui_model
         info.map["font_size"] = 28.;
         info.type = "DES";
         info.map["NodeClass"] = "GUINode";
-        infoMap[info.type] = info;
+        nodeInfoMap[info.type] = info;
 
 
         // 20221110 MS: This functionality is not needed and clutters this class. We use orogen_to_xrock for this.
@@ -90,8 +90,8 @@ namespace xrock_gui_model
         : ModelInterface(other->bagelGui),
           nodeMap(other->nodeMap),
           edgeMap(other->edgeMap),
-          infoMap(other->infoMap),
-          modelInfo(other->modelInfo)
+          nodeInfoMap(other->nodeInfoMap),
+          basicModel(other->basicModel)
     {
     }
 
@@ -155,7 +155,7 @@ namespace xrock_gui_model
     }
 
     // This function adds a node inside the GUI? This whole function is undocumented and a mystery!
-    // As far as i see it it generates/updates an infoMap entry from the original model
+    // As far as i see it it generates/updates an nodeInfoMap entry from the original model
     // So it should be named updateInfoMap()
     bool ComponentModelInterface::addNodeInfo(ConfigMap &model, std::string version)
     {
@@ -188,7 +188,7 @@ namespace xrock_gui_model
                 std::cerr << "version " << version.c_str() << "is not part of model" << type.c_str() << std::endl;
                 return false;
             }
-            if (infoMap.find(type) != infoMap.end())
+            if (nodeInfoMap.find(type) != nodeInfoMap.end())
             {
                 // 20221110 MS: Why is the version appended to the 'type' ? (which is 'name::version' in the end)
                 type += "::" + version;
@@ -199,7 +199,7 @@ namespace xrock_gui_model
             version << model["versions"][versionIndex]["name"];
         }
 
-        if (infoMap.find(type) != infoMap.end())
+        if (nodeInfoMap.find(type) != nodeInfoMap.end())
             return false;
 
         ConfigMap map, tmpMap;
@@ -336,7 +336,7 @@ namespace xrock_gui_model
         info.type = type;
         // NOTE: This info is really needed such that other plugins can distinguish the maps.
         info.map["NodeClass"] = "xrock";
-        infoMap[info.type] = info;
+        nodeInfoMap[info.type] = info;
 
         return true;
     }
@@ -355,7 +355,7 @@ namespace xrock_gui_model
             {
                 std::string name = libName + "::" + it2.first;
                 std::string type = "software::" + name;
-                if (infoMap.find(type) != infoMap.end())
+                if (nodeInfoMap.find(type) != nodeInfoMap.end())
                     continue;
                 ConfigMap map;
                 map["modelVersion"] = "v0.1";
@@ -395,7 +395,7 @@ namespace xrock_gui_model
                 info.numInputs = numInputs;
                 info.numOutputs = numOutputs;
                 info.map = map;
-                infoMap[type] = info;
+                nodeInfoMap[type] = info;
             }
         }
 
@@ -599,7 +599,7 @@ namespace xrock_gui_model
 
     const std::map<std::string, osg_graph_viz::NodeInfo> &ComponentModelInterface::getNodeInfoMap()
     {
-        return infoMap;
+        return nodeInfoMap;
     }
 
     // This function removes a node from the nodeMap
@@ -641,8 +641,8 @@ namespace xrock_gui_model
 
     bool ComponentModelInterface::hasNodeInfo(const std::string &type)
     {
-        std::map<std::string, osg_graph_viz::NodeInfo>::iterator it = infoMap.begin();
-        for (; it != infoMap.end(); ++it)
+        std::map<std::string, osg_graph_viz::NodeInfo>::iterator it = nodeInfoMap.begin();
+        for (; it != nodeInfoMap.end(); ++it)
         {
             if (it->first == type)
             {
@@ -654,8 +654,8 @@ namespace xrock_gui_model
 
     configmaps::ConfigMap ComponentModelInterface::getNodeInfo(const std::string &type)
     {
-        std::map<std::string, osg_graph_viz::NodeInfo>::iterator it = infoMap.begin();
-        for (; it != infoMap.end(); ++it)
+        std::map<std::string, osg_graph_viz::NodeInfo>::iterator it = nodeInfoMap.begin();
+        for (; it != nodeInfoMap.end(); ++it)
         {
             if (it->first == type)
             {
@@ -669,13 +669,13 @@ namespace xrock_gui_model
     // E.g. initially the loadComponentModel() function will pass all data to here.
     void ComponentModelInterface::setModelInfo(configmaps::ConfigMap &map)
     {
-        // NOTE: modelInfo holds the original data. So we just copy over.
-        modelInfo = map;
+        // NOTE: basicModel holds the original data. So we just copy over.
+        basicModel = map;
         // NOTE: bagelInfo holds the transformed version of the original data to be passed down to the bagelGui.
-        ConfigMap bi(modelInfo);
+        ConfigMap bi(basicModel);
         // TODO: Perform transformations
         // When finished, pass the data to bagelInfo
-        bagelInfo = bi;
+        bagelModel = bi;
     }
 
     // This function gets called whenever the XRockGui wants to know the current status of the model.
@@ -683,17 +683,17 @@ namespace xrock_gui_model
     configmaps::ConfigMap &ComponentModelInterface::getModelInfo()
     {
         // NOTE: bagelInfo holds the data which might have been altered.
-        ConfigMap mi(modelInfo);
-        // TODO: Peform inverse transformations to update modelInfo based on (possibly altered) bagelInfo
-        // When finished, update modelInfo and return it
-        modelInfo = mi;
-        return modelInfo;
+        ConfigMap mi(basicModel);
+        // TODO: Peform inverse transformations to update basicModel based on (possibly altered) bagelInfo
+        // When finished, update basicModel and return it
+        basicModel = mi;
+        return basicModel;
     }
 
     void ComponentModelInterface::resetConfig(configmaps::ConfigMap &map)
     {
         std::string modelName = map["modelName"];
-        osg_graph_viz::NodeInfo ndi = infoMap[modelName];
+        osg_graph_viz::NodeInfo ndi = nodeInfoMap[modelName];
         ConfigMap &model = ndi.map;
 
         if (map.hasKey("data"))

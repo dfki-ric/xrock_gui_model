@@ -623,14 +623,14 @@ namespace xrock_gui_model
         }
         case MenuActions::EXPORT_CND_TFENHANCE:
         {
-            QString fileName = QFileDialog::getSaveFileName(NULL, QObject::tr("Select Model"),
-                                                            "export.cnd", QObject::tr("YAML syntax (*.cnd)"), 0,
-                                                            QFileDialog::DontUseNativeDialog);
-
             QString urdf_file = QFileDialog::getOpenFileName(NULL, QObject::tr("Select urdf_file"),
                                                              ".", QObject::tr("YAML syntax (*.urdf)"), 0,
                                                              QFileDialog::DontUseNativeDialog);
-            if (!fileName.isNull())
+
+            QString fileName = QFileDialog::getSaveFileName(NULL, QObject::tr("Select Model"),
+                                                            "export.cnd", QObject::tr("YAML syntax (*.cnd)"), 0,
+                                                            QFileDialog::DontUseNativeDialog);
+            if (!urdf_file.isNull())
             {
                 ConfigMap map = bagelGui->createConfigMap();
                 exportCnd(map, fileName.toStdString(), urdf_file.toStdString());

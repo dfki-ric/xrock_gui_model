@@ -4,9 +4,7 @@
  * \brief Fuctions to communicate with the database
  **/
 
-#ifndef XROCK_GUI_MODEL_Serverless_DB_HPP
-#define XROCK_GUI_MODEL_Serverless_DB_HPP
-
+#pragma once
 #include <configmaps/ConfigMap.hpp>
 #include <xdbi/Serverless.hpp>
 #include <xtypes_generator/XTypeRegistry.hpp>
@@ -40,4 +38,3 @@ namespace xrock_gui_model
     };
 } // end of namespace xrock_gui_model
 
-#endif // XROCK_GUI_MODEL_Serverless_DB_HPP

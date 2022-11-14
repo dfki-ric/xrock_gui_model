@@ -4,9 +4,7 @@
  * \brief Displays known configures of a component and allows to select one
  **/
 
-#ifndef XROCK_GUI_MODEL_CONFIGURE_DIALOG_HPP
-#define XROCK_GUI_MODEL_CONFIGURE_DIALOG_HPP
-
+#pragma once
 #include <configmaps/ConfigMap.hpp>
 
 #include <QDialog>
@@ -52,4 +50,3 @@ namespace xrock_gui_model
     };
 } // end of namespace xrock_gui_model
 
-#endif // XROCK_GUI_MODEL_CONFIGURE_DIALOG_HPP

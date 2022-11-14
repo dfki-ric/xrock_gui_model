@@ -4,9 +4,7 @@
  * \brief Fuctions to communicate with the database
  **/
 
-#ifndef XROCK_GUI_MODEL_XROCK_DB_HPP
-#define XROCK_GUI_MODEL_XROCK_DB_HPP
-
+#pragma once
 #include <configmaps/ConfigMap.hpp>
 #include "DBInterface.hpp"
 
@@ -34,5 +32,3 @@ namespace xrock_gui_model
         std::string dbAddress;
     };
 } // end of namespace xrock_gui_model
-
-#endif // XROCK_GUI_MODEL_XROCK_DB_HPP

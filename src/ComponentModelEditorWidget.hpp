@@ -4,9 +4,7 @@
  * \brief
  **/
 
-#ifndef XROCK_GUI_MODEL_MODEL_WIDGET_HPP
-#define XROCK_GUI_MODEL_MODEL_WIDGET_HPP
-
+#pragma once
 #include <mars/main_gui/BaseWidget.h>
 #include <configmaps/ConfigMap.hpp>
 #include "ComponentModelInterface.hpp"
@@ -35,14 +33,14 @@ namespace xrock_gui_model
 {
     class XRockGUI;
 
-    class  ComponentModelEditorWidget : public mars::main_gui::BaseWidget
+    class ComponentModelEditorWidget : public mars::main_gui::BaseWidget
     {
         Q_OBJECT
 
     public:
         ComponentModelEditorWidget(mars::cfg_manager::CFGManagerInterface *cfg,
-                    bagel_gui::BagelGui *bagelGui, XRockGUI *xrockGui,
-                    QWidget *parent = 0);
+                                   bagel_gui::BagelGui *bagelGui, XRockGUI *xrockGui,
+                                   QWidget *parent = 0);
         ~ComponentModelEditorWidget();
         void clear();
         void deinit();
@@ -84,4 +82,3 @@ namespace xrock_gui_model
 
 } // end of namespace xrock_gui_model
 
-#endif // XROCK_GUI_MODEL_MODEL_WIDGET_HPP

@@ -4,9 +4,7 @@
  * \brief Some helper functions to operate on config maps
  **/
 
-#ifndef XROCK_GUI_MODEL_CONFIG_MAP_HELPER_HPP
-#define XROCK_GUI_MODEL_CONFIG_MAP_HELPER_HPP
-
+#pragma once
 #include <configmaps/ConfigData.h>
 
 namespace xrock_gui_model
@@ -27,4 +25,3 @@ namespace xrock_gui_model
     };
 } // end of namespace xrock_gui_model
 
-#endif // XROCK_GUI_MODEL_CONFIG_MAP_HELPER_HPP

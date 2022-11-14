@@ -60,6 +60,8 @@ namespace xrock_gui_model
         void update_prop_widget(const std::string &prop_name, const std::string &value);
         // get the text by name
         std::string get_prop_widget_text(const std::string &prop_name);
+        // update widget with thr properties and as well as fact information
+        void update_widgets(configmaps::ConfigMap &info);
 
     // TODO: Need a signal to notify others about changes in the fields. Used to update the current model values.
 

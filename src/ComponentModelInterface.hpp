@@ -4,9 +4,7 @@
  * \brief
  */
 
-#ifndef XROCK_GUI_MODEL_HPP
-#define XROCK_GUI_MODEL_HPP
-
+#pragma once
 #include <bagel_gui/ModelInterface.hpp>
 
 namespace xrock_gui_model
@@ -89,4 +87,4 @@ namespace xrock_gui_model
     };
 } // end of namespace xrock_gui_model
 
-#endif // XROCK_GUI_MODEL_HPP
+

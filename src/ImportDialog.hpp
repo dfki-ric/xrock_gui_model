@@ -4,9 +4,7 @@
  * \brief Gets a list of basic_model form database and allows to add one
  **/
 
-#ifndef XROCK_GUI_MODEL_IMPORT_DIALOG_HPP
-#define XROCK_GUI_MODEL_IMPORT_DIALOG_HPP
-
+#pragma once
 #include "XRockGUI.hpp"
 
 #include <QDialog>
@@ -69,4 +67,3 @@ namespace xrock_gui_model
     };
 } // end of namespace xrock_gui_model
 
-#endif // XROCK_GUI_MODEL_IMPORT_DIALOG_HPP

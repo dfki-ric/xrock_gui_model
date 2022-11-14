@@ -4,9 +4,7 @@
  * \brief Fuctions to communicate with the database
  **/
 
-#ifndef XROCK_GUI_MODEL_REST_DB_HPP
-#define XROCK_GUI_MODEL_REST_DB_HPP
-
+#pragma once
 #include <configmaps/ConfigMap.hpp>
 #include <xdbi/Client.hpp>
 #include <xtypes_generator/XTypeRegistry.hpp>
@@ -42,5 +40,3 @@ namespace xrock_gui_model
         xtypes::XTypeRegistryPtr registry;
     };
 } // end of namespace xrock_gui_model
-
-#endif // XROCK_GUI_MODEL_REST_DB_HPP

@@ -144,6 +144,12 @@ namespace xrock_gui_model
 
     ComponentModelEditorWidget::~ComponentModelEditorWidget(void)
     {
+        // Cleanup widgets
+        for(auto& [label, widget] : widgets)
+        {
+            delete label;
+            delete widget;
+        }
     }
 
     void ComponentModelEditorWidget::deinit(void)
@@ -152,15 +158,56 @@ namespace xrock_gui_model
         //cfg->setPropertyValue("XRockGUI", "modelPath", "value", modelPath);
     }
 
+    void ComponentModelEditorWidget::update_widgets(configmaps::ConfigMap& info)
+    {           
+        // Lets iterate over model's properties
+        nl::json info_data = nl::json::parse(info.toJsonString());
+        auto is_property_key = [&](const std::string& key) -> bool
+        {
+           static auto cm = std::make_shared<ComponentModel>();
+            const nl::json props = cm->get_properties();
+            for (auto it = props.begin(); it != props.end(); ++it)
+                if(key == it.key())
+                    return true;
+           return false;
+        };
+       for (auto it = info_data.begin(); it != info_data.end(); ++it)
+         {   
+            std::string key = it.key();
+            nl::json value = it.value();
+            if(is_property_key(key))
+              this->update_prop_widget(key,  value);
+
+         }
+   
+        for (auto it = info_data["versions"][0].begin(); it != info_data["versions"][0].end(); ++it)
+        {
+            std::string key = it.key();
+            nl::json value = it.value();
+
+            if(key == "name")
+                key = "version"; // maybe just rename it so when we pass it to update_prop_widget it will update the version widget
+                
+
+            if(not is_property_key(key) or value.is_object()) continue; // skip interfaces .. non-properties
+              this->update_prop_widget(key,  value);
+   
+
+        }
+        if(info["versions"][0].hasKey("interfaces"))
+        {
+            std::string inter = info["versions"][0]["interfaces"].toYamlString().c_str();
+            interfaces->setText(QString::fromStdString(inter));
+            
+        }
+    }
     void ComponentModelEditorWidget::currentModelChanged(bagel_gui::ModelInterface *model)
     {
         ComponentModelInterface* newModel = dynamic_cast<ComponentModelInterface *>(model);
         if (!newModel) return;
         // TODO: Update all fields with the info given by the map. We should NOT trigger textChanged() though!
         auto info = newModel->getModelInfo();
-        this->update_prop_widget("name", info["name"]);
-        // Set the newModel to be the current model
-        // which will also allow updates to the model via updateModel()
+        this->update_widgets(info);
         currentModel = newModel;
     }
 
@@ -170,8 +217,17 @@ namespace xrock_gui_model
         {
             if (label->text().toStdString() == prop_name)
             {
-                dynamic_cast<QLineEdit *>(widget)->setText(QString::fromStdString(value));
-                break;
+                if(QLineEdit * le = dynamic_cast<QLineEdit *>(widget))
+                {
+                    le->setText(QString::fromStdString(value));
+                    break;
+                }
+                else if(QComboBox * cb = dynamic_cast<QComboBox *>(widget))
+                {
+                  
+                    cb->setCurrentIndex(cb->findData(QString::fromStdString(value), Qt::DisplayRole)); // <- refers to the item text
+                    break;
+                }
             }
         }
     }

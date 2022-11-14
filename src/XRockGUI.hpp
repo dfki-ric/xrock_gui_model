@@ -4,9 +4,7 @@
  * \version 0.1
  */
 
-#ifndef XROCK_GUI_MODEL_LIB_HPP
-#define XROCK_GUI_MODEL_LIB_HPP
-
+#pragma once
 #include <iostream>
 #include <fstream>
 
@@ -150,4 +148,3 @@ namespace xrock_gui_model
 
 } // end of namespace xrock_gui_model
 
-#endif // XROCK_GUI_MODEL_LIB_HPP

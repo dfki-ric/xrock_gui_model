@@ -4,9 +4,7 @@
  * \brief
  **/
 
-#ifndef XROCK_GUI_MODEL_MODEL_WIDGET_HPP
-#define XROCK_GUI_MODEL_MODEL_WIDGET_HPP
-
+#pragma once
 #include <mars/main_gui/BaseWidget.h>
 #include <configmaps/ConfigMap.hpp>
 #include "ComponentModelInterface.hpp"
@@ -35,14 +33,14 @@ namespace xrock_gui_model
 {
     class XRockGUI;
 
-    class  ComponentModelEditorWidget : public mars::main_gui::BaseWidget
+    class ComponentModelEditorWidget : public mars::main_gui::BaseWidget
     {
         Q_OBJECT
 
     public:
         ComponentModelEditorWidget(mars::cfg_manager::CFGManagerInterface *cfg,
-                    bagel_gui::BagelGui *bagelGui, XRockGUI *xrockGui,
-                    QWidget *parent = 0);
+                                   bagel_gui::BagelGui *bagelGui, XRockGUI *xrockGui,
+                                   QWidget *parent = 0);
         ~ComponentModelEditorWidget();
         void clear();
         void deinit();
@@ -62,6 +60,8 @@ namespace xrock_gui_model
         void update_prop_widget(const std::string &prop_name, const std::string &value);
         // get the text by name
         std::string get_prop_widget_text(const std::string &prop_name);
+        // update widget with thr properties and as well as fact information
+        void update_widgets(configmaps::ConfigMap &info);
 
     // TODO: Need a signal to notify others about changes in the fields. Used to update the current model values.
 
@@ -84,4 +84,3 @@ namespace xrock_gui_model
 
 } // end of namespace xrock_gui_model
 
-#endif // XROCK_GUI_MODEL_MODEL_WIDGET_HPP

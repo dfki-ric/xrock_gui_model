@@ -11,11 +11,12 @@
 
 namespace xrock_gui_model
 {
+    class XRockGUI;
 
     class ComponentModelInterface : public bagel_gui::ModelInterface
     {
     public:
-        explicit ComponentModelInterface(bagel_gui::BagelGui *bagelGui);
+        explicit ComponentModelInterface(bagel_gui::BagelGui *bagelGui, XRockGUI* xrockGui);
         explicit ComponentModelInterface(const ComponentModelInterface *other);
         ~ComponentModelInterface();
 
@@ -52,7 +53,8 @@ namespace xrock_gui_model
 
         // NOTE: accesses the nodeModelMap. This map contains the component model info of all the parts inside this model
         const std::map<std::string, osg_graph_viz::NodeInfo> &getNodeInfoMap(); // PURE VIRTUAL
-        bool addNodeInfo(configmaps::ConfigMap &model, std::string version = "");
+        std::string deriveTypeFromNodeInfo(configmaps::ConfigMap &model);
+        bool addNodeInfo(const std::string& type, configmaps::ConfigMap &model);
         bool hasNodeInfo(const std::string &type);
         configmaps::ConfigMap getNodeInfo(const std::string &type);
 
@@ -65,6 +67,9 @@ namespace xrock_gui_model
         void resetConfig(configmaps::ConfigMap &map);
 
     private:
+        // We need a reference to the XRockGUI for DB accesses
+        XRockGUI* xrockGui;
+
         std::map<unsigned long, configmaps::ConfigMap> nodeMap;
         std::map<unsigned long, configmaps::ConfigMap> edgeMap;
 

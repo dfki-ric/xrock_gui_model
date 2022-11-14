@@ -141,7 +141,7 @@ namespace xrock_gui_model
         if (bagelGui)
         {
             // NOTE: addModelInterface() is actually a registerModelInterface() function to setup a factory
-            ComponentModelInterface* model = new ComponentModelInterface(bagelGui);
+            ComponentModelInterface* model = new ComponentModelInterface(bagelGui, this);
             bagelGui->addModelInterface("xrock", model);
             bagelGui->addPlugin(this);
         }
@@ -831,7 +831,7 @@ namespace xrock_gui_model
     void XRockGUI::loadComponentModel(std::string domain, std::string modelName, std::string version)
     {
         ConfigMap map = db->requestModel(domain, modelName, version, !version.empty());
-        std::cout << "loadComponentModel: " << map.toJsonString() << std::endl;
+        //std::cout << "loadComponentModel: " << map.toJsonString() << std::endl;
         // 20221109 MS: What is this importToBagel? Can this be removed?
         if (importToBagel)
         {

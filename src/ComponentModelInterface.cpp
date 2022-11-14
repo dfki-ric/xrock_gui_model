@@ -7,6 +7,7 @@
 #include "ConfigMapHelper.hpp"
 #include <osg_graph_viz/Node.hpp>
 #include <bagel_gui/BagelGui.hpp>
+#include "XRockGUI.hpp"
 #include <QMessageBox>
 
 #include <mars/utils/misc.h>
@@ -19,7 +20,7 @@ using namespace mars::utils;
 namespace xrock_gui_model
 {
 
-    ComponentModelInterface::ComponentModelInterface(BagelGui *bagelGui) : ModelInterface(bagelGui)
+    ComponentModelInterface::ComponentModelInterface(BagelGui *bagelGui, XRockGUI* xrockGui) : ModelInterface(bagelGui), xrockGui(xrockGui)
     {
         std::string confDir = bagelGui->getConfigDir();
         ConfigMap config = ConfigMap::fromYamlFile(confDir + "/config_default.yml", true);
@@ -88,6 +89,7 @@ namespace xrock_gui_model
     // TODO: Check whether all of this config maps need to be copied over.
     ComponentModelInterface::ComponentModelInterface(const ComponentModelInterface *other)
         : ModelInterface(other->bagelGui),
+          xrockGui(other->xrockGui),
           nodeMap(other->nodeMap),
           edgeMap(other->edgeMap),
           nodeInfoMap(other->nodeInfoMap),
@@ -131,7 +133,7 @@ namespace xrock_gui_model
                     }
                     else
                     {
-                        addNodeInfo(map);
+                        addNodeInfo(deriveTypeFromNodeInfo(map), map);
                     }
                 }
                 else if (file.find(".", 0, 1) != std::string::npos)
@@ -154,10 +156,15 @@ namespace xrock_gui_model
         return;
     }
 
+    std::string ComponentModelInterface::deriveTypeFromNodeInfo(configmaps::ConfigMap &model)
+    {
+        return (model["domain"].getString() + "::" + model["name"].getString() + "::" + model["versions"][0]["name"].getString());
+    }
+
     // This function adds a node inside the GUI? This whole function is undocumented and a mystery!
     // As far as i see it it generates/updates an nodeInfoMap entry from the original model
     // So it should be named updateInfoMap()
-    bool ComponentModelInterface::addNodeInfo(ConfigMap &model, std::string version)
+    bool ComponentModelInterface::addNodeInfo(const std::string& type, configmaps::ConfigMap &model)
     {
         if (!model.hasKey("domain"))
             return false;
@@ -169,35 +176,7 @@ namespace xrock_gui_model
         std::string domain = model["domain"];
         //domain = tolower(domain); // 20221110 MS: Has been removed. We want the domain to be exactly the same as in the original model
         // 20221110 MS: Why is the name the type here? Why don't we use the URI to identify the node?
-        std::string type = model["name"];
-
-        if (!version.empty())
-        {
-            unsigned int i = 0;
-            for (auto it : model["versions"])
-            {
-                if (it["name"] == version)
-                {
-                    versionIndex = i;
-                    break;
-                }
-                ++i;
-            }
-            if (i >= model["versions"].size())
-            {
-                std::cerr << "version " << version.c_str() << "is not part of model" << type.c_str() << std::endl;
-                return false;
-            }
-            if (nodeInfoMap.find(type) != nodeInfoMap.end())
-            {
-                // 20221110 MS: Why is the version appended to the 'type' ? (which is 'name::version' in the end)
-                type += "::" + version;
-            }
-        }
-        else
-        {
-            version << model["versions"][versionIndex]["name"];
-        }
+        std::string version = model["versions"][versionIndex]["name"];
 
         if (nodeInfoMap.find(type) != nodeInfoMap.end())
             return false;
@@ -671,11 +650,66 @@ namespace xrock_gui_model
     {
         // NOTE: basicModel holds the original data. So we just copy over.
         basicModel = map;
-        // NOTE: bagelInfo holds the transformed version of the original data to be passed down to the bagelGui.
-        ConfigMap bi(basicModel);
-        // TODO: Perform transformations
-        // When finished, pass the data to bagelInfo
-        bagelModel = bi;
+        // We now use the basic model to setup the GUI
+        if (basicModel["versions"][0].hasKey("components") && basicModel["versions"][0]["components"].hasKey("nodes"))
+        {
+            auto nodes = basicModel["versions"][0]["components"]["nodes"];
+            // At first, we have to create the nodes
+            for (auto it : nodes)
+            {
+                const std::string& name(it["name"].getString());
+                const std::string& modelName(it["model"]["name"].getString());
+                const std::string& modelDomain(it["model"]["domain"].getString());
+                const std::string& modelVersion(it["model"]["version"].getString());
+                // Unfortunately, the basicModel has no URI, so we have to construct a unique type id ourselves
+                ConfigMap partModel;
+                partModel["name"] = modelName;
+                partModel["domain"] = modelDomain;
+                ConfigMap v;
+                v["name"] = modelVersion;
+                partModel["versions"].push_back(v);
+                const std::string& partType(deriveTypeFromNodeInfo(partModel));
+                // Before we can add a node, we first have to check if the model is already known or
+                // has to be requested from the DB first
+                if (!hasNodeInfo(partType))
+                {
+                    // Get map from DB. For this we need a reference to the XRockGui
+                    partModel = xrockGui->db->requestModel(modelDomain, modelName, modelVersion, true);
+                    // Register the new model
+                    // NOTE: This function already converts the given basicModel into bagel specific stuff
+                    if (!addNodeInfo(partType, partModel))
+                    {
+                        std::cerr << "ComponentModelInterface::setModelInfo(): could not register " << partType << "\n";
+                        continue;
+                    }
+                    // Once we have updated type info, we need to make the bagelGui aware of it.
+                    // Only then, the subsequent addNode() will work.
+                    bagelGui->updateNodeTypes();
+                }
+                // Add the part as a node in the bagelGui
+                bagelGui->addNode(partType, name);
+            }
+            // After we have done the nodes, we can wire their interfaces together
+            if (basicModel["versions"][0]["components"].hasKey("edges"))
+            {
+                auto edges = basicModel["versions"][0]["components"]["edges"];
+                for (auto it : edges)
+                {
+                    ConfigMap edge(it);
+                    edge["fromNode"] = it["from"]["name"];
+                    edge["fromNodeOutput"] = it["from"]["interface"];
+                    edge["toNode"] = it["to"]["name"];
+                    edge["toNodeInput"] = it["to"]["interface"];
+                    if (!edge.hasKey("name"))
+                    {
+                        // TODO: Actually the ports also have to be inserted.
+                        edge["name"] = edge["fromNode"].getString() + edge["toNode"].getString();
+                    }
+                    edge["smooth"] = true;
+                    bagelGui->addEdge(edge);
+                }
+            }
+        }
     }
 
     // This function gets called whenever the XRockGui wants to know the current status of the model.

@@ -144,6 +144,12 @@ namespace xrock_gui_model
 
     ComponentModelEditorWidget::~ComponentModelEditorWidget(void)
     {
+        // Cleanup widgets
+        for(auto& [label, widget] : widgets)
+        {
+            delete label;
+            delete widget;
+        }
     }
 
     void ComponentModelEditorWidget::deinit(void)

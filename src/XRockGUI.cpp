@@ -804,7 +804,7 @@ namespace xrock_gui_model
     }
 
     // This function adds a new part to an already opened component model
-    void XRockGUI::addComponent(std::string domain, std::string modelName, std::string version, std::string nodeName)
+    void XRockGUI::addComponent(const std::string& domain, const std::string& modelName, const std::string& version, std::string nodeName)
     {
         ComponentModelInterface *model = dynamic_cast<ComponentModelInterface *>(bagelGui->getCurrentModel());
         if (model)
@@ -844,7 +844,7 @@ namespace xrock_gui_model
     }
 
     // This function loads a component model from DB
-    void XRockGUI::loadComponentModel(std::string domain, std::string modelName, std::string version)
+    void XRockGUI::loadComponentModel(const std::string& domain, const std::string& modelName, const std::string& version)
     {
         ConfigMap map = db->requestModel(domain, modelName, version, !version.empty());
         loadComponentModelFrom(map);
@@ -1626,7 +1626,7 @@ namespace xrock_gui_model
         loadComponentModelFrom(map);
     }
 
-    void XRockGUI::nodeContextClicked(const std::string name)
+    void XRockGUI::nodeContextClicked(const std::string &name)
     {
 
         if (name == "change version")
@@ -1700,7 +1700,7 @@ namespace xrock_gui_model
         }
     }
 
-    void XRockGUI::inPortContextClicked(const std::string name)
+    void XRockGUI::inPortContextClicked(const std::string &name)
     {
         if (name == "configure interface")
         {
@@ -1735,7 +1735,7 @@ namespace xrock_gui_model
         bagelGui->updateNodeMap(contextNodeName, node);
     }
 
-    void XRockGUI::outPortContextClicked(const std::string name)
+    void XRockGUI::outPortContextClicked(const std::string &name)
     {
         if (name == "configure interface")
         {

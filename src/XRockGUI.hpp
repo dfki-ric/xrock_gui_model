@@ -100,9 +100,9 @@ namespace xrock_gui_model
         void exportCnd(const configmaps::ConfigMap &map_, const std::string &filename, const std::string &urdf_file = "");
         void exportCnd2(const configmaps::ConfigMap &map_, const std::string &filename);
         void importCND(const std::string &fileName);
-        void nodeContextClicked(const std::string name);
-        void inPortContextClicked(const std::string name);
-        void outPortContextClicked(const std::string name);
+        void nodeContextClicked(const std::string &name);
+        void inPortContextClicked(const std::string &name);
+        void outPortContextClicked(const std::string &name);
         std::vector<std::string> getNodeContextStrings(const std::string &name);
         std::vector<std::string> getInPortContextStrings(const std::string &nodeName,
                                                          const std::string &portName);
@@ -112,8 +112,8 @@ namespace xrock_gui_model
         void addComponent();
 
         // public slots:
-        void addComponent(std::string domain, std::string modelName, std::string version, std::string nodeName = "");
-        void loadComponentModel(std::string domain, std::string modelName, std::string version);
+        void addComponent(const std::string& domain, const std::string& modelName, const std::string& version, std::string nodeName = "");
+        void loadComponentModel(const std::string& domain, const std::string& modelName, const std::string& version);
         void loadComponentModelFrom(configmaps::ConfigMap &map);
         void applyConfiguration(configmaps::ConfigMap &map);
         std::unique_ptr<DBInterface> db;

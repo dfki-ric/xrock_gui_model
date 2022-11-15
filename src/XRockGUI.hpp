@@ -100,9 +100,9 @@ namespace xrock_gui_model
         void exportCnd(const configmaps::ConfigMap &map_, const std::string &filename, const std::string &urdf_file = "");
         void exportCnd2(const configmaps::ConfigMap &map_, const std::string &filename);
         void importCND(const std::string &fileName);
-        void nodeContextClicked(const std::string &name);
-        void inPortContextClicked(const std::string &name);
-        void outPortContextClicked(const std::string &name);
+        void nodeContextClicked(const std::string name);
+        void inPortContextClicked(const std::string name);
+        void outPortContextClicked(const std::string name);
         std::vector<std::string> getNodeContextStrings(const std::string &name);
         std::vector<std::string> getInPortContextStrings(const std::string &nodeName,
                                                          const std::string &portName);

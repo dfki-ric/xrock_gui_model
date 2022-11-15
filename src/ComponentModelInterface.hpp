@@ -46,7 +46,7 @@ namespace xrock_gui_model
                               const std::string &absPath) { return false; }
 
         // TODO: Handle port compatibility!!!
-        std::map<unsigned long, std::vector<std::string>> getCompatiblePorts(unsigned long nodeId, const std::string &outPortName) { return std::map<unsigned long, std::vector<std::string>>(); }
+        std::map<unsigned long, std::vector<std::string>> getCompatiblePorts(unsigned long nodeId, std::string outPortName) { return std::map<unsigned long, std::vector<std::string>>(); }
         bool handlePortCompatibility() { return false; }
 
         // NOTE: accesses the nodeModelMap. This map contains the component model info of all the parts inside this model

@@ -1634,7 +1634,7 @@ namespace xrock_gui_model
         loadComponentModelFrom(map);
     }
 
-    void XRockGUI::nodeContextClicked(const std::string &name)
+    void XRockGUI::nodeContextClicked(const std::string name)
     {
 
         if (name == "change version")
@@ -1708,7 +1708,7 @@ namespace xrock_gui_model
         }
     }
 
-    void XRockGUI::inPortContextClicked(const std::string &name)
+    void XRockGUI::inPortContextClicked(const std::string name)
     {
         if (name == "configure interface")
         {
@@ -1743,7 +1743,7 @@ namespace xrock_gui_model
         bagelGui->updateNodeMap(contextNodeName, node);
     }
 
-    void XRockGUI::outPortContextClicked(const std::string &name)
+    void XRockGUI::outPortContextClicked(const std::string name)
     {
         if (name == "configure interface")
         {

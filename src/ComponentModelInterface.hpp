@@ -51,6 +51,7 @@ namespace xrock_gui_model
 
         // NOTE: accesses the nodeModelMap. This map contains the component model info of all the parts inside this model
         const std::map<std::string, osg_graph_viz::NodeInfo> &getNodeInfoMap(); // PURE VIRTUAL
+        std::string deriveTypeFrom(const std::string& domain, const std::string& name, const std::string& version);
         std::string deriveTypeFromNodeInfo(configmaps::ConfigMap &model);
         bool addNodeInfo(const std::string& type, configmaps::ConfigMap &model);
         bool hasNodeInfo(const std::string &type);
@@ -71,16 +72,16 @@ namespace xrock_gui_model
         std::map<unsigned long, configmaps::ConfigMap> nodeMap;
         std::map<unsigned long, configmaps::ConfigMap> edgeMap;
 
-        // map which holds the component models of the parts (needed to show their interfaces etc.)
+        // Map which holds a mixed and transformed version of the component models of the parts and the part itself (needed to show their interfaces etc.)
         // it is accessed by an unqiue identifier. The basic model uses domain, name, version keys as a unique identifier.
         std::map<std::string, osg_graph_viz::NodeInfo> nodeInfoMap;
 
         // This config map should contain the ORIGINAL info of the component model.
         // If this changes the bagel model has to be updated to show the results in the GUI
+        // NOTE: The bagel specific stuff based on the basic model is in the node, edge and nodeInfo maps
         configmaps::ConfigMap basicModel;
-        // This config map stores the derived bagel model (based on the original model)
-        // If this has changed by editing the model in the GUI the orignal model has to be updated
-        configmaps::ConfigMap bagelModel;
+        // This map stores the ORIGINAL info of the compponent models of the parts.
+        std::map<std::string, configmaps::ConfigMap> partModels;
 
         void loadNodeInfo(std::string path, bool orogen = false); // NOTE: Needed for bagel/shader stuff. Could be moved to XRockGui itself
         bool addOrogenInfo(configmaps::ConfigMap &model); // DEPRECATED

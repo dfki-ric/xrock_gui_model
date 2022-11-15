@@ -61,6 +61,9 @@ namespace xrock_gui_model
         // setModelInfo() will also trigger an GUI update
         void setModelInfo(configmaps::ConfigMap &map); // PURE VIRTUAL
         configmaps::ConfigMap &getModelInfo(); // PURE VIRTUAL
+        // This function will register a component model if it is not already registered.
+        // If the model is unknown it will request it internally
+        bool registerComponentModel(const std::string& domain, const std::string& name, const std::string& version);
 
         // NOTE: If requested by the user, this function resets the node configuration to be the default config of the associated component model
         void resetConfig(configmaps::ConfigMap &map);

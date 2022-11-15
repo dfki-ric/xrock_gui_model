@@ -444,8 +444,7 @@ namespace xrock_gui_model
                     map["interfaces"] = interfaces["i"].toYamlString();
 
                     map["versions"][0]["defaultConfiguration"]["data"]["config"]["graphFilename"] = graphFile;
-                    // TODO: Call different function for that
-                    //widget->setModelInfo(map);
+                    model->setModelInfo(map);
                 }
             }
             break;
@@ -610,10 +609,8 @@ namespace xrock_gui_model
 
                 if (currentModel.hasKey("name"))
                 {
-                    ConfigMap newModel = db->requestModel(currentModel["domain"], currentModel["name"], currentModel["versions"][0]["name"], true);
-                    // load updated model in new tab
-                    // TODO: Create function in XRockGUI for this
-                    //widget->loadModel(newModel);
+                    // Reload component model from DB (creating a new TAB)
+                    loadComponentModel(currentModel["domain"], currentModel["name"], currentModel["versions"][0]["name"]);
                 }
                 else
                     QMessageBox::warning(nullptr, "Warning", "Nothing to reload.", QMessageBox::Ok);
@@ -712,8 +709,7 @@ namespace xrock_gui_model
                 map["versions"][0]["name"] = version;
                 map["versions"][0]["maturity"] = "INPROGRESS";
             }
-            // TODO: Create function for this at XRockGUI
-            //widget->loadModel(map);
+            loadComponentModelFrom(map);
 
             // load smurf file and add components if not already included
             std::string smurfPath = "tmp/models/assembly/";
@@ -807,18 +803,17 @@ namespace xrock_gui_model
         id.exec();
     }
 
+    // This function adds a new part to an already opened component model
     void XRockGUI::addComponent(std::string domain, std::string modelName, std::string version, std::string nodeName)
     {
-        // create type name by using domain as namespace
-        std::string type = modelName;
-
-        //widget->loadType(domain, modelName, version);
         ComponentModelInterface *model = dynamic_cast<ComponentModelInterface *>(bagelGui->getCurrentModel());
         if (model)
         {
-            if (model->hasNodeInfo(type + "::" + version))
+            const std::string& type(model->deriveTypeFrom(domain, modelName, version));
+            if (!model->registerComponentModel(domain, modelName, version))
             {
-                type = type + "::" + version;
+                std::cerr << "XRockGUI::addComponent(): Could not register component model " << type << "\n";
+                return;
             }
             if (nodeName.empty())
             {
@@ -828,11 +823,10 @@ namespace xrock_gui_model
         }
     }
 
-    void XRockGUI::loadComponentModel(std::string domain, std::string modelName, std::string version)
+    // This function loads a component model from an already existing config map
+    void XRockGUI::loadComponentModelFrom(configmaps::ConfigMap &map)
     {
-        ConfigMap map = db->requestModel(domain, modelName, version, !version.empty());
-        //std::cout << "loadComponentModel: " << map.toJsonString() << std::endl;
-        // 20221109 MS: What is this importToBagel? Can this be removed?
+        // TODO: 20221109 MS: What is this importToBagel? Can this be removed?
         if (importToBagel)
         {
             mechanicsToBagel(map);
@@ -843,11 +837,17 @@ namespace xrock_gui_model
             bagelGui->createView("xrock", map["name"]);
             ComponentModelInterface* model = dynamic_cast<ComponentModelInterface*>(bagelGui->getCurrentModel());
             // Set the model info of the ComponentModelInterface
-            // TODO: Do we handle the inner structure or should setModelInfo() do it?
             model->setModelInfo(map);
             // Afterwards we have to (re-)trigger the currentModelChanged() function
             currentModelChanged(model);
         }
+    }
+
+    // This function loads a component model from DB
+    void XRockGUI::loadComponentModel(std::string domain, std::string modelName, std::string version)
+    {
+        ConfigMap map = db->requestModel(domain, modelName, version, !version.empty());
+        loadComponentModelFrom(map);
     }
 
     void XRockGUI::loadNodes(bagel_gui::BagelModel *model,
@@ -1623,8 +1623,7 @@ namespace xrock_gui_model
         }
         map["modelPath"] = mars::utils::getPathOfFile(fileName);
         map.toYamlFile("da.yml");
-        // TODO: Create function in XRockGUI for that
-        //widget->loadModel(map);
+        loadComponentModelFrom(map);
     }
 
     void XRockGUI::nodeContextClicked(const std::string name)

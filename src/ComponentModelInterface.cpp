@@ -208,8 +208,10 @@ namespace xrock_gui_model
         // Set the input and output numbers in the info map
         info.numInputs = numInputs;
         info.numOutputs = numOutputs;
+
         // TODO: Handle configurations
         // Why is the config moved to some "data" field?
+
         // NOTE: This info is really needed such that other plugins can distinguish the maps.
         info.map["NodeClass"] = "xrock";
         nodeInfoMap[info.type] = info;
@@ -678,6 +680,24 @@ namespace xrock_gui_model
         return ConfigMap();
     }
 
+    bool ComponentModelInterface::registerComponentModel(const std::string& domain, const std::string& name, const std::string& version)
+    {
+        const std::string& partType(deriveTypeFrom(domain, name, version));
+        if (hasNodeInfo(partType))
+            return true;
+        // Get map from DB. For this we need a reference to the XRockGui
+        ConfigMap partModel = xrockGui->db->requestModel(domain, name, version, true);
+        partModels[partType] = partModel;
+        // Register the new model
+        // NOTE: This function already converts the given basicModel into bagel specific stuff
+        if (!addNodeInfo(partType, partModel))
+            return false;
+        // Once we have updated type info, we need to make the bagelGui aware of it.
+        // Only then, the subsequent addNode() will work.
+        bagelGui->updateNodeTypes();
+        return true;
+    }
+
     // This function gets called whenever the XRockGui has updates for the current model.
     // E.g. initially the loadComponentModel() function will pass all data to here.
     void ComponentModelInterface::setModelInfo(configmaps::ConfigMap &map)
@@ -699,21 +719,10 @@ namespace xrock_gui_model
                 const std::string& partType(deriveTypeFrom(modelDomain, modelName, modelVersion));
                 // Before we can add a node, we first have to check if the model is already known or
                 // has to be requested from the DB first
-                if (!hasNodeInfo(partType))
+                if (!registerComponentModel(modelDomain, modelName, modelVersion))
                 {
-                    // Get map from DB. For this we need a reference to the XRockGui
-                    ConfigMap partModel = xrockGui->db->requestModel(modelDomain, modelName, modelVersion, true);
-                    partModels[partType] = partModel;
-                    // Register the new model
-                    // NOTE: This function already converts the given basicModel into bagel specific stuff
-                    if (!addNodeInfo(partType, partModel))
-                    {
-                        std::cerr << "ComponentModelInterface::setModelInfo(): could not register " << partType << "\n";
-                        continue;
-                    }
-                    // Once we have updated type info, we need to make the bagelGui aware of it.
-                    // Only then, the subsequent addNode() will work.
-                    bagelGui->updateNodeTypes();
+                    std::cerr << "ComponentModelInterface::setModelInfo(): could not register " << partType << "\n";
+                    continue;
                 }
                 // Add the part as a node in the bagelGui
                 bagelGui->addNode(partType, name);

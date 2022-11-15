@@ -114,6 +114,7 @@ namespace xrock_gui_model
         // public slots:
         void addComponent(std::string domain, std::string modelName, std::string version, std::string nodeName = "");
         void loadComponentModel(std::string domain, std::string modelName, std::string version);
+        void loadComponentModelFrom(configmaps::ConfigMap &map);
         void applyConfiguration(configmaps::ConfigMap &map);
         std::unique_ptr<DBInterface> db;
 

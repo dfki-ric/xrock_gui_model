@@ -5,6 +5,7 @@
 #include <QPushButton>
 #include <QDesktopServices>
 #include <array>
+#include <xtypes/ComponentModel.hpp>
 
 using namespace configmaps;
 namespace xrock_gui_model
@@ -26,7 +27,7 @@ namespace xrock_gui_model
         return result;
     }
 
-    std::string ImportDialog::lastDomain = "software";
+    std::string ImportDialog::lastDomain = "SOFTWARE";
     std::string ImportDialog::lastFilter = "";
 
     ImportDialog::ImportDialog(XRockGUI *xrockGui, bool load) : xrockGui(xrockGui), load(load),
@@ -42,11 +43,13 @@ namespace xrock_gui_model
         domainSelect = new QComboBox();
         vLayout->addWidget(domainSelect);
 
-        indexMap["software"] = 0;
-
-        for (auto it : indexMap)
+        const auto cm = ComponentModel();
+        int index = 0;
+        for (const auto &d : cm.get_allowed_property_values("domain"))
         {
-            domainSelect->addItem(it.first.c_str());
+            domainSelect->addItem(QString::fromStdString(d.get<std::string>()));
+            indexMap[d.get<std::string>()] = index;
+            index++;
         }
 
         connect(domainSelect, SIGNAL(currentIndexChanged(const QString &)),

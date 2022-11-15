@@ -403,7 +403,7 @@ namespace xrock_gui_model
             if (model)
             {
                 ConfigMap localMap = model->getModelInfo();
-                std::string domain = "software";
+                std::string domain = "SOFTWARE";
                 std::string type = "system_modelling::task_graph::Task";
                 std::string name = "behavior_graph::MotionControlTask.yml";
                 std::string version = localMap["name"];
@@ -651,7 +651,7 @@ namespace xrock_gui_model
         {
             QMessageBox message;
             ConfigMap localMap = model->getModelInfo();
-            std::string domain = "software";
+            std::string domain = "SOFTWARE";
             std::string name = "behavior_graph::MotionControlTask";
             std::string version = localMap["version"][0]["name"];
             std::string graphFile = "tmp/bagel/" + localMap["name"].getString() + "/" + version + "/" + localMap["name"].getString() + ".yml";
@@ -697,7 +697,7 @@ namespace xrock_gui_model
         if (model)
         {
             ConfigMap localMap = model->getModelInfo();
-            std::string domain = "software";
+            std::string domain = "SOFTWARE";
             std::string type = "bagel::subgraph";
             std::string name = "bagel::" + localMap["name"].getString();
             std::string version = localMap["name"];
@@ -768,7 +768,7 @@ namespace xrock_gui_model
                     }
                     if (!found)
                     {
-                        addComponent("software", "PIPE", "v1.0.0", motorName);
+                        addComponent("SOFTWARE", "PIPE", "v1.0.0", motorName);
                         // todo: change the output interface name and toggle interface
                         ConfigMap nodeMap = *(bagelGui->getNodeMap(motorName));
                         nodeMap["outputs"][0]["interface"] = 1;
@@ -780,17 +780,17 @@ namespace xrock_gui_model
                 }
             }
             // TODO: This whole function is irrelevant
-            //widget->loadType("software", "PIPE", "v1.0.0");
-            //widget->loadType("software", "SIN", "v1.0.0");
-            //widget->loadType("software", "ASIN", "v1.0.0");
-            //widget->loadType("software", "MOD", "v1.0.0");
-            //widget->loadType("software", "POW", "v1.0.0");
-            //widget->loadType("software", "TAN", "v1.0.0");
-            //widget->loadType("software", "COS", "v1.0.0");
-            //widget->loadType("software", "ABS", "v1.0.0");
-            //widget->loadType("software", "DIV", "v1.0.0");
-            //widget->loadType("software", "Timer", "v1.0.0");
-            //widget->loadType("software", "Modulated_Sine", "v1.0.0");
+            //widget->loadType("SOFTWARE", "PIPE", "v1.0.0");
+            //widget->loadType("SOFTWARE", "SIN", "v1.0.0");
+            //widget->loadType("SOFTWARE", "ASIN", "v1.0.0");
+            //widget->loadType("SOFTWARE", "MOD", "v1.0.0");
+            //widget->loadType("SOFTWARE", "POW", "v1.0.0");
+            //widget->loadType("SOFTWARE", "TAN", "v1.0.0");
+            //widget->loadType("SOFTWARE", "COS", "v1.0.0");
+            //widget->loadType("SOFTWARE", "ABS", "v1.0.0");
+            //widget->loadType("SOFTWARE", "DIV", "v1.0.0");
+            //widget->loadType("SOFTWARE", "Timer", "v1.0.0");
+            //widget->loadType("SOFTWARE", "Modulated_Sine", "v1.0.0");
         }
     }
 
@@ -1446,7 +1446,7 @@ namespace xrock_gui_model
             }
             else
             {
-                if (node["domain"] == "software")
+                if (node["domain"] == "SOFTWARE")
                 {
                     std::string name = node["name"];
                     nameMap[name] = 1;
@@ -1799,7 +1799,7 @@ namespace xrock_gui_model
 
     void XRockGUI::applyConfiguration(configmaps::ConfigMap &map)
     {
-        if (map["domain"] != "software")
+        if (map["domain"] != "SOFTWARE")
             return;
         ComponentModelInterface *model = dynamic_cast<ComponentModelInterface *>(bagelGui->getCurrentModel());
         if (!model)

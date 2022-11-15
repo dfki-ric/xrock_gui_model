@@ -370,7 +370,7 @@ namespace xrock_gui_model
                 map["modelVersion"] = "v0.1";
                 map["modelName"] = name;
                 map["name"] = "";
-                map["domain"] = "software";
+                map["domain"] = "SOFTWARE";
                 map["NodeClass"] = "xrock";
                 map["type"] = type;
                 numInputs = 0;
@@ -476,7 +476,7 @@ namespace xrock_gui_model
             {
                 fromDomain << node.second["domain"];
                 fromNodeMap = node.second;
-                if (node.second["domain"] == "software")
+                if (node.second["domain"] == "SOFTWARE")
                 {
                     // todo: add framework handling
                     if (node.second["xrock_type"] == "system_modelling::task_graph::Task")
@@ -505,7 +505,7 @@ namespace xrock_gui_model
                             fromDomain << it["domain"];
                             // currently we can't decide wether the software interface of the assembly is from a Rock or
                             // other framework
-                            if (fromDomain == "software")
+                            if (fromDomain == "SOFTWARE")
                             {
                                 if (!map.hasKey("transport"))
                                 {

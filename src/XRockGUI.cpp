@@ -836,6 +836,14 @@ namespace xrock_gui_model
             // Create view will setup a NEW instance of a component model interface
             bagelGui->createView("xrock", map["name"]);
             ComponentModelInterface* model = dynamic_cast<ComponentModelInterface*>(bagelGui->getCurrentModel());
+            // add lode on the right position
+            if (map["versions"][0].hasKey("data"))
+            {
+                ConfigMap &dataMap = map["versions"][0]["data"];
+                ConfigMap layoutMap = dataMap["gui"]["layouts"];
+                for (auto [str, pos] : layoutMap)
+                    bagelGui->applyLayout(pos);
+            }
             // Set the model info of the ComponentModelInterface
             model->setModelInfo(map);
             // Afterwards we have to (re-)trigger the currentModelChanged() function
@@ -1626,7 +1634,7 @@ namespace xrock_gui_model
         loadComponentModelFrom(map);
     }
 
-    void XRockGUI::nodeContextClicked(const std::string &name)
+    void XRockGUI::nodeContextClicked(const std::string name)
     {
 
         if (name == "change version")
@@ -1700,7 +1708,7 @@ namespace xrock_gui_model
         }
     }
 
-    void XRockGUI::inPortContextClicked(const std::string &name)
+    void XRockGUI::inPortContextClicked(const std::string name)
     {
         if (name == "configure interface")
         {
@@ -1735,7 +1743,7 @@ namespace xrock_gui_model
         bagelGui->updateNodeMap(contextNodeName, node);
     }
 
-    void XRockGUI::outPortContextClicked(const std::string &name)
+    void XRockGUI::outPortContextClicked(const std::string name)
     {
         if (name == "configure interface")
         {

@@ -173,18 +173,18 @@ namespace xrock_gui_model
         if (nodeInfoMap.find(type) != nodeInfoMap.end())
             return false;
 
-        // TODO: Does this template only contain the component model info or is it a mixture?
-        // Where is the instance specific data stored?
-
         // Setup all information in the NodeInfo
         osg_graph_viz::NodeInfo info;
         // It should preserve as much of the orignal model as possible, so we should actually copy everything into info in the beginning!
-        info.map = model;
+        info.map["model"] = model;
+        // NOTE: This info is really needed such that other plugins can distinguish the maps.
+        info.map["NodeClass"] = "xrock";
         info.type = type;
+        // NOTE: Make the type visible in the NodeData widget
+        info.map["type"] = type;
 
         // Transform interfaces to inputs/outputs
         // This is needed, because the bagel GUI expects these to be set properly
-        // TODO: Shall we delete the interfaces key afterwards?
         int numInputs = 0;
         int numOutputs = 0;
         if (model["versions"][0].hasKey("interfaces"))
@@ -212,11 +212,13 @@ namespace xrock_gui_model
         info.numInputs = numInputs;
         info.numOutputs = numOutputs;
 
-        // TODO: Handle configurations
-        // Why is the config moved to some "data" field?
+        // Set the default configuration as configuration starting point
+        if (model["versions"][0].hasKey("defaultConfiguration"))
+        {
+            info.map["configuration"] = model["versions"][0]["defaultConfiguration"];
+        }
 
-        // NOTE: This info is really needed such that other plugins can distinguish the maps.
-        info.map["NodeClass"] = "xrock";
+        // Register the new model in the nodeInfoMap data structure
         nodeInfoMap[info.type] = info;
 
         return true;
@@ -648,9 +650,6 @@ namespace xrock_gui_model
         std::map<unsigned long, ConfigMap>::iterator it = nodeMap.find(nodeId);
         if (it != nodeMap.end())
         {
-            // todo: handle domain namespace in name
-            std::string nodeName = node["name"];
-            std::string domain = (std::string)node["domain"];
             it->second = node;
             return true;
         }
@@ -707,6 +706,7 @@ namespace xrock_gui_model
     {
         // NOTE: basicModel holds the original data. So we just copy over.
         basicModel = map;
+        std::cout << "ComponentModelInterface::setModelInfo()\n" << basicModel.toJsonString() << "\n";
         // We now use the basic model to setup the GUI
         if (basicModel["versions"][0].hasKey("components") && basicModel["versions"][0]["components"].hasKey("nodes"))
         {
@@ -729,7 +729,6 @@ namespace xrock_gui_model
                 }
                 // Add the part as a node in the bagelGui
                 bagelGui->addNode(partType, name);
-                // TODO: add configuration and other stuff to the node
                 // TODO: Apply interface_aliases info
             }
             // After we have done the nodes, we can wire their interfaces together
@@ -754,6 +753,25 @@ namespace xrock_gui_model
                     edge["smooth"] = true;
                     bagelGui->addEdge(edge);
                 }
+            }
+            // Add configuration update to nodes and edges
+            if (basicModel["versions"][0]["components"].hasKey("configuration"))
+            {
+                if (basicModel["versions"][0]["components"]["configuration"].hasKey("nodes"))
+                {
+                    auto nodeConfig = basicModel["versions"][0]["components"]["configuration"]["nodes"];
+                    for (auto it : nodeConfig)
+                    {
+                        const std::string& nodeName(it["name"].getString());
+                        ConfigMap currentMap = *bagelGui->getNodeMap(nodeName);
+                        if (it.hasKey("data"))
+                            currentMap["configuration"]["data"] = it["data"];
+                        if (it.hasKey("submodel"))
+                            currentMap["configuration"]["submodel"] = it["submodel"];
+                        bagelGui->updateNodeMap(nodeName, currentMap);
+                    }
+                }
+                // TODO: Handle edge data
             }
         }
         // Once we are done creating the nodes, we update their layout
@@ -791,32 +809,10 @@ namespace xrock_gui_model
 
     void ComponentModelInterface::resetConfig(configmaps::ConfigMap &map)
     {
-        std::string modelName = map["modelName"];
-        osg_graph_viz::NodeInfo ndi = nodeInfoMap[modelName];
-        ConfigMap &model = ndi.map;
-
-        if (map.hasKey("data"))
+        if (map["model"]["versions"][0].hasKey("defaultConfiguration"))
         {
-            ConfigMap &rMap = map["data"];
-            if (map["data"].hasKey("submodel"))
-            {
-                rMap.erase("submodel");
-            }
-            if (map["data"].hasKey("configuration"))
-            {
-                rMap.erase("configuration");
-            }
-        }
-        if (model.hasKey("data"))
-        {
-            if (model["data"].hasKey("configuration"))
-            {
-                map["data"]["configuration"] = model["data"]["configuration"];
-            }
-            if (model["data"].hasKey("submodel"))
-            {
-                map["data"]["submodel"] = model["data"]["submodel"];
-            }
+            // The node map already contains the default configuration
+            map["configuration"] = map["model"]["versions"][0]["defaultConfiguration"];
         }
     }
 

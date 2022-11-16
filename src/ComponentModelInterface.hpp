@@ -64,6 +64,8 @@ namespace xrock_gui_model
         // This function will register a component model if it is not already registered.
         // If the model is unknown it will request it internally
         bool registerComponentModel(const std::string& domain, const std::string& name, const std::string& version);
+        // This function tries to find layout specific info in the given model and will update the layout/positions of the parts
+        void applyPartLayout(configmaps::ConfigMap &map);
 
         // NOTE: If requested by the user, this function resets the node configuration to be the default config of the associated component model
         void resetConfig(configmaps::ConfigMap &map);

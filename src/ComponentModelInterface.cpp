@@ -173,6 +173,9 @@ namespace xrock_gui_model
         if (nodeInfoMap.find(type) != nodeInfoMap.end())
             return false;
 
+        // TODO: Does this template only contain the component model info or is it a mixture?
+        // Where is the instance specific data stored?
+
         // Setup all information in the NodeInfo
         osg_graph_viz::NodeInfo info;
         // It should preserve as much of the orignal model as possible, so we should actually copy everything into info in the beginning!
@@ -752,6 +755,25 @@ namespace xrock_gui_model
                     bagelGui->addEdge(edge);
                 }
             }
+        }
+        // Once we are done creating the nodes, we update their layout
+        applyPartLayout(basicModel);
+    }
+
+    void ComponentModelInterface::applyPartLayout(configmaps::ConfigMap &map)
+    {
+        if (!map["versions"][0].hasKey("data"))
+            return;
+        ConfigMap& dataMap = map["versions"][0]["data"];
+        if (!dataMap.hasKey("gui"))
+            return;
+        if (!dataMap["gui"].hasKey("layouts"))
+            return;
+        // Found a layout in the component model data field. Lets apply it.
+        ConfigMap& layoutMap = dataMap["gui"]["layouts"];
+        for (const auto &[layoutName, layoutPositions] : layoutMap)
+        {
+            bagelGui->applyLayout(layoutPositions);
         }
     }
 

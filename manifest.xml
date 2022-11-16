@@ -2,7 +2,8 @@
   <description brief="Interface implementation for XRock models into
                       bagel_gui">
   </description>
-  <depend package="external/cpr" />
+  <depend package="database/xdbi" />
+  <depend package="representation/xtypes" />
   <depend package="qt4-webkit" />
   <depend package="simulation/lib_manager" />
   <depend package="bagel/bagel_gui" />

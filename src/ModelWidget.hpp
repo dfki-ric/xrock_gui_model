@@ -12,9 +12,11 @@
 
 #include <QWidget>
 #include <QListWidget>
+#include <QComboBox>
 #include <QLineEdit>
 #include <QTextEdit>
 #include <QCheckBox>
+#include <QLabel>
 
 namespace bagel_gui {
   class BagelGui;
@@ -61,6 +63,7 @@ namespace xrock_gui_model {
     void checkComputation(int v);
     void layoutsClicked(const QModelIndex &index);
     void addRemoveLayout();
+    void addComponent();
     void loadModel();
     void saveModel();
     void storeModel();
@@ -70,6 +73,7 @@ namespace xrock_gui_model {
     void updateModelInfo();
     void getModelInfo(std::string *domain, std::string *name, std::string *verison);
     void openUrl(const QUrl &);
+    void validateYamlSyntax();
 
   private:
     bagel_gui::BagelGui *bagelGui;
@@ -81,9 +85,11 @@ namespace xrock_gui_model {
     //std::vector<std::string> nodeTypes;
     //std::string newNode;
     configmaps::ConfigMap localMap, layoutMap;
-    QLineEdit *name, *type, *version, *domain, *layoutName, *maturity;
+    QLineEdit *name, *type, *version,*layoutName, *maturity;
+    QComboBox *domain;
     QLineEdit *projectName, *designedBy;
-    QTextEdit *includes, *data, *interfaces;
+    QTextEdit *includes, *annotations, *interfaces;
+    QLabel *dataStatusLabel;
     configmaps::ConfigMap interfaceMap;
     bool ignoreUpdate;
     std::vector<std::string> xrockConfigFilter;

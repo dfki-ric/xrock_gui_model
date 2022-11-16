@@ -29,7 +29,7 @@ namespace xrock_gui_model {
     Q_OBJECT
 
   public:
-    ImportDialog(ModelLib *modelLib, bool load=false);
+   explicit ImportDialog(ModelLib *modelLib, bool load=false);
     ~ImportDialog();
 
     static std::string lastDomain, lastFilter;

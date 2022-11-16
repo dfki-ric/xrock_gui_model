@@ -80,8 +80,14 @@ namespace xrock_gui_model {
 
     QPushButton *button = new QPushButton("add component");
     if(load) {
+      this->setWindowTitle ("Load Model/Component");
       button->setText("load model");
     }
+    else
+    {
+      this->setWindowTitle ("Add Model/Component");
+    }
+    
     vLayout->addWidget(button);
     connect(button, SIGNAL(clicked()), this, SLOT(addModel()));
 
@@ -145,15 +151,18 @@ namespace xrock_gui_model {
     //fprintf(stderr, "START ImportDialog::versionChanged()\n\n");
     //fprintf(stderr, "%s\n\n", map.toYamlString().c_str());
     //fprintf(stderr, "END ImportDialog\n\n");
-    std::string domainData = selectedDomain + "Data";
     doc->setHtml("");
-    if(map["versions"][0].hasKey(domainData)) {
-      if(map["versions"][0][domainData].hasKey("data")) {
-        ConfigMap dataMap = ConfigMap::fromYamlString(map["versions"][0][domainData]["data"]);
+    if(map["versions"][0].hasKey("data")) {
+      {
+        ConfigMap dataMap;
+        if (map["versions"][0]["data"].isMap())
+            dataMap = map["versions"][0]["data"];
+        else
+            dataMap = ConfigMap::fromYamlString(map["versions"][0]["data"]);
         if(dataMap.hasKey("description")) {
           if(dataMap["description"].hasKey("markdown")) {
             std::string md = dataMap["description"]["markdown"];
-            fprintf(stderr, "convert: %s\n", md.c_str());
+            //fprintf(stderr, "convert: %s\n", md.c_str());
             doc->setHtml(getHtml(md).c_str());
           }
         }
@@ -182,7 +191,7 @@ namespace xrock_gui_model {
 
 
   void ImportDialog::updateFilter(const QString &filter) {
-    QRegExp exp(filter);
+    QRegExp exp(filter, Qt::CaseInsensitive);
 
     models->clear();
     for(auto it: modelList) {
@@ -203,6 +212,10 @@ namespace xrock_gui_model {
     selectedModel   = std::string("");
     selectedVersion = std::string("");
     modelList = modelLib->db->requestModelListByDomain( selectedDomain );
+    std::sort(modelList.begin(), modelList.end());
+    auto last = std::unique(modelList.begin(),modelList.end());
+    modelList.erase(last, modelList.end());
+
     for(auto it: modelList) {
       models->addItem(it.first.c_str());
     }

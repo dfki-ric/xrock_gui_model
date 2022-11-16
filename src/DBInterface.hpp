@@ -8,7 +8,7 @@
 #define XROCK_GUI_MODEL_XROCK_DB_INTERFACE_HPP
 
 #include <configmaps/ConfigMap.hpp>
-
+#include <xdbi/DbInterface.hpp>
 
 namespace xrock_gui_model {
 
@@ -25,8 +25,13 @@ namespace xrock_gui_model {
                                                 const std::string &version,
                                                 const bool limit = false) = 0;
     virtual bool storeModel(const configmaps::ConfigMap &map) = 0;
+    virtual void set_dbGraph(const std::string &_dbGraph) {};
+    virtual void set_dbAddress(const std::string &_dbAddress) {};
+    static std::vector<std::string> loadBackends() {
+        return xdbi::DbInterface::get_available_backends();
 
-    virtual void set_dbAddress(const std::string &_dbAddress) = 0;
+    }
+    virtual bool isConnected(){return false;};
 
   };
 } // end of namespace xrock_gui_model

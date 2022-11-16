@@ -37,9 +37,9 @@ namespace xrock_gui_model {
     }
 
     {
-      std::vector<std::string>::iterator it = searchPaths.begin();
-      for(; it!=searchPaths.end(); ++it) {
-        loadNodeInfo(*it);
+      std::vector<std::string>::iterator it2 = searchPaths.begin();
+      for(; it2!=searchPaths.end(); ++it2) {
+        loadNodeInfo(*it2);
       }
     }
 
@@ -77,9 +77,8 @@ namespace xrock_gui_model {
     edition = "";
   }
 
-  Model::Model(const Model *other) : ModelInterface(other->bagelGui) {
-    infoMap = other->infoMap;
-    edition = "";
+  Model::Model(const Model *other) : ModelInterface(other->bagelGui),
+  				      infoMap(other->infoMap),edition("") {
   }
 
   Model::~Model() {
@@ -230,11 +229,11 @@ namespace xrock_gui_model {
           ++numOutputs;
         }
       }
-      for(auto it: tmpMap["inputs"]) {
-        map["inputs"].push_back(it);
+      for(auto it3: tmpMap["inputs"]) {
+        map["inputs"].push_back(it3);
       }
-      for(auto it: tmpMap["outputs"]) {
-        map["outputs"].push_back(it);
+      for(auto it4: tmpMap["outputs"]) {
+        map["outputs"].push_back(it4);
       }
     }
 
@@ -248,25 +247,31 @@ namespace xrock_gui_model {
     if(!version.empty()) {
       info.map["modelVersion"] = version;
     }
-    if(model["versions"][versionIndex].hasKey(domain+"Data")) {
-      if(model["versions"][versionIndex][domain+"Data"].hasKey("data")) {
-        info.map[domain+"Data"]= model["versions"][versionIndex][domain+"Data"];
-        // unpack the data string for the gui
-        info.map[domain+"Data"]["data"] = ConfigMap::fromYamlString(model["versions"][versionIndex][domain+"Data"]["data"]);
+    if(model["versions"][versionIndex].hasKey("data")) {
+      info.map["data"]= model["versions"][versionIndex]["data"];
+      // unpack the data string for the gui
+      if (!(model["versions"][versionIndex]["data"].isMap())) {
+        info.map["data"] = ConfigMap::fromYamlString(model["versions"][versionIndex]["data"]);
       }
     }
     if(model["versions"][versionIndex].hasKey("defaultConfiguration") &&
        model["versions"][versionIndex]["defaultConfiguration"].hasKey("data")) {
-      info.map["defaultConfiguration"]["data"] = ConfigMap::fromYamlString(model["versions"][versionIndex]["defaultConfiguration"]["data"]);
+      if (model["versions"][versionIndex]["defaultConfiguration"]["data"].isMap())
+        info.map["defaultConfiguration"]["data"] = model["versions"][versionIndex]["defaultConfiguration"]["data"];
+      else
+        info.map["defaultConfiguration"]["data"] = ConfigMap::fromYamlString(model["versions"][versionIndex]["defaultConfiguration"]["data"]);
     }
     else if(model["versions"][versionIndex].hasKey("defaultConfig") &&
        model["versions"][versionIndex]["defaultConfig"].hasKey("data")) {
-      info.map["defaultConfiguration"]["data"] = ConfigMap::fromYamlString(model["versions"][versionIndex]["defaultConfig"]["data"]);
+      if (model["versions"][versionIndex]["defaultConfig"]["data"].isMap())
+        info.map["defaultConfiguration"]["data"] = model["versions"][versionIndex]["defaultConfig"]["data"];
+      else
+        info.map["defaultConfiguration"]["data"] = ConfigMap::fromYamlString(model["versions"][versionIndex]["defaultConfig"]["data"]);
     }
     if(model["versions"][versionIndex].hasKey("components") &&
        model["versions"][versionIndex]["components"].hasKey("configuration") &&
        model["versions"][versionIndex]["components"]["configuration"].hasKey("nodes")) {
-      ConfigMapHelper::unpackSubmodel(info.map[domain+"Data"]["data"], model["versions"][versionIndex]["components"]["configuration"]["nodes"]);
+      ConfigMapHelper::unpackSubmodel(info.map["data"], model["versions"][versionIndex]["components"]["configuration"]["nodes"]);
     }
     info.type = type;
     info.map["NodeClass"] = "xrock";
@@ -312,9 +317,9 @@ namespace xrock_gui_model {
           }
         }
         if(it2.second.hasKey("properties")) {
-          map["softwareData"]["data"]["properties"] = it2.second["properties"];
+          map["data"]["properties"] = it2.second["properties"];
         }
-        map["softwareData"]["data"]["framework"] = "Rock";
+        map["data"]["framework"] = "Rock";
         info.type = type;
         info.numInputs = numInputs;
         info.numOutputs = numOutputs;
@@ -334,17 +339,14 @@ namespace xrock_gui_model {
     if(nodeType == "DES") return true;
     if(nodeMap.find(nodeId) == nodeMap.end()) {
       if(map.hasKey("defaultConfiguration")) {
-        std::string domainData = map["domain"];
-        domainData += "Data";
-        if(!map.hasKey(domainData) ||
-           !map[domainData].hasKey("data") ||
-           !map[domainData]["data"].hasKey("configuration")) {
-          map[domainData]["data"]["configuration"] = map["defaultConfiguration"]["data"];
+        if(!map.hasKey("data") ||
+           !map["data"].hasKey("configuration")) {
+          map["data"]["configuration"] = map["defaultConfiguration"]["data"];
         }
       }
-      if(map.hasKey("softwareData") and map["softwareData"].hasKey("data") and
-         map["softwareData"]["data"].hasKey("framework")) {
-        if(map["softwareData"]["data"]["framework"] == "Rock") {
+      if(map.hasKey("data") and
+         map["data"].hasKey("framework")) {
+        if(map["data"]["framework"] == "Rock") {
           map["name"] = mars::utils::replaceString(nodeName, ":", "_");
         }
       }
@@ -586,29 +588,25 @@ namespace xrock_gui_model {
   }
 
   void Model::resetConfig(configmaps::ConfigMap &map) {
-    std::string domain = map["domain"];
-    std::string domainData = domain+"Data";
     std::string modelName = map["modelName"];
-    std::string modelVersion = map["modelVersion"];
     osg_graph_viz::NodeInfo ndi = infoMap[modelName];
     ConfigMap &model = ndi.map;
 
-    if(map[domainData].hasKey("data")) {
-      ConfigMap &rMap = map[domainData]["data"];
-      if(map[domainData]["data"].hasKey("submodel")) {
+    if(map.hasKey("data")) {
+      ConfigMap &rMap = map["data"];
+      if(map["data"].hasKey("submodel")) {
         rMap.erase("submodel");
       }
-      if(map[domainData]["data"].hasKey("configuration")) {
+      if(map["data"].hasKey("configuration")) {
         rMap.erase("configuration");
       }
     }
-    if(model.hasKey(domainData) &&
-       model[domainData].hasKey("data")) {
-      if(model[domainData]["data"].hasKey("configuration")) {
-        map[domainData]["data"]["configuration"] = model[domainData]["data"]["configuration"];
+    if(model.hasKey("data")) {
+      if(model["data"].hasKey("configuration")) {
+        map["data"]["configuration"] = model["data"]["configuration"];
       }
-      if(model[domainData]["data"].hasKey("submodel")) {
-        map[domainData]["data"]["submodel"] = model[domainData]["data"]["submodel"];
+      if(model["data"].hasKey("submodel")) {
+        map["data"]["submodel"] = model["data"]["submodel"];
       }
     }
   }

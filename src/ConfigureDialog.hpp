@@ -30,7 +30,7 @@ namespace xrock_gui_model {
                     const std::string &type, bool onlyMap=false,
                     bool noTreeEdit=false, configmaps::ConfigMap *dropdown = NULL,
                     std::string fileName = "");
-    ConfigureDialog(std::string *text);
+     ConfigureDialog(std::string *text);
     ~ConfigureDialog();
 
   protected slots:

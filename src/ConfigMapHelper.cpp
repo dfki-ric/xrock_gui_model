@@ -4,13 +4,16 @@ using namespace configmaps;
 
 namespace xrock_gui_model {
 
-  void ConfigMapHelper::unpackSubmodel(ConfigMap &target, ConfigVector &source) {
+  void ConfigMapHelper::unpackSubmodel(ConfigMap &target, const ConfigVector &source) {
     size_t i = 0;
     for(auto it: source) {
       target["submodel"][i]["name"] = it["name"];
       if(it.hasKey("data")) {
         try {
-          target["submodel"][i]["data"] = ConfigMap::fromYamlString(it["data"]);
+          if (it["data"].isMap())
+            target["submodel"][i]["data"] = it["data"];
+          else
+            target["submodel"][i]["data"] = ConfigMap::fromYamlString(it["data"]);
         }
         catch (...) {
           fprintf(stderr, "ERROR: unpack submodel\n");
@@ -23,7 +26,7 @@ namespace xrock_gui_model {
     }
   }
 
-  void ConfigMapHelper::packSubmodel(ConfigMap &target, ConfigVector &source) {
+  void ConfigMapHelper::packSubmodel(ConfigMap &target, const ConfigVector &source) {
     size_t i = 0;
     for(auto it: source) {
       target["submodel"][i]["name"] = it["name"];

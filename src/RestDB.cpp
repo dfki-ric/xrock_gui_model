@@ -31,12 +31,9 @@ namespace xrock_gui_model
         props["domain"] = mars::utils::toupper(domain);
         const std::vector<XTypePtr> models = client->find("ComponentModel", props, 0);
         std::vector<std::pair<std::string, std::string>> out;
-        for (const auto &model : models)
-        {
-            if (!model->has_property("version"))
-                throw std::runtime_error("Model of  componentModel type has no 'version' property!");
-            out.push_back(std::make_pair(model->get_property("name"), model->get_property("type")));
-        }
+        std::transform(models.begin(), models.end(), std::back_inserter(out), [&](auto &model)
+                       {if (!model->has_property("version"))throw std::runtime_error("Model of ComponentModel type has no 'version' property!"); 
+                    return std::make_pair(model->get_property("name"), model->get_property("type")); });
         return out;
     }
 
@@ -49,12 +46,11 @@ namespace xrock_gui_model
         props["domain"] = mars::utils::toupper(domain);
         const std::vector<XTypePtr> models = client->find("ComponentModel", props, 0);
         std::vector<std::string> out;
-        for (const auto &m : models)
-        {
-            if (!m->has_property("version"))
-                throw std::runtime_error("Model of ComponentModel type has no 'version' property!");
-            out.push_back(m->get_property("version"));
-        }
+        out.reserve(models.size());
+        out.reserve(models.size());
+        std::transform(models.begin(), models.end(), std::back_inserter(out), [&](auto &model)
+                       {if (!model->has_property("version"))throw std::runtime_error("Model of ComponentModel type has no 'version' property!");
+                      return model->get_property("version") ; });
         return out;
     }
 
@@ -112,8 +108,9 @@ namespace xrock_gui_model
         // # import from JSON and export to DB
         std::vector<ComponentModelPtr> models = ComponentModel::import_from_basic_model(serialized_model, load_missing_models);
         std::vector<XTypePtr> db_models{};
-        for (const auto &m : models)
-            db_models.push_back(std::static_pointer_cast<XType>(m));
+        db_models.reserve(models.size());
+        std::transform(models.begin(), models.end(), std::back_inserter(db_models), [&](auto &model)
+                       { return std::static_pointer_cast<XType>(model); });
 
         try
         {

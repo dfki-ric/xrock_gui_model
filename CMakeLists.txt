@@ -43,10 +43,12 @@ set(SOURCES
   src/ImportDialog.cpp
   src/VersionDialog.cpp
   src/ConfigureDialog.cpp
+  src/MultiDBConfigDialog.cpp
   src/ConfigMapHelper.cpp
   src/FileDB.cpp
   src/RestDB.cpp
   src/ServerlessDB.cpp
+  src/MultiDB.cpp
   src/ToolbarBackend.cpp
 )
 
@@ -57,10 +59,12 @@ set(HEADERS
   src/ImportDialog.hpp
   src/VersionDialog.hpp
   src/ConfigureDialog.hpp
+  src/MultiDBConfigDialog.hpp
   src/ConfigMapHelper.hpp
   src/FileDB.hpp
   src/RestDB.hpp
   src/ServerlessDB.hpp
+  src/MultiDB.hpp
   src/ToolbarBackend.hpp
 )
 
@@ -69,6 +73,7 @@ set (QT_MOC_HEADER
   src/ImportDialog.hpp
   src/VersionDialog.hpp
   src/ConfigureDialog.hpp
+  src/MultiDBConfigDialog.hpp
   src/ToolbarBackend.hpp
 )
 

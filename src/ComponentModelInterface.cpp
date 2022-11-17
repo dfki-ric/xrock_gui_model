@@ -163,7 +163,7 @@ namespace xrock_gui_model
 
     std::string ComponentModelInterface::deriveTypeFromNodeInfo(configmaps::ConfigMap &model)
     {
-        return deriveTypeFrom(model["domain"].getString(), model["name"].getString(), model["versions"][0]["name"].getString());
+        return deriveTypeFrom(model["model"]["domain"].getString(), model["model"]["name"].getString(), model["model"]["versions"][0]["name"].getString());
     }
 
     // This function actually adds the component model information of a node into the nodeInfoMap.

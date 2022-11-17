@@ -86,6 +86,7 @@ namespace xrock_gui_model
         // NOTE: The bagel specific stuff based on the basic model is in the node, edge and nodeInfo maps
         configmaps::ConfigMap basicModel;
         // This map stores the ORIGINAL info of the compponent models of the parts.
+        // TODO: This might not be needed anymore, because we store the complete model in the nodeInfoMap as well.
         std::map<std::string, configmaps::ConfigMap> partModels;
 
         void loadNodeInfo(std::string path, bool orogen = false); // NOTE: Needed for bagel/shader stuff. Could be moved to XRockGui itself

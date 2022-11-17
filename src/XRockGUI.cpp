@@ -850,6 +850,8 @@ namespace xrock_gui_model
         loadComponentModelFrom(map);
     }
 
+    // TODO: 20221117 MS: This function looks deprecated. Is it still needed?
+    // The generic name 'loadNodes' does not mirror the case that this only does things to 'mechanics' nodes.
     void XRockGUI::loadNodes(bagel_gui::BagelModel *model,
                              configmaps::ConfigMap &nodes, std::string path,
                              std::vector<std::string> *nodesFound)
@@ -892,6 +894,8 @@ namespace xrock_gui_model
         }
     }
 
+    // TODO: 20221117 MS: This function looks deprecated. Is it still needed?
+    // The generic name 'handleModelMap' does not mirror the case that this only does things to 'bagel' nodes.
     void XRockGUI::handleModelMap(bagel_gui::BagelModel *model,
                                   configmaps::ConfigMap &map,
                                   std::string path)
@@ -966,6 +970,7 @@ namespace xrock_gui_model
         }
     }
 
+    // TODO: Is this still needed? Looks bogus for me (especially the hardcoded paths)
     void XRockGUI::mechanicsToBagel(configmaps::ConfigMap &map)
     {
         bagel_gui::BagelModel *model = dynamic_cast<bagel_gui::BagelModel *>(bagelGui->getCurrentModel());
@@ -997,9 +1002,11 @@ namespace xrock_gui_model
         if (!node_)
             return;
         ConfigMap node = *node_;
+        // TODO: Check if this dialog has to be refactored.
         VersionDialog vd(this);
-        std::string domain = node["domain"];
-        std::string type = node["modelName"];
+        // When we request to change the version of a node, we have to search for alternative component models
+        std::string domain = node["model"]["domain"];
+        std::string type = node["model"]["name"];
         vd.requestComponent(domain, type);
         vd.exec();
     }
@@ -1008,20 +1015,18 @@ namespace xrock_gui_model
     {
         ConfigMap node = *(bagelGui->getNodeMap(name));
         ConfigMap config;
-        if (node["data"].hasKey("configuration"))
+        if (!node.hasKey("configuration"))
+            return;
+        // Preload the current configuration
+        config = node["configuration"]["data"];
         {
-            config = node["data"]["configuration"];
-        }
-        else if (node.hasKey("defaultConfiguration"))
-        {
-            config = node["defaultConfiguration"];
-        }
-        {
-            ConfigureDialog cd(&config, env, node["modelName"], true, true);
+            // TODO: Check if this dialog has to be refactored.
+            ConfigureDialog cd(&config, env, node["model"]["name"], true, true);
             cd.resize(400, 400);
             cd.exec();
         }
-        node["data"]["configuration"] = config;
+        // Update the node configuration
+        node["configuration"]["data"] = config;
         bagelGui->updateNodeMap(name, node);
     }
 
@@ -1040,7 +1045,7 @@ namespace xrock_gui_model
             {
                 std::string bundlePath = envs;
                 // only if both is set we continue
-                std::string configFile = node["modelName"];
+                std::string configFile = node["model"]["name"];
                 configFile += ".yml";
                 std::string path = mars::utils::pathJoin(bundlePath, bundleName);
                 path = mars::utils::pathJoin(path, "config");
@@ -1069,16 +1074,21 @@ namespace xrock_gui_model
     {
         ConfigMap node = *(bagelGui->getNodeMap(name));
         ConfigMap config;
-        if (node["data"].hasKey("submodel"))
+        // TODO: Shall we use default config if this is not present?
+        if (!node.hasKey("configuration"))
+            return;
+        if (!node["configuration"].hasKey("submodel"))
         {
-            config["submodel"] = node["data"]["submodel"];
+            QMessageBox::information(nullptr, "Configure Components", "This model does not have inner components or the configuration is invalid.", QMessageBox::Ok);
+            return;
         }
+        config["submodel"] = node["configuration"]["submodel"];
         {
-            ConfigureDialog cd(&config, env, node["modelName"], true, true);
+            ConfigureDialog cd(&config, env, node["model"]["name"], true, true);
             cd.resize(400, 400);
             cd.exec();
         }
-        node["data"]["submodel"] = config["submodel"];
+        node["configuration"]["submodel"] = config["submodel"];
         bagelGui->updateNodeMap(name, node);
     }
 
@@ -1092,6 +1102,7 @@ namespace xrock_gui_model
         openConfigureInterfaceDialog(nodeName, portName, "inputs");
     }
 
+    // TODO: Does this only work for bagel nodes? Where does this 'defaultConfig' come from?
     void XRockGUI::openConfigureInterfaceDialog(const std::string &nodeName,
                                                 const std::string &portName,
                                                 const std::string &portType)
@@ -1104,7 +1115,7 @@ namespace xrock_gui_model
         }
         ConfigMap node = *(bagelGui->getNodeMap(nodeName));
         ConfigMap config;
-        std::string type = node["xrock_type"];
+        std::string type = node["type"];
         bool bagelType = matchPattern("bagel::*", type);
         ConfigVector::iterator it = node[portType].begin();
         ConfigItem *subMap = NULL;
@@ -1139,6 +1150,7 @@ namespace xrock_gui_model
                     }
                     else
                     {
+                        // TODO: This is not correct. Where does this come from? The basic model does not have such a property?
                         config = ConfigMap::fromYamlString((*it)["defaultConfig"].getString());
                     }
                 }
@@ -1154,7 +1166,7 @@ namespace xrock_gui_model
             }
         }
         {
-            ConfigureDialog cd(&config, env, node["modelName"], true, false, &dropdown);
+            ConfigureDialog cd(&config, env, node["model"]["name"], true, false, &dropdown);
             cd.resize(400, 400);
             cd.exec();
         }
@@ -1179,6 +1191,7 @@ namespace xrock_gui_model
             }
             else
             {
+                // TODO: This is not correct. Where does this come from? The basic model does not have such a property?
                 (*it)["defaultConfig"] = config.toYamlString();
             }
             bagelGui->updateNodeMap(nodeName, node);
@@ -1215,14 +1228,13 @@ namespace xrock_gui_model
             }
             ConfigMap node = *(bagelGui->getNodeMap(versionChangeName));
             bagelGui->removeNode(versionChangeName);
-            std::string domain = node["domain"];
-            std::string name = node["modelName"];
+            std::string domain = node["model"]["domain"];
+            std::string name = node["model"]["name"];
             std::string versionName = version;
-            std::string type = name + "::" + versionName;
-            //widget->loadType(domain, name, versionName);
+            std::string type = model->deriveTypeFrom(domain, name, version);
             if (!model->hasNodeInfo(type))
             {
-                type = name;
+                model->registerComponentModel(domain, name, version);
             }
 
             bagelGui->addNode(type, versionChangeName);
@@ -1405,6 +1417,8 @@ namespace xrock_gui_model
         else
             QMessageBox::critical(nullptr, "Export", QString::fromStdString("Failed to export cnd with code: " + std::to_string(ret)), QMessageBox::Ok);
     }
+
+    // TODO: 20221117 MS: This function seems to be deprecated. We should always use export_cnd script.
     void XRockGUI::exportCnd2(const configmaps::ConfigMap &map_,
                               const std::string &filename)
     {
@@ -1588,6 +1602,8 @@ namespace xrock_gui_model
         FILE *f = fopen(shutdownFile.c_str(), "w");
         fclose(f);
     }
+
+    // TODO: Refactor this!
     void XRockGUI::importCND(const std::string &fileName)
     {
         ConfigMap map;
@@ -1659,17 +1675,17 @@ namespace xrock_gui_model
         else if (name == "open model")
         {
             ConfigMap node = *(bagelGui->getNodeMap(contextNodeName));
-            std::string domain = node["domain"];
-            std::string version = node["modelVersion"];
-            std::string model_name = node["modelName"];
+            std::string domain = node["model"]["domain"];
+            std::string model_name = node["model"]["name"];
+            std::string version = node["model"]["versions"][0]["name"];
             loadComponentModel(domain, model_name, version);
         }
         else if (name == "show description")
         {
             ConfigMap node = *(bagelGui->getNodeMap(contextNodeName));
-            std::string domain = node["domain"];
-            std::string version = node["modelVersion"];
-            std::string model_name = node["modelName"];
+            std::string domain = node["model"]["domain"];
+            std::string version = node["model"]["versions"][0]["name"];
+            std::string model_name = node["model"]["name"];
             QWebView *doc = new QWebView();
             doc->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
             widget->connect(doc, SIGNAL(linkClicked(const QUrl &)), widget, SLOT(openUrl(const QUrl &)));
@@ -1697,10 +1713,11 @@ namespace xrock_gui_model
         else if (name == "apply configuration")
         {
             ConfigMap node = *(bagelGui->getNodeMap(contextNodeName));
-            applyConfiguration(node);
+            applyConfiguration(node); // TODO: Check this function if it needs to be refactored
         }
     }
 
+    // TODO: 20221117 MS: This function seems to work only with bagel nodes? Is it still valid?
     void XRockGUI::inPortContextClicked(const std::string name)
     {
         if (name == "configure interface")
@@ -1736,6 +1753,7 @@ namespace xrock_gui_model
         bagelGui->updateNodeMap(contextNodeName, node);
     }
 
+    // TODO: 20221117 MS: This function seems to work only with bagel nodes? Is it still valid?
     void XRockGUI::outPortContextClicked(const std::string name)
     {
         if (name == "configure interface")
@@ -1797,9 +1815,12 @@ namespace xrock_gui_model
         return r;
     }
 
+    // TODO: This function might not work properly yet. See the version string stuff below.
     void XRockGUI::applyConfiguration(configmaps::ConfigMap &map)
     {
-        if (map["domain"] != "SOFTWARE")
+        // This function is restricted to software domain because it deals with ROCK task configuration only
+        // TODO: We should restrict the context strings then, so we cannot select it for other domains
+        if (map["model"]["domain"] != "SOFTWARE")
             return;
         ComponentModelInterface *model = dynamic_cast<ComponentModelInterface *>(bagelGui->getCurrentModel());
         if (!model)
@@ -1816,27 +1837,27 @@ namespace xrock_gui_model
             cmd = "DYLD_LIBRARY_PATH=$MYLD_LIBRARY_PATH ruby " + c + cmd;
         }
 #endif
-        if (map.hasKey("data") and
-            map["data"].hasKey("configuration") and
-            map["data"]["configuration"].hasKey("config"))
+        if (map.hasKey("configuration") and
+            map["configuration"].hasKey("data") and
+            map["configuration"]["data"].hasKey("config"))
         {
-            std::string yaml = "--- name:default\n" + map["data"]["configuration"]["config"].toYamlString();
+            std::string yaml = "--- name:default\n" + map["configuration"]["data"]["config"].toYamlString();
             std::ofstream file;
             file.open(configFile);
             file << yaml;
             file.close();
             cmd += " -c " + configFile;
             cmd += " -o " + modelFile + " ";
-            cmd += map["modelName"].getString();
+            cmd += map["model"]["name"].getString();
             cmd += " default";
         }
-        else if (map.hasKey("data") and
-                 map["data"].hasKey("configuration") and
-                 map["data"]["configuration"].hasKey("config_names"))
+        else if (map.hasKey("configuration") and
+                 map["configuration"].hasKey("data") and
+                 map["configuration"]["data"].hasKey("config_names"))
         {
             cmd += " -o " + modelFile + " ";
-            cmd += map["modelName"].getString();
-            for (auto it : map["data"]["configuration"]["config_names"])
+            cmd += map["model"]["name"].getString();
+            for (auto it : map["configuration"]["data"]["config_names"])
             {
                 cmd += " " + (std::string)it;
             }
@@ -1854,11 +1875,11 @@ namespace xrock_gui_model
             printf("ERROR: executing rock-instantiate\n");
             return;
         }
-        configmaps::ConfigMap info = model->getModelInfo();
-        std::string version = info["name"];
-        versionChangeName << map["name"];
-        version += "_" + info["versions"][0]["name"].getString() + "_" + versionChangeName;
-        cmd = "orogen_to_xrock --modelname " + map["modelName"].getString() + " --model_file " + modelFile + " --version_name " + version;
+        std::string version = map["model"]["versions"][0]["name"];
+        // TODO: What is this version name reformatting doing?
+        //versionChangeName << map["name"];
+        //version += "_" + info["versions"][0]["name"].getString() + "_" + versionChangeName;
+        cmd = "orogen_to_xrock --modelname " + map["model"]["name"].getString() + " --model_file " + modelFile + " --version_name " + version;
 #ifdef __APPLE__
         {
             std::string c = getenv("AUTOPROJ_CURRENT_ROOT");

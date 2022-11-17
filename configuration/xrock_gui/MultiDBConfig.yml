@@ -3,8 +3,8 @@ main_server:
   path: modkom/component_db
 import_servers:
   - type: Serverless
-    path: modkom/component_db
+    path: database/atomic_component_db
     graph: graph_test
   - type: Client
     url: http://localhost:8183
-    graph: graph_unit_test
+    graph: graph_production

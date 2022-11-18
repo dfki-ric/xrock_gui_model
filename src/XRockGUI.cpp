@@ -1092,13 +1092,15 @@ namespace xrock_gui_model
             QMessageBox::information(nullptr, "Configure Components", "This model does not have inner components or the configuration is invalid.", QMessageBox::Ok);
             return;
         }
-        config["submodel"] = node["configuration"]["submodel"];
+        // Since the data fields in there are strings, we have convert them to ConfigMaps
+        ConfigMapHelper::unpackSubmodel(config, node["configuration"]["submodel"]);
         {
             ConfigureDialog cd(&config, env, node["model"]["name"], true, true);
             cd.resize(400, 400);
             cd.exec();
         }
-        node["configuration"]["submodel"] = config["submodel"];
+        // Afterwards we have to repack them into strings
+        ConfigMapHelper::packSubmodel(node["configuration"], config["submodel"]);
         bagelGui->updateNodeMap(name, node);
     }
 

@@ -37,8 +37,6 @@ namespace xrock_gui_model
 
     std::vector<std::string> ServerlessDB::requestVersions(const std::string &domain, const std::string &model)
     {
-        // ToDo as soon as modelDeepness is integrated, we can simplify this
-        // request["modelDeepness"] = "versionOnly";
         nl::json props;
         props["name"] = model;
         props["domain"] = mars::utils::toupper(domain);

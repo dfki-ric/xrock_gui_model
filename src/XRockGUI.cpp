@@ -1087,11 +1087,6 @@ namespace xrock_gui_model
         // TODO: Shall we use default config if this is not present?
         if (!node.hasKey("configuration"))
             return;
-        if (!node["configuration"].hasKey("submodel"))
-        {
-            QMessageBox::information(nullptr, "Configure Components", "This model does not have inner components or the configuration is invalid.", QMessageBox::Ok);
-            return;
-        }
         // Since the data fields in there are strings, we have convert them to ConfigMaps
         ConfigMapHelper::unpackSubmodel(config, node["configuration"]["submodel"]);
         {
@@ -1776,19 +1771,25 @@ namespace xrock_gui_model
 
     std::vector<std::string> XRockGUI::getNodeContextStrings(const std::string &name)
     {
-        // get node map
-        // check domain foo
-        // save context name
+        // Get the node map to show context dependent on node properties (see below)
+        ConfigMap map = *(bagelGui->getNodeMap(name));
         std::vector<std::string> r;
         r.push_back("change version");
         r.push_back("configure node");
-        r.push_back("configure components");
+        // Make configure nodes only visible if the component actually has inner parts
+        if (map["model"]["versions"][0].hasKey("components") && map["model"]["versions"][0]["components"].hasKey("nodes"))
+        {
+            r.push_back("configure components");
+        }
         r.push_back("reset configuration");
-        r.push_back("open ROCK config file");
+        // Only software nodes can have a ROCK config file
+        if (map["model"]["domain"] == "SOFTWARE")
+        {
+            r.push_back("open ROCK config file");
+        }
         r.push_back("apply configuration");
         r.push_back("open model");
         r.push_back("show description");
-        // todo: add bundle handling for node configuration
 
         contextNodeName = name;
         return r;

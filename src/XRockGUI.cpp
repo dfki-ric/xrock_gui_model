@@ -11,10 +11,11 @@
 #include "FileDB.hpp"
 #include "RestDB.hpp"
 #include "ServerlessDB.hpp"
+#include "MultiDB.hpp"
+#include "MultiDBConfigDialog.hpp"
 #include "VersionDialog.hpp"
 #include "ConfigureDialog.hpp"
 #include "ConfigMapHelper.hpp"
-
 #include <lib_manager/LibManager.hpp>
 #include <bagel_gui/BagelGui.hpp>
 #include <bagel_gui/BagelModel.hpp>
@@ -100,11 +101,15 @@ namespace xrock_gui_model
             }
 
             std::string confDir2 = confDir + "/XRockGUI.yml";
+            std::string confDir3 = confDir + "/MultiDB.yml";
             if (mars::utils::pathExists(confDir2))
             {
                 cfg->loadConfig(confDir2.c_str());
             }
-
+            if (mars::utils::pathExists(confDir3))
+            {
+                cfg->loadConfig(confDir3.c_str());
+            }
             mars::cfg_manager::cfgPropertyStruct prop_dbAddress;
             prop_dbAddress = cfg->getOrCreateProperty("XRockGUI", "dbAddress",
                                                       defaultAddress, this);
@@ -118,10 +123,6 @@ namespace xrock_gui_model
                 std::string dbAbsPath = mars::utils::pathJoin(env["AUTOPROJ_CURRENT_ROOT"], env["dbPath"].toString());
                 db.reset(new ServerlessDB(dbAbsPath));
                 std::cout << "Using serverless where db path is: " << dbAbsPath << std::endl;
-            }
-            else if (env.hasKey("dbType") and env["dbType"] == "MultiDB")
-            {
-                // todo
             }
             else
             {
@@ -596,9 +597,18 @@ namespace xrock_gui_model
         }
         case MenuActions::SELECT_MULTIDB: // MultiDbClient
         {
-            // TODO: implement
-            std::cout << "integration of MultiDbClient still required" << std::endl;
+                std::string multidb_config_path = bagelGui->getConfigDir() + "/MultiDBConfig.yml";
+                MultiDBConfigDialog dialog(multidb_config_path);
+                dialog.exec();
+                ConfigMap yaml_to_json = configmaps::ConfigMap::fromYamlFile(multidb_config_path);
+                db.reset(new MultiDB(nl::json::parse(yaml_to_json.toJsonString())));
+                if (!db->isConnected())
+            {
+                std::string msg = "import_servers type client requested! Please run server using command:\njsondb -d " + toolbarBackend->get_dbPath();
+                QMessageBox::warning(nullptr, "Warning", msg.c_str(), QMessageBox::Ok);
+            }
             break;
+        
         }
         case MenuActions::RELOAD_MODEL_FROM_DB: // Reload
         {
@@ -859,7 +869,7 @@ namespace xrock_gui_model
         ConfigVector::iterator it = nodes["nodes"].begin();
         for (; it != nodes["nodes"].end(); ++it)
         {
-            if ((*it)["model"]["domain"] == "mechanics")
+            if ((*it)["model"]["domain"] == "MECHANICS")
             {
                 std::string modelName = (*it)["model"]["name"];
                 std::string name = (*it)["name"];

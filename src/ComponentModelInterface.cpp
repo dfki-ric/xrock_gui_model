@@ -715,6 +715,8 @@ namespace xrock_gui_model
             for (auto it : nodes)
             {
                 const std::string& name(it["name"].getString());
+                if (bagelGui->getNodeMap(name))
+                    continue;
                 const std::string& modelName(it["model"]["name"].getString());
                 const std::string& modelDomain(it["model"]["domain"].getString());
                 const std::string& modelVersion(it["model"]["version"].getString());
@@ -752,6 +754,8 @@ namespace xrock_gui_model
                             + "_" + edge["toNodeInput"].getString();
                     }
                     edge["smooth"] = true;
+                    if (hasEdge(edge))
+                        continue;
                     bagelGui->addEdge(edge);
                 }
             }

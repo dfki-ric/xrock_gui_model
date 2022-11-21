@@ -201,12 +201,13 @@ namespace xrock_gui_model
             
         }
     }
+
     void ComponentModelEditorWidget::currentModelChanged(bagel_gui::ModelInterface *model)
     {
         ComponentModelInterface* newModel = dynamic_cast<ComponentModelInterface *>(model);
         if (!newModel) return;
-        // TODO: Update all fields with the info given by the map. We should NOT trigger textChanged() though!
         auto info = newModel->getModelInfo();
+        currentModel = nullptr;
         this->update_widgets(info);
         currentModel = newModel;
     }
@@ -231,6 +232,17 @@ namespace xrock_gui_model
             }
         }
     }
+
+    bool ComponentModelEditorWidget::has_prop_widget(const std::string& prop_name)
+    {
+        for (auto &[label, widget] : widgets)
+        {
+            if (label->text().toStdString() == prop_name)
+                return true;
+        }
+        return false;
+    }
+
     std::string ComponentModelEditorWidget::get_prop_widget_text(const std::string &prop_name)
     {
         for (auto &[label, widget] : widgets)
@@ -245,12 +257,17 @@ namespace xrock_gui_model
         }
         throw std::runtime_error("no prop found with name " + prop_name);
     }
+
     void ComponentModelEditorWidget::updateModel()
     {
         if (!currentModel) return;
         ConfigMap updatedMap(currentModel->getModelInfo());
-        updatedMap["name"] = get_prop_widget_text("name");
-        // TODO: Read out the other fields and update the model properties of the currentModel
+        for (auto &it : updatedMap)
+        {
+            if (!has_prop_widget(it.first))
+                continue;
+            it.second = get_prop_widget_text(it.first);
+        }
         currentModel->setModelInfo(updatedMap);
     }
 

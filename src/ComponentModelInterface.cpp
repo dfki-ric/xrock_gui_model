@@ -222,139 +222,6 @@ namespace xrock_gui_model
         nodeInfoMap[info.type] = info;
 
         return true;
-
-        // TODO: Check what is really needed from below
-        //ConfigMap map, tmpMap;
-        //{
-        //    // 20221110 MS: This is shitty. We want 'type' to remain 'type'. Is this possible?
-        //    if (model.hasKey("type"))
-        //    {
-        //        map["xrock_type"] = model["type"];
-        //    }
-        //    // 20221110 MS: Why is this not kept as 'version'?
-        //    map["modelVersion"] = model["versions"][versionIndex]["name"];
-        //    ConfigVector::iterator it = model["versions"][versionIndex]["interfaces"].begin();
-        //    for (; it != model["versions"][versionIndex]["interfaces"].end(); ++it)
-        //    {
-        //        std::string iDomain = domain;
-        //        if (it->hasKey("domain"))
-        //        {
-        //            iDomain << (*it)["domain"];
-        //        }
-        //        if (it->hasKey("data"))
-        //        {
-        //            ConfigMap dataMap;
-        //            if ((*it)["data"].isMap())
-        //            {
-        //                dataMap = (*it)["data"];
-        //            }
-        //            else
-        //            {
-        //                std::string dataString = (*it)["data"];
-        //                if (!dataString.empty())
-        //                {
-        //                    dataMap = ConfigMap::fromYamlString(dataString);
-        //                }
-        //            }
-        //            if (dataMap.hasKey("domain"))
-        //            {
-        //                iDomain << dataMap["domain"];
-        //            }
-        //        }
-        //        if (!it->hasKey("direction") || (std::string)(*it)["direction"] == "INCOMING")
-        //        {
-        //            ConfigMap interface_;
-        //            interface_["name"] = (*it)["name"];
-        //            interface_["type"] = (*it)["type"];
-        //            interface_["direction"] = "incoming";
-        //            if (!iDomain.empty())
-        //            {
-        //                interface_["domain"] = iDomain;
-        //            }
-        //            tmpMap["inputs"].push_back(interface_);
-        //            ++numInputs;
-        //        }
-        //        else if ((std::string)(*it)["direction"] == "OUTGOING")
-        //        {
-        //            ConfigMap interface_;
-        //            interface_["name"] = (*it)["name"];
-        //            interface_["type"] = (*it)["type"];
-        //            interface_["direction"] = "outgoing";
-        //            if (!iDomain.empty())
-        //            {
-        //                interface_["domain"] = iDomain;
-        //            }
-        //            tmpMap["outputs"].push_back(interface_);
-        //            ++numOutputs;
-        //        }
-        //        else if ((std::string)(*it)["direction"] == "BIDIRECTIONAL")
-        //        {
-        //            ConfigMap interface_;
-        //            interface_["name"] = (*it)["name"];
-        //            interface_["type"] = (*it)["type"];
-        //            interface_["direction"] = "bidirectional";
-        //            if (!iDomain.empty())
-        //            {
-        //                interface_["domain"] = iDomain;
-        //            }
-        //            map["inputs"].push_back(interface_);
-        //            map["outputs"].push_back(interface_);
-        //            ++numInputs;
-        //            ++numOutputs;
-        //        }
-        //    }
-        //    for (auto it3 : tmpMap["inputs"])
-        //    {
-        //        map["inputs"].push_back(it3);
-        //    }
-        //    for (auto it4 : tmpMap["outputs"])
-        //    {
-        //        map["outputs"].push_back(it4);
-        //    }
-        //}
-        //info.numInputs = numInputs;
-        //info.numOutputs = numOutputs;
-        //info.map = map;
-        //info.map["name"] = "";
-        //info.map["type"] = type;
-        //info.map["domain"] = domain;
-        //info.map["modelName"] = model["name"];
-        //if (!version.empty())
-        //{
-        //    info.map["modelVersion"] = version;
-        //}
-        //if (model["versions"][versionIndex].hasKey("data"))
-        //{
-        //    info.map["data"] = model["versions"][versionIndex]["data"];
-        //    // unpack the data string for the gui
-        //    if (!(model["versions"][versionIndex]["data"].isMap()))
-        //    {
-        //        info.map["data"] = ConfigMap::fromYamlString(model["versions"][versionIndex]["data"]);
-        //    }
-        //}
-        //if (model["versions"][versionIndex].hasKey("defaultConfiguration") &&
-        //    model["versions"][versionIndex]["defaultConfiguration"].hasKey("data"))
-        //{
-        //    if (model["versions"][versionIndex]["defaultConfiguration"]["data"].isMap())
-        //        info.map["defaultConfiguration"]["data"] = model["versions"][versionIndex]["defaultConfiguration"]["data"];
-        //    else
-        //        info.map["defaultConfiguration"]["data"] = ConfigMap::fromYamlString(model["versions"][versionIndex]["defaultConfiguration"]["data"]);
-        //}
-        //else if (model["versions"][versionIndex].hasKey("defaultConfig") &&
-        //         model["versions"][versionIndex]["defaultConfig"].hasKey("data"))
-        //{
-        //    if (model["versions"][versionIndex]["defaultConfig"]["data"].isMap())
-        //        info.map["defaultConfiguration"]["data"] = model["versions"][versionIndex]["defaultConfig"]["data"];
-        //    else
-        //        info.map["defaultConfiguration"]["data"] = ConfigMap::fromYamlString(model["versions"][versionIndex]["defaultConfig"]["data"]);
-        //}
-        //if (model["versions"][versionIndex].hasKey("components") &&
-        //    model["versions"][versionIndex]["components"].hasKey("configuration") &&
-        //    model["versions"][versionIndex]["components"]["configuration"].hasKey("nodes"))
-        //{
-        //    ConfigMapHelper::unpackSubmodel(info.map["data"], model["versions"][versionIndex]["components"]["configuration"]["nodes"]);
-        //}
-        //info.type = type;
     }
 
     // TODO: Is this function deprecated? Because we normally import orogen models from orogen_to_xrock script
@@ -418,38 +285,21 @@ namespace xrock_gui_model
         return true;
     }
 
-    // 20221110 MS: This function adds an entry into the nodeMap
-    // todo: document in what cases which addNode function is used
+    // This function gets called whenever the GUI adds a new node to the canvas
     bool ComponentModelInterface::addNode(unsigned long nodeId, configmaps::ConfigMap *node)
     {
-        // TODO: This function also does a lot of undocumented magic. Refactor it!!!
         ConfigMap &map = *node;
+
+        // Check if the node has already been added
+        if (nodeMap.find(nodeId) != nodeMap.end())
+            return false;
+
+        // TODO: Instead of these 'DES' nodes we should have a property called 'description'
         std::string nodeType = map["type"];
-        std::string nodeName = map["name"];
         if (nodeType == "DES")
             return true;
-        if (nodeMap.find(nodeId) == nodeMap.end())
-        {
-            if (map.hasKey("defaultConfiguration"))
-            {
-                if (!map.hasKey("data") ||
-                    !map["data"].hasKey("configuration"))
-                {
-                    map["data"]["configuration"] = map["defaultConfiguration"]["data"];
-                }
-            }
-            if (map.hasKey("data") and
-                map["data"].hasKey("framework"))
-            {
-                if (map["data"]["framework"] == "Rock")
-                {
-                    map["name"] = mars::utils::replaceString(nodeName, ":", "_");
-                }
-            }
-            nodeMap[nodeId] = map;
-            return true;
-        }
-        return false;
+        nodeMap[nodeId] = map;
+        return true;
     }
 
     bool ComponentModelInterface::addNode(unsigned long nodeId,
@@ -464,110 +314,15 @@ namespace xrock_gui_model
     {
         ConfigMap &map = *edge;
 
+        // Check if we already have added the edge
         if (edgeMap.find(edgeId) != edgeMap.end())
             return false;
 
-        // TODO: This function also does a lot of undocumented magic. Refactor it!!!
-
-        // todo: add error handling
-        std::string fromNode = map["fromNode"];
-        std::string fromNodePort = map["fromNodeOutput"];
-        std::string toNode = map["toNode"];
-        std::string toNodePort = map["toNodeInput"];
-        std::string fromDomain;
-        std::string toDomain;
-        ConfigMap fromNodeMap;
-        for (auto node : nodeMap)
-        {
-            if (node.second["name"] == fromNode)
-            {
-                fromDomain << node.second["domain"];
-                fromNodeMap = node.second;
-                if (node.second["domain"] == "SOFTWARE")
-                {
-                    // todo: add framework handling
-                    if (node.second["xrock_type"] == "system_modelling::task_graph::Task")
-                    {
-                        if (!map.hasKey("transport"))
-                        {
-                            map["transport"] = "CORBA";
-                            map["type"] = "DATA";
-                            map["size"] = "100";
-                        }
-                    }
-                    else if (matchPattern("bagel::*", node.second["xrock_type"]))
-                    {
-                        if (!map.hasKey("weight"))
-                        {
-                            map["weight"] = "1.0";
-                        }
-                    }
-                }
-                if (fromDomain == "assembly")
-                {
-                    for (auto it : node.second["outputs"])
-                    {
-                        if (it["name"] == fromNodePort)
-                        {
-                            fromDomain << it["domain"];
-                            // currently we can't decide wether the software interface of the assembly is from a Rock or
-                            // other framework
-                            if (fromDomain == "SOFTWARE")
-                            {
-                                if (!map.hasKey("transport"))
-                                {
-                                    map["transport"] = "CORBA";
-                                    map["type"] = "DATA";
-                                    map["size"] = "100";
-                                }
-                            }
-                            break;
-                        }
-                    }
-                }
-                if (!toDomain.empty())
-                    break;
-            }
-            if (node.second["name"] == toNode)
-            {
-                toDomain << node.second["domain"];
-                if (toDomain == "assembly")
-                {
-                    for (auto it : node.second["inputs"])
-                    {
-                        if (it["name"] == toNodePort)
-                        {
-                            toDomain << it["domain"];
-                            break;
-                        }
-                    }
-                }
-                if (!fromDomain.empty())
-                    break;
-            }
-        }
-
-        // add edge domain info
-        // check wether ports are of same domain
-        if (fromDomain != toDomain)
-        {
-            return false;
-        }
-        if (fromDomain == "assembly")
-        {
-            for (auto it : fromNodeMap["outputs"])
-            {
-                if ((std::string)it["name"] == fromNodePort)
-                {
-                    map["domain"] = it["domain"];
-                    break;
-                }
-            }
-        }
-        else
-        {
-            map["domain"] << fromDomain;
-        }
+        // TODO: Move this check to port compatibility function
+        //if (fromDomain != toDomain)
+        //{
+        //    return false;
+        //}
         edgeMap[edgeId] = map;
         return true;
     }
@@ -579,6 +334,7 @@ namespace xrock_gui_model
         return addEdge(edgeId, &map);
     }
 
+    // Checks whether an edge between the same nodes and interfaces already exists
     bool ComponentModelInterface::hasEdge(configmaps::ConfigMap *edge)
     {
         ConfigMap &map = *edge;
@@ -603,17 +359,9 @@ namespace xrock_gui_model
     }
 
     // DEPRECATED
+    // TODO: Check if this is a pure virtual function. If it is not, remove it completely
     bool ComponentModelInterface::groupNodes(unsigned long groupNodeId, unsigned long nodeId)
     {
-        // todo: handle deployments
-        std::map<unsigned long, ConfigMap>::iterator it = nodeMap.find(groupNodeId);
-        if (it != nodeMap.end())
-        {
-            if ((std::string)it->second["type"] == "software::Deployment")
-            {
-                return true;
-            }
-        }
         return false;
     }
 
@@ -633,9 +381,7 @@ namespace xrock_gui_model
     bool ComponentModelInterface::removeEdge(unsigned long edgeId)
     {
         if (edgeMap.find(edgeId) == edgeMap.end())
-        {
             return true;
-        }
 
         edgeMap.erase(edgeId);
         return true;
@@ -706,7 +452,7 @@ namespace xrock_gui_model
     {
         // NOTE: basicModel holds the original data. So we just copy over.
         basicModel = map;
-        std::cout << "ComponentModelInterface::setModelInfo()\n" << basicModel.toJsonString() << "\n";
+        //std::cout << "ComponentModelInterface::setModelInfo()\n" << basicModel.toJsonString() << "\n";
         // We now use the basic model to setup the GUI
         if (basicModel["versions"][0].hasKey("components") && basicModel["versions"][0]["components"].hasKey("nodes"))
         {
@@ -840,7 +586,7 @@ namespace xrock_gui_model
         }
         // When finished, update basicModel and return it
         // NOTE: There might be leftovers of the bagel specific data which will be ignored by the xtype specific data
-        std::cout << "ComponentModelInterface::getModelInfo():\n" << mi.toJsonString() << "\n";
+        //std::cout << "ComponentModelInterface::getModelInfo():\n" << mi.toJsonString() << "\n";
         basicModel = mi;
         return basicModel;
     }

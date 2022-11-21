@@ -65,8 +65,6 @@ namespace xrock_gui_model
         // update widget with thr properties and as well as fact information
         void update_widgets(configmaps::ConfigMap &info);
 
-    // TODO: Need a signal to notify others about changes in the fields. Used to update the current model values.
-
     private:
         std::map<QLabel *, QWidget *> widgets; // Generic list of label:
         bagel_gui::BagelGui *bagelGui;

@@ -701,6 +701,7 @@ namespace xrock_gui_model
         }
     }
 
+    // TODO: Check if this function should belong here, because it does not operate on a component model interface but a bagel interface
     void XRockGUI::createBagelModel()
     {
         ModelInterface *model = bagelGui->getCurrentModel();
@@ -788,7 +789,6 @@ namespace xrock_gui_model
                     n -= step;
                 }
             }
-            // TODO: This whole function is irrelevant
             //widget->loadType("SOFTWARE", "PIPE", "v1.0.0");
             //widget->loadType("SOFTWARE", "SIN", "v1.0.0");
             //widget->loadType("SOFTWARE", "ASIN", "v1.0.0");
@@ -1026,7 +1026,6 @@ namespace xrock_gui_model
         if (!node_)
             return;
         ConfigMap node = *node_;
-        // TODO: Check if this dialog has to be refactored.
         VersionDialog vd(this);
         // When we request to change the version of a node, we have to search for alternative component models
         std::string domain = node["model"]["domain"];
@@ -1044,7 +1043,6 @@ namespace xrock_gui_model
         // Preload the current configuration
         config = node["configuration"]["data"];
         {
-            // TODO: Check if this dialog has to be refactored.
             ConfigureDialog cd(&config, env, node["model"]["name"], true, true);
             cd.resize(400, 400);
             cd.exec();
@@ -1098,7 +1096,6 @@ namespace xrock_gui_model
     {
         ConfigMap node = *(bagelGui->getNodeMap(name));
         ConfigMap config;
-        // TODO: Shall we use default config if this is not present?
         if (!node.hasKey("configuration"))
             return;
         // Since the data fields in there are strings, we have convert them to ConfigMaps
@@ -1307,9 +1304,9 @@ namespace xrock_gui_model
                         }
                     }
                 }
-                if (node.hasKey("data"))
+                if (node.hasKey("configuration"))
                 {
-                    nodeMap["data"].updateMap(node["data"]);
+                    nodeMap["configuration"].updateMap(node["configuration"]);
                 }
             }
 
@@ -1428,9 +1425,10 @@ namespace xrock_gui_model
         {
             cnd_export << " -b Client ";
         }
-        // else if(dynamic_cast<MultiDB*>(db)){
-        //  cnd_export << " -b multidb ";
-        //}
+        else if(dynamic_cast<MultiDB*>(db))
+        {
+          cnd_export << " -b multidb ";
+        }
 
         int ret = std::system(cnd_export.str().c_str());
         if (ret == EXIT_SUCCESS)
@@ -1624,7 +1622,6 @@ namespace xrock_gui_model
         fclose(f);
     }
 
-    // TODO: Refactor this!
     void XRockGUI::importCND(const std::string &fileName)
     {
         ConfigMap map;
@@ -1658,12 +1655,12 @@ namespace xrock_gui_model
                 map["versions"][0]["components"]["configuration"]["nodes"].push_back(config);
             }
         }
+        // TODO: The next lines have to be refactored
         map["modelPath"] = mars::utils::getPathOfFile(fileName);
         map.toYamlFile("da.yml");
         loadComponentModelFrom(map);
     }
 
-    // TODO: This has to be adapted to the new ComponentModelInterface
     void XRockGUI::nodeContextClicked(const std::string name)
     {
 
@@ -1701,6 +1698,7 @@ namespace xrock_gui_model
             std::string version = node["model"]["versions"][0]["name"];
             loadComponentModel(domain, model_name, version);
         }
+        // TODO: We should add a property called 'description' to the xtypes
         else if (name == "show description")
         {
             ConfigMap node = *(bagelGui->getNodeMap(contextNodeName));
@@ -1734,7 +1732,7 @@ namespace xrock_gui_model
         else if (name == "apply configuration")
         {
             ConfigMap node = *(bagelGui->getNodeMap(contextNodeName));
-            applyConfiguration(node); // TODO: Check this function if it needs to be refactored
+            applyConfiguration(node);
         }
     }
 
@@ -1846,7 +1844,6 @@ namespace xrock_gui_model
     void XRockGUI::applyConfiguration(configmaps::ConfigMap &map)
     {
         // This function is restricted to software domain because it deals with ROCK task configuration only
-        // TODO: We should restrict the context strings then, so we cannot select it for other domains
         if (map["model"]["domain"] != "SOFTWARE")
             return;
         ComponentModelInterface *model = dynamic_cast<ComponentModelInterface *>(bagelGui->getCurrentModel());
@@ -1928,6 +1925,7 @@ namespace xrock_gui_model
         }
         else if (property.paramId == dbUser_paramId)
         {
+            // TODO: Is something missing here?
         }
     }
 

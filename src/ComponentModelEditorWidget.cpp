@@ -54,7 +54,7 @@ namespace xrock_gui_model
                     for (const auto &allowed : allowed_values)
                         combobox->addItem(QString::fromStdString(allowed));
                     layout->addWidget(combobox, i++, 1);
-                    connect(combobox, SIGNAL(textChanged(const QString &)), this, SLOT(updateModel()));
+                    connect(combobox, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(updateModel()));
                     widgets[label] = combobox;
                 }
                 else
@@ -262,11 +262,24 @@ namespace xrock_gui_model
     {
         if (!currentModel) return;
         ConfigMap updatedMap(currentModel->getModelInfo());
+        // Update toplvl properties
         for (auto &it : updatedMap)
         {
             if (!has_prop_widget(it.first))
                 continue;
             it.second = get_prop_widget_text(it.first);
+        }
+        // Update 'second' level properties (all due to having the basic model legacy :/)
+        ConfigMap& secondLevel(updatedMap["versions"][0]); 
+        for (auto &it : secondLevel)
+        {
+            // NOTE: The 'name' key on the second level is tied to the 'version' widget
+            std::string key = it.first;
+            if (key == "name")
+                key = "version";
+            if (!has_prop_widget(key))
+                continue;
+            it.second = get_prop_widget_text(key);
         }
         currentModel->setModelInfo(updatedMap);
     }

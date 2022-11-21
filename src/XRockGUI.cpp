@@ -355,8 +355,11 @@ namespace xrock_gui_model
         }
         case MenuActions::STORE_MODEL_TO_DB: // store model
         {
-            // TODO: Create function in XRockGUI or in DBInterface or somewhere else
-            //widget->storeModel();
+            if (!storeComponentModel())
+            {
+                QMessageBox::critical(nullptr, "Error", "Could not store component model to database", QMessageBox::Ok);
+            }
+            QMessageBox::information(nullptr, "Success", "Component model has been sucessfully stored into database", QMessageBox::Ok);
             break;
         }
         case MenuActions::EXPORT_CND:
@@ -817,20 +820,19 @@ namespace xrock_gui_model
     void XRockGUI::addComponent(const std::string& domain, const std::string& modelName, const std::string& version, std::string nodeName)
     {
         ComponentModelInterface *model = dynamic_cast<ComponentModelInterface *>(bagelGui->getCurrentModel());
-        if (model)
+        if (!model)
+            return;
+        const std::string& type(model->deriveTypeFrom(domain, modelName, version));
+        if (!model->registerComponentModel(domain, modelName, version))
         {
-            const std::string& type(model->deriveTypeFrom(domain, modelName, version));
-            if (!model->registerComponentModel(domain, modelName, version))
-            {
-                std::cerr << "XRockGUI::addComponent(): Could not register component model " << type << "\n";
-                return;
-            }
-            if (nodeName.empty())
-            {
-                nodeName = modelName;
-            }
-            bagelGui->addNode(type, nodeName);
+            std::cerr << "XRockGUI::addComponent(): Could not register component model " << type << "\n";
+            return;
         }
+        if (nodeName.empty())
+        {
+            nodeName = modelName;
+        }
+        bagelGui->addNode(type, nodeName);
     }
 
     // This function loads a component model from an already existing config map
@@ -858,6 +860,18 @@ namespace xrock_gui_model
     {
         ConfigMap map = db->requestModel(domain, modelName, version, !version.empty());
         loadComponentModelFrom(map);
+    }
+
+    // This function stores the current component model
+    bool XRockGUI::storeComponentModel()
+    {
+        ComponentModelInterface *model = dynamic_cast<ComponentModelInterface *>(bagelGui->getCurrentModel());
+        if (!model)
+            return false;
+        // Get the current model info
+        ConfigMap map = model->getModelInfo();
+        // Store the returned info to db
+        return db->storeModel(map);
     }
 
     // TODO: 20221117 MS: This function looks deprecated. Is it still needed?
@@ -1782,12 +1796,12 @@ namespace xrock_gui_model
             r.push_back("configure components");
         }
         r.push_back("reset configuration");
-        // Only software nodes can have a ROCK config file
+        // Only software nodes can have a ROCK config file and can have 'apply configuration'
         if (map["model"]["domain"] == "SOFTWARE")
         {
             r.push_back("open ROCK config file");
+            r.push_back("apply configuration");
         }
-        r.push_back("apply configuration");
         r.push_back("open model");
         r.push_back("show description");
 

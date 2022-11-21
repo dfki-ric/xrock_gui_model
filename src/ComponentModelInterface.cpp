@@ -728,6 +728,7 @@ namespace xrock_gui_model
                     continue;
                 }
                 // Add the part as a node in the bagelGui
+                // TODO: Apply node alias if set
                 bagelGui->addNode(partType, name);
                 // TODO: Apply interface_aliases info
             }
@@ -771,7 +772,7 @@ namespace xrock_gui_model
                         bagelGui->updateNodeMap(nodeName, currentMap);
                     }
                 }
-                // TODO: Handle edge data
+                // TODO: Handle edge configuration
             }
         }
         // Once we are done creating the nodes, we update their layout
@@ -801,8 +802,41 @@ namespace xrock_gui_model
     {
         // NOTE: bagelInfo holds the data which might have been altered.
         ConfigMap mi(basicModel);
-        // TODO: Peform inverse transformations to update basicModel based on (possibly altered) bagelInfo
+        // NOTE: The toplevel properties have already been updated at this point (see ComponentModelEditorWidget)
+        // Update inner components & configuration based on nodeMap
+        mi["versions"][0]["components"]["nodes"] = ConfigVector();
+        mi["versions"][0]["components"]["configuration"]["nodes"] = ConfigVector();
+        for (auto& [id, node] : nodeMap)
+        {
+            // Update node entry
+            ConfigMap n;
+            n["name"] = node["name"];
+            n["model"]["name"] = node["model"]["name"];
+            n["model"]["domain"] = node["model"]["domain"];
+            n["model"]["version"] = node["model"]["versions"][0]["name"];
+            mi["versions"][0]["components"]["nodes"].push_back(n);
+            // Update node configuration entry
+            ConfigMap c(node["configuration"]);
+            c["name"] = n["name"];
+            mi["versions"][0]["components"]["configuration"]["nodes"].push_back(c);
+        }
+        // Update edges & configuration based on edgeMap
+        mi["versions"][0]["components"]["edges"] = ConfigVector();
+        mi["versions"][0]["components"]["configuration"]["edges"] = ConfigVector();
+        for (auto& [id, edge] : edgeMap)
+        {
+            ConfigMap e(edge);
+            // Update edge entry
+            e["from"]["name"] = edge["fromNode"];
+            e["from"]["interface"] = edge["fromNodeOutput"];
+            e["to"]["name"] = edge["toNode"];
+            e["to"]["interface"] = edge["toNodeInput"];
+            mi["versions"][0]["components"]["edges"].push_back(e);
+            // TODO: Update edge configuration
+        }
         // When finished, update basicModel and return it
+        // NOTE: There might be leftovers of the bagel specific data which will be ignored by the xtype specific data
+        std::cout << "ComponentModelInterface::getModelInfo():\n" << mi.toJsonString() << "\n";
         basicModel = mi;
         return basicModel;
     }

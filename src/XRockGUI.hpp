@@ -112,9 +112,13 @@ namespace xrock_gui_model
         void addComponent();
 
         // public slots:
+        // This function adds a new component to the current component model (possibly asking the DB for it's model)
         void addComponent(const std::string& domain, const std::string& modelName, const std::string& version, std::string nodeName = "");
+        // These function load a component model from DB or from a ConfigMap
         void loadComponentModel(const std::string& domain, const std::string& modelName, const std::string& version);
         void loadComponentModelFrom(configmaps::ConfigMap &map);
+        // This function stores the current component model
+        bool storeComponentModel();
         void applyConfiguration(configmaps::ConfigMap &map);
         std::unique_ptr<DBInterface> db;
 

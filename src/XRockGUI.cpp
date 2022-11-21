@@ -1425,7 +1425,7 @@ namespace xrock_gui_model
         {
             cnd_export << " -b Client ";
         }
-        else if(dynamic_cast<MultiDB*>(db))
+        else if(dynamic_cast<MultiDB*>(db.get()))
         {
           cnd_export << " -b multidb ";
         }

@@ -1389,7 +1389,7 @@ namespace xrock_gui_model
             printf("ERROR: executing rock-instantiate\n");
             return;
         }
-        std::string new_version = map["model"]["name"] + "_" + map["model"]["versions"][0]["name"] + "_" + versionChangeName;
+        std::string new_version = map["model"]["name"].getString() + "_" + map["model"]["versions"][0]["name"].getString() + "_" + versionChangeName;
         cmd = "orogen_to_xrock --modelname " + map["model"]["name"].getString() + " --model_file " + modelFile + " --version_name " + new_version;
 #ifdef __APPLE__
         {

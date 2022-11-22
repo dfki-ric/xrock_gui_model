@@ -43,7 +43,6 @@ namespace xrock_gui_model
         CREATE_BAGEL_MODEL = 12,
         CREATE_BAGEL_TASK = 13,
         EDIT_MODEL_DESCRIPTION = 14,
-        EXPORT_CND_AND_LAUNCH = 15,
         STOP_CND = 16,
         IMPORT_CND = 20,
         SELECT_SERVERLESS = 21,
@@ -98,7 +97,6 @@ namespace xrock_gui_model
         void configureOutPort(const std::string &nodeName, const std::string &portName);
         void selectVersion(const std::string &version);
         void exportCnd(const configmaps::ConfigMap &map_, const std::string &filename, const std::string &urdf_file = "");
-        void exportCnd2(const configmaps::ConfigMap &map_, const std::string &filename);
         void importCND(const std::string &fileName);
         void nodeContextClicked(const std::string name);
         void inPortContextClicked(const std::string name);

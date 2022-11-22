@@ -37,7 +37,6 @@ namespace xrock_gui_model
         EXPORT_CND = 5,
         ADD_COMPONENT_FROM_DB = 6,
         LOAD_MODEL_FROM_DB = 7,
-        IMPORT_HW_TO_BAGEL = 8,
         EDIT_LOCAL_MAP = 10,
         CREATE_BAGEL_MOTION_CONTROL_TASK = 11,
         CREATE_BAGEL_MODEL = 12,
@@ -84,10 +83,6 @@ namespace xrock_gui_model
 
         // MenuInterface methods
         void menuAction(int action, bool checked = false);
-        void loadNodes(bagel_gui::BagelModel *model, configmaps::ConfigMap &nodes, std::string path,
-                       std::vector<std::string> *nodesFound);
-        void handleModelMap(bagel_gui::BagelModel *model, configmaps::ConfigMap &map, std::string path);
-        void mechanicsToBagel(configmaps::ConfigMap &map);
         void currentModelChanged(bagel_gui::ModelInterface *model);
         void changeNodeVersion(const std::string &name);
         void configureNode(const std::string &name);
@@ -120,18 +115,15 @@ namespace xrock_gui_model
         std::unique_ptr<DBInterface> db;
 
     private:
-        std::map<std::string, configmaps::ConfigMap> modelCache;
         mars::main_gui::GuiInterface *gui;
         bagel_gui::BagelGui *bagelGui;
         ComponentModelEditorWidget *widget;
-        bool importToBagel;
         std::string versionChangeName, configureNodeName, contextNodeName, contextPortName;
         mars::cfg_manager::CFGManagerInterface *cfg;
         configmaps::ConfigMap env;
         mars::cfg_manager::cfgParamId dbAddress_paramId;
         mars::cfg_manager::cfgParamId dbUser_paramId;
         mars::cfg_manager::cfgParamId dbPassword_paramId;
-        std::string lastExecFolder;
         std::string resourcesPath;
         ToolbarBackend *toolbarBackend;
 

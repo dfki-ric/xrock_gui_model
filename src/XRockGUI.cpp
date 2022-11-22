@@ -65,7 +65,6 @@ namespace xrock_gui_model
 
     void XRockGUI::initConfig()
     {
-        importToBagel = false;
         cfg = libManager->getLibraryAs<mars::cfg_manager::CFGManagerInterface>("cfg_manager", true);
         std::string confDir = ".";
 
@@ -166,7 +165,6 @@ namespace xrock_gui_model
             gui->addGenericMenuAction("../Database/Add Component", static_cast<int>(MenuActions::ADD_COMPONENT_FROM_DB), this);
             gui->addGenericMenuAction("../Database/Store Model", static_cast<int>(MenuActions::STORE_MODEL_TO_DB), this);
             gui->addGenericMenuAction("../Database/Load Model", static_cast<int>(MenuActions::LOAD_MODEL_FROM_DB), this);
-            gui->addGenericMenuAction("../Database/HardToSoft", static_cast<int>(MenuActions::IMPORT_HW_TO_BAGEL), this);
             gui->addGenericMenuAction("../Windows/ComponentModelEditorWidget", static_cast<int>(MenuActions::TOGGLE_MODEL_WIDGET), this);
             gui->addGenericMenuAction("../Expert/Edit Description", static_cast<int>(MenuActions::EDIT_MODEL_DESCRIPTION), this);
             gui->addGenericMenuAction("../Expert/Edit Local Map", static_cast<int>(MenuActions::EDIT_LOCAL_MAP), this);
@@ -381,14 +379,6 @@ namespace xrock_gui_model
         case MenuActions::LOAD_MODEL_FROM_DB: // load model from database
         {
             requestModel();
-            break;
-        }
-        case MenuActions::IMPORT_HW_TO_BAGEL: // import hardware information into bagel model
-        {
-            // 20221102 MS: Why is this here? Has nothing todo with XROCK.
-            importToBagel = true;
-            ImportDialog id(this, true);
-            id.exec();
             break;
         }
         case MenuActions::EDIT_LOCAL_MAP:
@@ -702,13 +692,11 @@ namespace xrock_gui_model
 
     void XRockGUI::requestModel()
     {
-        importToBagel = false;
         ImportDialog id(this, true);
         id.exec();
     }
     void XRockGUI::addComponent()
     {
-        importToBagel = false;
         ImportDialog id(this, false);
         id.exec();
     }
@@ -735,21 +723,13 @@ namespace xrock_gui_model
     // This function loads a component model from an already existing config map
     void XRockGUI::loadComponentModelFrom(configmaps::ConfigMap &map)
     {
-        // TODO: 20221109 MS: What is this importToBagel? Can this be removed?
-        if (importToBagel)
-        {
-            mechanicsToBagel(map);
-        }
-        else
-        {
-            // Create view will setup a NEW instance of a component model interface
-            bagelGui->createView("xrock", map["name"]);
-            ComponentModelInterface* model = dynamic_cast<ComponentModelInterface*>(bagelGui->getCurrentModel());
-            // Set the model info of the ComponentModelInterface
-            model->setModelInfo(map);
-            // Afterwards we have to (re-)trigger the currentModelChanged() function
-            currentModelChanged(model);
-        }
+        // Create view will setup a NEW instance of a component model interface
+        bagelGui->createView("xrock", map["name"]);
+        ComponentModelInterface* model = dynamic_cast<ComponentModelInterface*>(bagelGui->getCurrentModel());
+        // Set the model info of the ComponentModelInterface
+        model->setModelInfo(map);
+        // Afterwards we have to (re-)trigger the currentModelChanged() function
+        currentModelChanged(model);
     }
 
     // This function loads a component model from DB
@@ -769,145 +749,6 @@ namespace xrock_gui_model
         ConfigMap map = model->getModelInfo();
         // Store the returned info to db
         return db->storeModel(map);
-    }
-
-    // TODO: 20221117 MS: This function looks deprecated. Is it still needed?
-    // The generic name 'loadNodes' does not mirror the case that this only does things to 'mechanics' nodes.
-    void XRockGUI::loadNodes(bagel_gui::BagelModel *model,
-                             configmaps::ConfigMap &nodes, std::string path,
-                             std::vector<std::string> *nodesFound)
-    {
-        ConfigVector::iterator it = nodes["nodes"].begin();
-        for (; it != nodes["nodes"].end(); ++it)
-        {
-            if ((*it)["model"]["domain"] == "MECHANICS")
-            {
-                std::string modelName = (*it)["model"]["name"];
-                std::string name = (*it)["name"];
-                if (!path.empty())
-                {
-                    name = path + "_" + name;
-                }
-                if (modelName == "motor_universal")
-                {
-                    if (!model->hasNode(name))
-                    {
-                        bagelGui->addNode("OUTPUT", name);
-                    }
-                    nodesFound->push_back((*it)["name"]);
-                }
-                else
-                {
-                    ConfigMap map;
-                    std::map<std::string, ConfigMap>::iterator mt = modelCache.find(modelName);
-                    if (mt != modelCache.end())
-                    {
-                        map = mt->second;
-                    }
-                    else
-                    {
-                        map = db->requestModel("mechanics", modelName, std::string("v1"), true);
-                        modelCache[modelName] = map;
-                    }
-                    handleModelMap(model, map, name);
-                }
-            }
-        }
-    }
-
-    // TODO: 20221117 MS: This function looks deprecated. Is it still needed?
-    // The generic name 'handleModelMap' does not mirror the case that this only does things to 'bagel' nodes.
-    void XRockGUI::handleModelMap(bagel_gui::BagelModel *model,
-                                  configmaps::ConfigMap &map,
-                                  std::string path)
-    {
-        ConfigMap cMap;
-        std::vector<std::string> nodesFound;
-        if (map.hasKey("versions"))
-        {
-            if (map["versions"][0].hasKey("components"))
-            {
-                cMap = ConfigMap::fromYamlString(map["versions"][0]["components"]);
-            }
-        }
-        if (cMap.hasKey("nodes"))
-        {
-            loadNodes(model, cMap, path, &nodesFound);
-        }
-        // check if we have links in data
-        if (map["versions"][0].hasKey("data"))
-        {
-            ConfigMap data;
-            if (map["versions"][0]["data"].isMap())
-                data = map["versions"][0]["mechanicsData"]["data"];
-            else
-                data = ConfigMap::fromYamlString(map["versions"][0]["data"]);
-            if (data.hasKey("bagel_control"))
-            {
-                std::string bagelControl = data["bagel_control"];
-                if (!model->hasNodeInfo(bagelControl))
-                {
-                    // todo: handle path via config or database?
-                    QFileInfo fi("../mars_bagel/bagel/");
-                    model->loadSubgraphInfo(bagelControl, fi.absoluteFilePath().toStdString());
-                    bagelGui->updateNodeTypes();
-                }
-                std::string nodeName = path + "_" + bagelControl.substr(0, bagelControl.size() - 4);
-                if (!model->hasNode(nodeName))
-                {
-                    bagelGui->addNode(bagelControl, nodeName);
-                }
-                const ConfigMap *nodeMap_ = bagelGui->getNodeMap(nodeName);
-                if (!nodeMap_)
-                {
-                    return;
-                }
-                ConfigMap nodeMap = *nodeMap_;
-                std::vector<std::string>::iterator it = nodesFound.begin();
-                for (; it != nodesFound.end(); ++it)
-                {
-                    if (!model->hasConnection(path + "_" + *it))
-                    {
-                        // create edge info if available
-                        ConfigVector::iterator it2 = nodeMap["outputs"].begin();
-                        for (; it2 != nodeMap["outputs"].end(); ++it2)
-                        {
-                            if ((*it2)["name"] == *it)
-                            {
-                                ConfigMap edge;
-                                edge["fromNode"] = nodeName;
-                                edge["fromNodeOutput"] = *it;
-                                edge["toNode"] = path + "_" + *it;
-                                edge["toNodeInput"] = "in1";
-                                edge["weight"] = 1.0;
-                                edge["smooth"] = true;
-                                bagelGui->addEdge(edge);
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    // TODO: Is this still needed? Looks bogus for me (especially the hardcoded paths)
-    void XRockGUI::mechanicsToBagel(configmaps::ConfigMap &map)
-    {
-        bagel_gui::BagelModel *model = dynamic_cast<bagel_gui::BagelModel *>(bagelGui->getCurrentModel());
-        if (!model)
-        {
-            bagelGui->createView("bagel", "control");
-            bagelGui->setSmoothLineMode();
-            bagelGui->setLoadPath("../mars_bagel/bagel/");
-            model = dynamic_cast<bagel_gui::BagelModel *>(bagelGui->getCurrentModel());
-            if (!model)
-            {
-                return;
-            }
-        }
-        modelCache.clear();
-        handleModelMap(model, map, "");
     }
 
     void XRockGUI::currentModelChanged(bagel_gui::ModelInterface *model)

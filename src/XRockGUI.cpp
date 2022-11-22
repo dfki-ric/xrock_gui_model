@@ -960,10 +960,6 @@ namespace xrock_gui_model
         }
     }
 
-    /*
-     * todo: handle node configuration
-     *       warn if edges can not be reconnected (dropdown optional)
-     */
     void XRockGUI::selectVersion(const std::string &version)
     {
         ComponentModelInterface *model = dynamic_cast<ComponentModelInterface *>(bagelGui->getCurrentModel());
@@ -994,68 +990,11 @@ namespace xrock_gui_model
             }
 
             bagelGui->addNode(type, versionChangeName);
-            //PC 11.11.2022 : Why are we returning here? Can we omit the rest of the code for this method?
+
+            // TODO: Reconnect ports if needed
+            // TODO: Handle node configuration
+
             return;
-            ConfigMap nodeMap = *(bagelGui->getNodeMap(versionChangeName));
-            // update node configuration
-            {
-                nodeMap["pos"] = node["pos"];
-                for (auto it : node["inputs"])
-                {
-                    ConfigVector::iterator it2 = nodeMap["inputs"].begin();
-                    for (; it2 != nodeMap["inputs"].end(); ++it2)
-                    {
-                        if ((*it2)["name"].getString() == it["name"].getString())
-                        {
-                            if (it.hasKey("interface"))
-                            {
-                                (*it2)["interface"] = it["interface"];
-                            }
-                            if (it.hasKey("interfaceExportName"))
-                            {
-                                (*it2)["interfaceExportName"] = it["interfaceExportName"];
-                            }
-                            if (it.hasKey("initValue"))
-                            {
-                                (*it2)["initValue"] = it["initValue"];
-                            }
-                            break;
-                        }
-                    }
-                }
-                for (auto it : node["outputs"])
-                {
-                    ConfigVector::iterator it2 = nodeMap["outputs"].begin();
-                    for (; it2 != nodeMap["outputs"].end(); ++it2)
-                    {
-                        if ((*it2)["name"].getString() == it["name"].getString())
-                        {
-                            if (it.hasKey("interface"))
-                            {
-                                (*it2)["interface"] = it["interface"];
-                            }
-                            if (it.hasKey("interfaceExportName"))
-                            {
-                                (*it2)["interfaceExportName"] = it["interfaceExportName"];
-                            }
-                            break;
-                        }
-                    }
-                }
-                if (node.hasKey("configuration"))
-                {
-                    nodeMap["configuration"].updateMap(node["configuration"]);
-                }
-            }
-
-            bagelGui->updateNodeMap(versionChangeName, nodeMap);
-
-            for (auto it : edgeList)
-            {
-                it.erase("vertices");
-                it.erase("decoupleVertices");
-                bagelGui->addEdge(it);
-            }
         }
     }
 
@@ -1392,7 +1331,6 @@ namespace xrock_gui_model
         return r;
     }
 
-    // TODO: This function might not work properly yet. See the version string stuff below.
     void XRockGUI::applyConfiguration(configmaps::ConfigMap &map)
     {
         // This function is restricted to software domain because it deals with ROCK task configuration only
@@ -1451,11 +1389,8 @@ namespace xrock_gui_model
             printf("ERROR: executing rock-instantiate\n");
             return;
         }
-        std::string version = map["model"]["versions"][0]["name"];
-        // TODO: What is this version name reformatting doing?
-        //versionChangeName << map["name"];
-        //version += "_" + info["versions"][0]["name"].getString() + "_" + versionChangeName;
-        cmd = "orogen_to_xrock --modelname " + map["model"]["name"].getString() + " --model_file " + modelFile + " --version_name " + version;
+        std::string new_version = map["model"]["name"] + "_" + map["model"]["versions"][0]["name"] + "_" + versionChangeName;
+        cmd = "orogen_to_xrock --modelname " + map["model"]["name"].getString() + " --model_file " + modelFile + " --version_name " + new_version;
 #ifdef __APPLE__
         {
             std::string c = getenv("AUTOPROJ_CURRENT_ROOT");
@@ -1466,7 +1401,7 @@ namespace xrock_gui_model
         printf("execute: %s\n", cmd.c_str());
         system(cmd.c_str());
         // 5. switch node to new version
-        selectVersion(version);
+        selectVersion(new_version);
     }
 
     void XRockGUI::cfgUpdateProperty(mars::cfg_manager::cfgPropertyStruct property)

@@ -92,6 +92,9 @@ namespace xrock_gui_model
         void selectVersion(const std::string &version);
         void exportCnd(const configmaps::ConfigMap &map_, const std::string &filename, const std::string &urdf_file = "");
         void importCND(const std::string &fileName);
+
+        // drop down menu functions on nodes and node interfaces
+        // these are triggered by right-clicking in the GUI
         void nodeContextClicked(const std::string name);
         void inPortContextClicked(const std::string name);
         void outPortContextClicked(const std::string name);
@@ -100,8 +103,6 @@ namespace xrock_gui_model
                                                          const std::string &portName);
         std::vector<std::string> getOutPortContextStrings(const std::string &nodeName,
                                                           const std::string &portName);
-        void requestModel();
-        void addComponent();
 
         // public slots:
         // This function adds a new component to the current component model (possibly asking the DB for it's model)
@@ -111,7 +112,15 @@ namespace xrock_gui_model
         void loadComponentModelFrom(configmaps::ConfigMap &map);
         // This function stores the current component model
         bool storeComponentModel();
+        // This function applies a ROCK configuration to a ROCK Task with dynamic ports to create a new model
+        // TODO: Since the XTypes now know the notion of an dynamic interface, we could remove this and create such functionality
+        // in ComponentModelInterface without creating a new model in the database
         void applyConfiguration(configmaps::ConfigMap &map);
+
+        // These functions open a dialog to select a component model to be opened/instantiated and then fetch the info from the database (see below)
+        void requestModel();
+        void addComponent();
+        // Stored a pointer to the currently selected XRock database backend instance
         std::unique_ptr<DBInterface> db;
 
     private:
@@ -136,7 +145,12 @@ namespace xrock_gui_model
                                           const std::string &portName,
                                           const std::string &portType);
         void configureComponents(const std::string &name);
+
+        // This function creates a new ROCK Task out of an bagel graph
+        // TODO: This function is deprecated and should be moved to a script
         void createBagelModel();
+        // This function creates a new Bagel Model out of an ASSEMBLY with a SMURF File
+        // TODO: This function is deprecated and should be moved to a script
         void createBagelTask();
     };
 

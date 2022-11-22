@@ -1289,7 +1289,6 @@ namespace xrock_gui_model
         }
     }
 
-    // TODO: 20221117 MS: This function seems to work only with bagel nodes? Is it still valid?
     void XRockGUI::inPortContextClicked(const std::string name)
     {
         if (name == "configure interface")
@@ -1297,6 +1296,7 @@ namespace xrock_gui_model
             configureInPort(contextNodeName, contextPortName);
             return;
         }
+        // TODO: Move the bagel specific stuff to an extra function after checking if the interface is a bagel interface or not
         double biasValue = 0.0;
         std::string merge;
         if (name == "SUM merge")
@@ -1325,7 +1325,6 @@ namespace xrock_gui_model
         bagelGui->updateNodeMap(contextNodeName, node);
     }
 
-    // TODO: 20221117 MS: This function seems to work only with bagel nodes? Is it still valid?
     void XRockGUI::outPortContextClicked(const std::string name)
     {
         if (name == "configure interface")

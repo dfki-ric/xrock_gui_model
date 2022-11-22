@@ -43,7 +43,6 @@ namespace xrock_gui_model
         CREATE_BAGEL_MODEL = 12,
         CREATE_BAGEL_TASK = 13,
         EDIT_MODEL_DESCRIPTION = 14,
-        STOP_CND = 16,
         IMPORT_CND = 20,
         SELECT_SERVERLESS = 21,
         SELECT_CLIENT = 22,

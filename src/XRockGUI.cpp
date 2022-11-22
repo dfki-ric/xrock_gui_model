@@ -172,7 +172,6 @@ namespace xrock_gui_model
             gui->addGenericMenuAction("../Expert/Edit Local Map", static_cast<int>(MenuActions::EDIT_LOCAL_MAP), this);
             gui->addGenericMenuAction("../Expert/Create Bagel Model", static_cast<int>(MenuActions::CREATE_BAGEL_MODEL), this);
             gui->addGenericMenuAction("../Expert/Create Bagel Task", static_cast<int>(MenuActions::CREATE_BAGEL_TASK), this);
-            gui->addGenericMenuAction("../Expert/Stop CND", static_cast<int>(MenuActions::STOP_CND), this);
             gui->addGenericMenuAction("../Actions/Load Model", static_cast<int>(MenuActions::LOAD_MODEL_FROM_DB), this, 0,
                                       icon + "load.png", true);
             gui->addGenericMenuAction("../Actions/Add Component", static_cast<int>(MenuActions::ADD_COMPONENT_FROM_DB), this, 0,
@@ -468,40 +467,6 @@ namespace xrock_gui_model
         {
             // TODO: What is this for?
             //widget->editDescription();
-            break;
-        }
-        case MenuActions::STOP_CND:
-        {
-            ModelInterface *model = bagelGui->getCurrentModel();
-            if (!model)
-            {
-                return;
-            }
-            ConfigMap modelInfo = model->getModelInfo();
-            std::string path = lastExecFolder;
-            std::string name = modelInfo["name"];
-            if (name.size() == 0)
-            {
-                name = "tmp_model_name";
-            }
-            std::string cndNamePre = name + "_pre.cnd";
-            std::string cndPathPre = mars::utils::pathJoin(path, cndNamePre);
-            std::string cndPath = mars::utils::pathJoin(path, "shutdown.cnd");
-            std::string cmd;
-#ifdef __APPLE__
-            std::string rockLaunch = "mac-rock-launch";
-#else
-            std::string rockLaunch = "rock-launch";
-#endif
-            if (mars::utils::pathExists(cndPathPre))
-            {
-                cmd = rockLaunch + " " + cndPathPre;
-                printf("Call %s\n", cmd.c_str());
-                system(cmd.c_str());
-            }
-            cmd = rockLaunch + " " + cndPath;
-            printf("Call %s\n", cmd.c_str());
-            system(cmd.c_str());
             break;
         }
         case MenuActions::IMPORT_CND:

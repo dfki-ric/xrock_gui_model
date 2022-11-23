@@ -327,14 +327,26 @@ namespace xrock_gui_model
         {
         case MenuActions::LOAD_MODEL:
         {
-            // TODO: Create function in XRockGUI or in DBInterface or somewhere else
-            //widget->loadModel();
+            QString fileName = QFileDialog::getOpenFileName(NULL, QObject::tr("Select Model File"),
+                                                            ".", QObject::tr("YAML syntax (*.yml)"), 0,
+                                                            QFileDialog::DontUseNativeDialog);
+
+            ConfigMap map = configmaps::ConfigMap::fromYamlFile(fileName.toStdString());
+            loadComponentModelFrom(map);
+
             break;
         }
         case MenuActions::SAVE_MODEL:
         {
-            // TODO: Create function in XRockGUI or in DBInterface or somewhere else
-            //widget->saveModel();
+            ComponentModelInterface *model = dynamic_cast<ComponentModelInterface *>(bagelGui->getCurrentModel());
+            if (!model)
+                return;
+            ConfigMap map = model->getModelInfo();
+            QString fileName = QString::fromStdString(map["name"].getString() + ".yml");
+            fileName = QFileDialog::getSaveFileName(NULL, QObject::tr("Select Model File"),
+                                                            fileName, QObject::tr("YAML syntax (*.yml)"), 0,
+                                                            QFileDialog::DontUseNativeDialog);
+            map.toYamlFile(fileName.toStdString());
             break;
         }
         case MenuActions::TOGGLE_MODEL_WIDGET:

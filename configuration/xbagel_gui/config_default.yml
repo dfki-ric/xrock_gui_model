@@ -1,0 +1,7 @@
+RockRoot: ../../..
+HeaderFontSize: 10
+PortFontSize: 8
+PortIconScale: 1.3333
+retinaScale: 1.
+dbType: FileDB
+dbPath: bagel/bagel_db

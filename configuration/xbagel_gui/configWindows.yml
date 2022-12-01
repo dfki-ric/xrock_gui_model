@@ -1,0 +1,169 @@
+Windows:
+  - name: Docks
+    type: string
+    value: NodeData%%ModelWidget%%NodeTypeWidget%%
+  - name: HistoryWidget/Window Top
+    type: int
+    value: 40
+  - name: HistoryWidget/height
+    type: int
+    value: 400
+  - name: HistoryWidget/hidden
+    type: bool
+    value: true
+  - name: HistoryWidget/left
+    type: int
+    value: 40
+  - name: HistoryWidget/width
+    type: int
+    value: 400
+  - name: LibManagerWidget/Window Top
+    type: int
+    value: 40
+  - name: LibManagerWidget/height
+    type: int
+    value: 400
+  - name: LibManagerWidget/hidden
+    type: bool
+    value: true
+  - name: LibManagerWidget/left
+    type: int
+    value: 40
+  - name: LibManagerWidget/width
+    type: int
+    value: 400
+  - name: Main Window/Window Height
+    type: int
+    value: 926
+  - name: Main Window/Window Left
+    type: int
+    value: 473
+  - name: Main Window/Window Top
+    type: int
+    value: 185
+  - name: Main Window/Window Width
+    type: int
+    value: 1585
+  - name: Main Window/docking
+    type: bool
+    value: true
+  - name: Mars Style
+    type: bool
+    value: false
+  - name: ModelWidget/Window Top
+    type: int
+    value: 40
+  - name: ModelWidget/area
+    type: int
+    value: 2
+  - name: ModelWidget/floating
+    type: bool
+    value: false
+  - name: ModelWidget/height
+    type: int
+    value: 882
+  - name: ModelWidget/hidden
+    type: bool
+    value: false
+  - name: ModelWidget/left
+    type: int
+    value: 1219
+  - name: ModelWidget/top
+    type: int
+    value: 44
+  - name: ModelWidget/width
+    type: int
+    value: 366
+  - name: NodeData/Window Top
+    type: int
+    value: 40
+  - name: NodeData/area
+    type: int
+    value: 1
+  - name: NodeData/floating
+    type: bool
+    value: false
+  - name: NodeData/height
+    type: int
+    value: 469
+  - name: NodeData/hidden
+    type: bool
+    value: false
+  - name: NodeData/left
+    type: int
+    value: 0
+  - name: NodeData/top
+    type: int
+    value: 457
+  - name: NodeData/width
+    type: int
+    value: 317
+  - name: NodeInfoWidget/Window Top
+    type: int
+    value: 40
+  - name: NodeInfoWidget/height
+    type: int
+    value: 400
+  - name: NodeInfoWidget/hidden
+    type: bool
+    value: true
+  - name: NodeInfoWidget/left
+    type: int
+    value: 40
+  - name: NodeInfoWidget/width
+    type: int
+    value: 400
+  - name: NodeTypeWidget/Window Top
+    type: int
+    value: 40
+  - name: NodeTypeWidget/area
+    type: int
+    value: 1
+  - name: NodeTypeWidget/floating
+    type: bool
+    value: false
+  - name: NodeTypeWidget/height
+    type: int
+    value: 412
+  - name: NodeTypeWidget/hidden
+    type: bool
+    value: false
+  - name: NodeTypeWidget/left
+    type: int
+    value: 0
+  - name: NodeTypeWidget/top
+    type: int
+    value: 44
+  - name: NodeTypeWidget/width
+    type: int
+    value: 317
+  - name: cfg/Window Top
+    type: int
+    value: 45
+  - name: cfg/height
+    type: int
+    value: 654
+  - name: cfg/hidden
+    type: bool
+    value: true
+  - name: cfg/left
+    type: int
+    value: 40
+  - name: cfg/width
+    type: int
+    value: 534
+  - name: graph_control/Window Top
+    type: int
+    value: 661
+  - name: graph_control/height
+    type: int
+    value: 405
+  - name: graph_control/hidden
+    type: bool
+    value: true
+  - name: graph_control/left
+    type: int
+    value: 1238
+  - name: graph_control/width
+    type: int
+    value: 720

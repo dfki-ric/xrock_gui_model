@@ -1,0 +1,1 @@
+DYLD_LIBRARY_PATH=$MYLD_LIBRARY_PATH gui_app dock config_path="@CMAKE_INSTALL_PREFIX@/configuration/xbagel_gui" $@

@@ -476,7 +476,14 @@ namespace xrock_gui_model
                     continue;
                 }
                 // Add the part as a node in the bagelGui
-                // TODO: Apply node alias if set
+                if (it.hasKey("alias"))
+                {
+                    std::cout << "Component " << name << " will be renamed to alias " << it["alias"].getString() << "\n";
+                    // TODO: How do we later get back the original name?
+                    // Also, when we change the name to the alias, getNodeMap() will not be able to retrieve the node by its original name anymore.
+                    // We could host a map of alias to original name and orignal name to alias to support this, right?
+                    // In the basicModel, we always have both, the original name and the alias
+                }
                 bagelGui->addNode(partType, name);
                 // TODO: Apply interface_aliases info
                 ConfigMap nodeMap = *(bagelGui->getNodeMap(name));

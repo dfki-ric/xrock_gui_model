@@ -3,6 +3,7 @@
  * \author Malte Langosz
  * \brief
  */
+#include <mars/main_gui/MainGUI.h>
 
 #include "ModelLib.hpp"
 #include "Model.hpp"
@@ -18,7 +19,6 @@
 #include <lib_manager/LibManager.hpp>
 #include <bagel_gui/BagelGui.hpp>
 #include <bagel_gui/BagelModel.hpp>
-#include <mars/main_gui/MainGUI.h>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QMessageBox>
@@ -359,10 +359,13 @@ namespace xrock_gui_model
 
   void ModelLib::writeStatus(const int statusId, const std::string &message)
   {
+    /* This function was used for the integration into another workflow gui
+     * which is not used any more.
     std::ofstream outputFile("status.yml");
     outputFile << "status : " << statusId << std::endl;
     outputFile << "message : " << message << std::endl;
     outputFile.close();
+    */
   }
 
   Model *ModelLib::getModelInstance()

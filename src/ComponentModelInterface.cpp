@@ -3,11 +3,11 @@
  * \author Malte Langosz
  */
 
+#include "XRockGUI.hpp"
 #include "ComponentModelInterface.hpp"
 #include "ConfigMapHelper.hpp"
 #include <osg_graph_viz/Node.hpp>
 #include <bagel_gui/BagelGui.hpp>
-#include "XRockGUI.hpp"
 #include <QMessageBox>
 
 #include <mars/utils/misc.h>

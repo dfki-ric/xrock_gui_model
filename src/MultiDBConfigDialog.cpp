@@ -49,7 +49,7 @@ namespace xrock_gui_model
         table_backends->setHorizontalHeaderLabels(QStringList() << "Backend Type"
                                                                 << "URL/Path"
                                                                 << "Graph");
-        table_backends->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+        table_backends->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
         table_backends->setSelectionBehavior(QAbstractItemView::SelectRows);
 
         vLayout->addWidget(table_backends);

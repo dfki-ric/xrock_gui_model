@@ -8,6 +8,7 @@
 #include <iostream>
 #include <fstream>
 
+#include <mars/main_gui/MainGUI.h>
 #include <lib_manager/LibInterface.hpp>
 #include <mars/main_gui/GuiInterface.h>
 #include <mars/main_gui/MenuInterface.h>

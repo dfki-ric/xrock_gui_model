@@ -220,7 +220,6 @@ namespace xrock_gui_model
             libManager->releaseLibrary("cfg_manager");
         }
         delete toolbarBackend;
-        writeStatus(0, "closed fine");
     }
 
     void XRockGUI::loadStartModel()
@@ -311,14 +310,6 @@ namespace xrock_gui_model
             ss << "loadSettingsFromFile: ERROR while loading: " << workspace << '/' << filename;
             std::cerr << ss.str() << std::endl;
         }
-    }
-
-    void XRockGUI::writeStatus(const int statusId, const std::string &message)
-    {
-        std::ofstream outputFile("status.yml");
-        outputFile << "status : " << statusId << std::endl;
-        outputFile << "message : " << message << std::endl;
-        outputFile.close();
     }
 
     void XRockGUI::menuAction(int action, bool checked)

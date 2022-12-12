@@ -141,7 +141,6 @@ namespace xrock_gui_model
         void loadModelFromParameter();
         bool loadCart();
         void loadSettingsFromFile(const std::string &filename);
-        void writeStatus(const int statusId, const std::string &message);
         void openConfigureInterfaceDialog(const std::string &nodeName,
                                           const std::string &portName,
                                           const std::string &portType);

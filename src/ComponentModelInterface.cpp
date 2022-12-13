@@ -396,6 +396,15 @@ namespace xrock_gui_model
         std::map<unsigned long, ConfigMap>::iterator it = nodeMap.find(nodeId);
         if (it != nodeMap.end())
         {
+            // Do not allow changes to name but change the alias instead
+            if (node["name"] != it->second["name"])
+                node["alias"] = node["name"];
+            // TODO: Check that the alias is unique across the whole node map
+            node["name"] = it->second["name"];
+            // Do not allow changes to model
+            node["model"] = it->second["model"];
+            // TODO: Do not allow changes to interface names, change their alias instead
+            // Update node
             it->second = node;
             return true;
         }
@@ -452,7 +461,7 @@ namespace xrock_gui_model
     {
         // NOTE: basicModel holds the original data. So we just copy over.
         basicModel = map;
-        //std::cout << "ComponentModelInterface::setModelInfo()\n" << basicModel.toJsonString() << "\n";
+        std::cout << "ComponentModelInterface::setModelInfo()\n" << basicModel.toJsonString() << "\n";
         // We now use the basic model to setup the GUI
         if (basicModel["versions"][0].hasKey("components") && basicModel["versions"][0]["components"].hasKey("nodes"))
         {
@@ -475,26 +484,45 @@ namespace xrock_gui_model
                     std::cerr << "ComponentModelInterface::setModelInfo(): could not register " << partType << "\n";
                     continue;
                 }
-                // Add the part as a node in the bagelGui
-                if (it.hasKey("alias"))
-                {
-                    std::cout << "Component " << name << " will be renamed to alias " << it["alias"].getString() << "\n";
-                    // TODO: How do we later get back the original name?
-                    // Also, when we change the name to the alias, getNodeMap() will not be able to retrieve the node by its original name anymore.
-                    // We could host a map of alias to original name and orignal name to alias to support this, right?
-                    // In the basicModel, we always have both, the original name and the alias
-                }
                 bagelGui->addNode(partType, name);
-                // TODO: Apply interface_aliases info
-                ConfigMap nodeMap = *(bagelGui->getNodeMap(name));
-                bool updateMap = false;
 
+                // Postprocessing
+                ConfigMap currentMap = *bagelGui->getNodeMap(name);
+                // Update alias
+                currentMap["alias"] = it.hasKey("alias") ? it["alias"].getString() : "";
+                // Update interface aliases
+                if (it.hasKey("interface_aliases"))
+                {
+                    ConfigMap& if_aliases = it["interface_aliases"];
+                    for (const auto [original_name,value] : if_aliases)
+                    {
+                        const std::string& alias(value.getString());
+                        // Update matching inputs
+                        if (currentMap.hasKey("inputs"))
+                        {
+                            for (auto input : currentMap["inputs"])
+                            {
+                                if (input["name"].getString() == original_name)
+                                    input["alias"] = alias;
+                            }
+                        }
+                        // Update matching outputs
+                        if (currentMap.hasKey("outputs"))
+                        {
+                            for (auto output : currentMap["outputs"])
+                            {
+                                if (output["name"].getString() == original_name)
+                                    output["alias"] = alias;
+                            }
+                        }
+                    }
+                }
                 // exposed interfaces are stored in the input data within the bagel_gui
                 // so we have to create this information from the model interfaces
                 if(basicModel["versions"][0].hasKey("interfaces"))
                 {
                     ConfigVector interfaces = basicModel["versions"][0]["interfaces"];
-                    //fprintf(stderr, "node: %s\n", nodeMap.toYamlString().c_str());
+                    //fprintf(stderr, "node: %s\n", currentMap.toYamlString().c_str());
                     for(auto interface: basicModel["versions"][0]["interfaces"])
                     {
                         if(interface.hasKey("linkToNode") && interface["linkToNode"] == it["name"])
@@ -502,8 +530,8 @@ namespace xrock_gui_model
                             // search for interface
                             if(interface["direction"] == "INCOMING" || interface["direction"] == "BIDIRECTIONAL")
                             {
-                                for(ConfigVector::iterator input = nodeMap["inputs"].begin();
-                                    input <nodeMap["inputs"].end(); ++input)
+                                for(ConfigVector::iterator input = currentMap["inputs"].begin();
+                                    input <currentMap["inputs"].end(); ++input)
                                 {
                                     if((*input)["name"] == interface["linkToInterface"])
                                     {
@@ -513,8 +541,8 @@ namespace xrock_gui_model
                                     }
                                 }
                             } else {
-                                for(ConfigVector::iterator output = nodeMap["outputs"].begin();
-                                    output <nodeMap["outputs"].end(); ++output)
+                                for(ConfigVector::iterator output = currentMap["outputs"].begin();
+                                    output <currentMap["outputs"].end(); ++output)
                                 {
                                     if((*output)["name"] == interface["linkToInterface"])
                                     {
@@ -527,11 +555,7 @@ namespace xrock_gui_model
                         }
                     }
                 }
-                if(updateMap)
-                {
-                    bagelGui->updateNodeMap(name, nodeMap);
-                }
-
+                bagelGui->updateNodeMap(name, currentMap);
             }
             // After we have done the nodes, we can wire their interfaces together
             if (basicModel["versions"][0]["components"].hasKey("edges"))
@@ -617,9 +641,21 @@ namespace xrock_gui_model
             // Update node entry
             ConfigMap n;
             n["name"] = node["name"];
+            n["alias"] = node["alias"];
             n["model"]["name"] = node["model"]["name"];
             n["model"]["domain"] = node["model"]["domain"];
             n["model"]["version"] = node["model"]["versions"][0]["name"];
+            // Update interface_aliases
+            ConfigVector& inputs = node["inputs"];
+            for (auto input : inputs)
+            {
+                n["interface_aliases"][input["name"].getString()] = input["alias"];
+            }
+            ConfigVector& outputs = node["outputs"];
+            for (auto output : outputs)
+            {
+                n["interface_aliases"][output["name"].getString()] = output["alias"];
+            }
             mi["versions"][0]["components"]["nodes"].push_back(n);
             // Update node configuration entry
             ConfigMap c(node["configuration"]);
@@ -643,7 +679,7 @@ namespace xrock_gui_model
         }
         // When finished, update basicModel and return it
         // NOTE: There might be leftovers of the bagel specific data which will be ignored by the xtype specific data
-        //std::cout << "ComponentModelInterface::getModelInfo():\n" << mi.toJsonString() << "\n";
+        std::cout << "ComponentModelInterface::getModelInfo():\n" << mi.toJsonString() << "\n";
         basicModel = mi;
         return basicModel;
     }

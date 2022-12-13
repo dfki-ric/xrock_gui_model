@@ -389,16 +389,19 @@ namespace xrock_gui_model
 
     // This function updates an existing node in the nodeMap.
     bool ComponentModelInterface::updateNode(unsigned long nodeId,
-                           configmaps::ConfigMap node)
+                           configmaps::ConfigMap& node)
     {
         if (node["type"] == "DES")
             return true;
         std::map<unsigned long, ConfigMap>::iterator it = nodeMap.find(nodeId);
         if (it != nodeMap.end())
         {
+            // FIXME: This function works correctly, but the GUI does not read it back properly
             // Do not allow changes to name but change the alias instead
             if (node["name"] != it->second["name"])
+            {
                 node["alias"] = node["name"];
+            }
             // TODO: Check that the alias is unique across the whole node map
             node["name"] = it->second["name"];
             // Do not allow changes to model

@@ -23,7 +23,7 @@ namespace xrock_gui_model
     std::vector<std::pair<std::string, std::string>> FileDB::requestModelListByDomain(const std::string &domain)
     {
         std::vector<std::pair<std::string, std::string>> modelList;
-        if (domain != "software")
+        if (domain != "SOFTWARE")
             return modelList;
 
         // return content of info.yml
@@ -40,7 +40,7 @@ namespace xrock_gui_model
     std::vector<std::string> FileDB::requestVersions(const std::string &domain, const std::string &model)
     {
         std::vector<std::string> versionList;
-        if (domain != "software")
+        if (domain != "SOFTWARE")
             return versionList;
 
         // return content of info.yml
@@ -67,7 +67,7 @@ namespace xrock_gui_model
                                    const bool limit)
     {
         std::vector<std::string> versionList;
-        if (domain != "software")
+        if (domain != "SOFTWARE")
             return ConfigMap();
         if (limit)
         {

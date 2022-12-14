@@ -396,7 +396,6 @@ namespace xrock_gui_model
         std::map<unsigned long, ConfigMap>::iterator it = nodeMap.find(nodeId);
         if (it != nodeMap.end())
         {
-            // FIXME: This function works correctly, but the GUI does not read it back properly
             // Do not allow changes to name but change the alias instead
             if (node["name"] != it->second["name"])
             {
@@ -406,7 +405,25 @@ namespace xrock_gui_model
             node["name"] = it->second["name"];
             // Do not allow changes to model
             node["model"] = it->second["model"];
-            // TODO: Do not allow changes to interface names, change their alias instead
+            // Do not allow changes to interface names, change their alias instead
+            ConfigVector& inputs = node["inputs"];
+            for (size_t i = 0; i < inputs.size(); i++)
+            {
+                if (inputs[i]["name"] != it->second["inputs"][i]["name"])
+                {
+                    inputs[i]["alias"] = inputs[i]["name"];
+                }
+                inputs[i]["name"] = it->second["inputs"][i]["name"];
+            }
+            ConfigVector& outputs = node["outputs"];
+            for (size_t i = 0; i < outputs.size(); i++)
+            {
+                if (outputs[i]["name"] != it->second["outputs"][i]["name"])
+                {
+                    outputs[i]["alias"] = outputs[i]["name"];
+                }
+                outputs[i]["name"] = it->second["outputs"][i]["name"];
+            }
             // Update node
             it->second = node;
             return true;

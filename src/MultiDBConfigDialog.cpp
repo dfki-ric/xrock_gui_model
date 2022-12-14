@@ -10,6 +10,10 @@
 #include "DBInterface.hpp"
 #include <configmaps/ConfigMap.hpp>
 
+// Needed for version check
+#include <QtGlobal>
+
+
 using namespace configmaps;
 
 namespace xrock_gui_model
@@ -49,7 +53,11 @@ namespace xrock_gui_model
         table_backends->setHorizontalHeaderLabels(QStringList() << "Backend Type"
                                                                 << "URL/Path"
                                                                 << "Graph");
+#if QT_VERSION >= 0x050000
         table_backends->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+#else
+        table_backends->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+#endif
         table_backends->setSelectionBehavior(QAbstractItemView::SelectRows);
 
         vLayout->addWidget(table_backends);

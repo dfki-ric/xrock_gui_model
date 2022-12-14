@@ -482,7 +482,7 @@ namespace xrock_gui_model
     {
         // NOTE: basicModel holds the original data. So we just copy over.
         basicModel = map;
-        std::cout << "ComponentModelInterface::setModelInfo()\n" << basicModel.toJsonString() << "\n";
+        //std::cout << "ComponentModelInterface::setModelInfo()\n" << basicModel.toJsonString() << "\n";
         // We now use the basic model to setup the GUI
         if (basicModel["versions"][0].hasKey("components") && basicModel["versions"][0]["components"].hasKey("nodes"))
         {
@@ -677,7 +677,7 @@ namespace xrock_gui_model
         }
         // When finished, update basicModel and return it
         // NOTE: There might be leftovers of the bagel specific data which will be ignored by the xtype specific data
-        std::cout << "ComponentModelInterface::getModelInfo():\n" << mi.toJsonString() << "\n";
+        //std::cout << "ComponentModelInterface::getModelInfo():\n" << mi.toJsonString() << "\n";
         basicModel = mi;
         return basicModel;
     }

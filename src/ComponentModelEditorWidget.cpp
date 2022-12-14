@@ -17,7 +17,6 @@
 #include <bagel_gui/BagelModel.hpp>
 #include <mars/utils/misc.h>
 #include <QDesktopServices>
-#include <xtypes/ComponentModel.hpp>
 
 using namespace configmaps;
 
@@ -35,24 +34,22 @@ namespace xrock_gui_model
             QVBoxLayout *vLayout = new QVBoxLayout();
             size_t i = 0;
             // 20221107 MS: Why does this widget set a model path?
-            auto cm = std::make_shared<ComponentModel>();
-            const nl::json props = cm->get_properties();
-            for (auto it = props.begin(); it != props.end(); ++it)
-            {
-                if (it->is_null())
-                    continue; // skip for now..
+            ConfigMap props = xrockGui->db->getPropertiesOfComponentModel();
 
-                const QString key = QString::fromStdString(it.key());
-                const QString value = QString::fromStdString(it.value());
-                QLabel *label = new QLabel(key);
+            fprintf(stderr, "props: %s\n", props.toYamlString().c_str());
+            for(auto it: props)
+            {
+                ConfigMap prop = it.second;
+                QLabel *label = new QLabel(it.first.c_str());
                 layout->addWidget(label, i, 0);
-                const auto allowed_values = cm->get_allowed_property_values(key.toStdString());
-                if (allowed_values.size() > 0)
+                if(prop.hasKey("allowed_values"))
                 {
                     // if property has some allowed values, its a combobox
                     QComboBox *combobox = new QComboBox();
-                    for (const auto &allowed : allowed_values)
+                    for(auto allowed: prop["allowed_values"])
+                    {
                         combobox->addItem(QString::fromStdString(allowed));
+                    }
                     layout->addWidget(combobox, i++, 1);
                     connect(combobox, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(updateModel()));
                     widgets[label] = combobox;
@@ -64,10 +61,8 @@ namespace xrock_gui_model
                     layout->addWidget(linedit, i++, 1);
                     connect(linedit, SIGNAL(textChanged(const QString &)), this, SLOT(updateModel()));
                     widgets[label] = linedit;
-                }
+                }            // 20221107 MS: What are annotations?
             }
-
-            // 20221107 MS: What are annotations?
             //l = new QLabel("annotations");
             //layout->addWidget(l, i, 0);
             //annotations = new QTextEdit();
@@ -97,14 +92,17 @@ namespace xrock_gui_model
             l = new QLabel("Layout:");
             gridLayout->addWidget(l, 0, 0);
             i = 0;
-            for (const auto allowed : cm->get_allowed_property_values("domain"))
+            if(props.hasKey("domain") && props["domain"].hasKey("allowed_values"))
             {
-                QCheckBox *check = new QCheckBox(QString::fromStdString(allowed));
-                check->setChecked(true);
-                connect(check, SIGNAL(stateChanged(int)), this, SLOT(setViewFilter(int)));
-                gridLayout->addWidget(check, i / 2, i % 2 + 1);
-                layoutCheckBoxes[allowed] = check;
-                i++;
+                for (auto allowed : props["domain"]["allowed_values"])
+                {
+                    QCheckBox *check = new QCheckBox(QString::fromStdString(allowed));
+                    check->setChecked(true);
+                    connect(check, SIGNAL(stateChanged(int)), this, SLOT(setViewFilter(int)));
+                    gridLayout->addWidget(check, i / 2, i % 2 + 1);
+                    layoutCheckBoxes[allowed] = check;
+                    i++;
+                }
             }
             vLayout->addLayout(gridLayout);
             layouts = new QListWidget();
@@ -159,46 +157,54 @@ namespace xrock_gui_model
     }
 
     void ComponentModelEditorWidget::update_widgets(configmaps::ConfigMap& info)
-    {           
+    {
         // Lets iterate over model's properties
         nl::json info_data = nl::json::parse(info.toJsonString());
         auto is_property_key = [&](const std::string& key) -> bool
         {
-           static auto cm = std::make_shared<ComponentModel>();
-            const nl::json props = cm->get_properties();
-            for (auto it = props.begin(); it != props.end(); ++it)
-                if(key == it.key())
+            ConfigMap props = xrockGui->db->getPropertiesOfComponentModel();
+            for (auto it: props)
+            {
+                if(key == it.first)
+                {
                     return true;
-           return false;
+                }
+            }
+            return false;
         };
-       for (auto it = info_data.begin(); it != info_data.end(); ++it)
-         {   
+        for (auto it = info_data.begin(); it != info_data.end(); ++it)
+        {
             std::string key = it.key();
             nl::json value = it.value();
             if(is_property_key(key))
-              this->update_prop_widget(key,  value);
+            {
+                this->update_prop_widget(key,  value);
+            }
 
-         }
-   
+        }
+
         for (auto it = info_data["versions"][0].begin(); it != info_data["versions"][0].end(); ++it)
         {
             std::string key = it.key();
             nl::json value = it.value();
 
             if(key == "name")
+            {
                 key = "version"; // maybe just rename it so when we pass it to update_prop_widget it will update the version widget
-                
+            }
 
-            if(not is_property_key(key) or value.is_object()) continue; // skip interfaces .. non-properties
-              this->update_prop_widget(key,  value);
-   
 
+            if(not is_property_key(key) or value.is_object())
+            {
+                continue; // skip interfaces .. non-properties
+            }
+            this->update_prop_widget(key,  value);
         }
         if(info["versions"][0].hasKey("interfaces"))
         {
             std::string inter = info["versions"][0]["interfaces"].toYamlString().c_str();
             interfaces->setText(QString::fromStdString(inter));
-            
+
         }
     }
 
@@ -225,7 +231,7 @@ namespace xrock_gui_model
                 }
                 else if(QComboBox * cb = dynamic_cast<QComboBox *>(widget))
                 {
-                  
+
                     cb->setCurrentIndex(cb->findData(QString::fromStdString(value), Qt::DisplayRole)); // <- refers to the item text
                     break;
                 }
@@ -270,7 +276,7 @@ namespace xrock_gui_model
             it.second = get_prop_widget_text(it.first);
         }
         // Update 'second' level properties (all due to having the basic model legacy :/)
-        ConfigMap& secondLevel(updatedMap["versions"][0]); 
+        ConfigMap& secondLevel(updatedMap["versions"][0]);
         for (auto &it : secondLevel)
         {
             // NOTE: The 'name' key on the second level is tied to the 'version' widget

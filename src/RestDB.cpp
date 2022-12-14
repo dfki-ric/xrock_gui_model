@@ -147,6 +147,45 @@ namespace xrock_gui_model
     {
         return client->isConnected();
     }
+
+    configmaps::ConfigMap RestDB::getPropertiesOfComponentModel()
+    {
+        ConfigMap propMap;
+        auto cm = std::make_shared<ComponentModel>();
+        const nl::json props = cm->get_properties();
+        for (auto it = props.begin(); it != props.end(); ++it)
+        {
+            if (it->is_null())
+                continue; // skip for now..
+
+            std::string key = it.key();
+            propMap[key]["value"] = std::string(it.value());
+            const auto allowed_values = cm->get_allowed_property_values(key);
+            if (allowed_values.size() > 0)
+            {
+                //propMap[key]["allowed_values"] = ConfigVector();
+                size_t i = 0;
+                for (const auto &allowed : allowed_values)
+                {
+                    std::string s = allowed;
+                    propMap[key]["allowed_values"][i++] = s;
+                }
+            }
+        }
+        return propMap;
+    }
+
+    std::vector<std::string> RestDB::getDomains()
+    {
+        std::vector<std::string> domains;
+        const auto cm = ComponentModel();
+        for (const auto &d : cm.get_allowed_property_values("domain"))
+        {
+            domains.push_back(d.get<std::string>());
+        }
+        return domains;
+    }
+
     // void RestDB::set_dbPath(const fs::path &_dbPath) {
     //   client->setWorkingDbPath(_dbPath);
     // }

@@ -5,7 +5,6 @@
 #include <QPushButton>
 #include <QDesktopServices>
 #include <array>
-#include <xtypes/ComponentModel.hpp>
 
 using namespace configmaps;
 namespace xrock_gui_model
@@ -43,12 +42,12 @@ namespace xrock_gui_model
         domainSelect = new QComboBox();
         vLayout->addWidget(domainSelect);
 
-        const auto cm = ComponentModel();
+        std::vector<std::string> domains = xrockGui->db->getDomains();
         int index = 0;
-        for (const auto &d : cm.get_allowed_property_values("domain"))
+        for (const auto &d : domains)
         {
-            domainSelect->addItem(QString::fromStdString(d.get<std::string>()));
-            indexMap[d.get<std::string>()] = index;
+            domainSelect->addItem(QString::fromStdString(d));
+            indexMap[d] = index;
             index++;
         }
 

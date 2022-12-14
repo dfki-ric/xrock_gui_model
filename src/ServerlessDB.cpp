@@ -30,7 +30,7 @@ namespace xrock_gui_model
         std::vector<std::pair<std::string, std::string>> out;
         out.reserve(models.size());
         std::transform(models.begin(), models.end(), std::back_inserter(out), [&](auto &model)
-                       {if (!model->has_property("version"))throw std::runtime_error("Model of ComponentModel type has no 'version' property!"); 
+                       {if (!model->has_property("version"))throw std::runtime_error("Model of ComponentModel type has no 'version' property!");
                        return std::make_pair(model->get_property("name"), model->get_property("type")); });
         return out;
     }
@@ -127,4 +127,43 @@ namespace xrock_gui_model
     {
         serverless->setWorkingDbPath(_dbPath);
     }
+
+    configmaps::ConfigMap ServerlessDB::getPropertiesOfComponentModel()
+    {
+        ConfigMap propMap;
+        auto cm = std::make_shared<ComponentModel>();
+        const nl::json props = cm->get_properties();
+        for (auto it = props.begin(); it != props.end(); ++it)
+        {
+            if (it->is_null())
+                continue; // skip for now..
+
+            std::string key = it.key();
+            propMap[key]["value"] = std::string(it.value());
+            const auto allowed_values = cm->get_allowed_property_values(key);
+            if (allowed_values.size() > 0)
+            {
+                //propMap[key]["allowed_values"] = ConfigVector();
+                size_t i = 0;
+                for (const auto &allowed : allowed_values)
+                {
+                    std::string s = allowed;
+                    propMap[key]["allowed_values"][i++] = s;
+                }
+            }
+        }
+        return propMap;
+    }
+
+    std::vector<std::string> ServerlessDB::getDomains()
+    {
+        std::vector<std::string> domains;
+        const auto cm = ComponentModel();
+        for (const auto &d : cm.get_allowed_property_values("domain"))
+        {
+            domains.push_back(d.get<std::string>());
+        }
+        return domains;
+    }
+
 } // end of namespace xrock_gui_model

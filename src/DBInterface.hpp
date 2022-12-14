@@ -32,6 +32,12 @@ namespace xrock_gui_model
             return xdbi::DbInterface::get_available_backends();
         }
         virtual bool isConnected() { return false; };
+        virtual configmaps::ConfigMap getPropertiesOfComponentModel() {return configmaps::ConfigMap();};
+        virtual std::vector<std::string> getDomains() {
+            std::vector<std::string> domains;
+            domains.push_back("SOFTWARE");
+            return domains;
+        }
     };
 } // end of namespace xrock_gui_model
 

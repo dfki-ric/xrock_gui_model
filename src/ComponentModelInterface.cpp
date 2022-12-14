@@ -51,7 +51,7 @@ namespace xrock_gui_model
                 loadNodeInfo(*it2);
             }
         }
-        
+
         // 20221110 MS: Is this node still needed? It is a description node? Why do we need it? We can add a description property to the XType(s) instead.
         osg_graph_viz::NodeInfo info;
         info.numInputs = 0;
@@ -182,7 +182,7 @@ namespace xrock_gui_model
         info.type = type;
         // NOTE: Make the type visible in the NodeData widget
         info.map["type"] = type;
-
+        info.map["domain"] = model["domain"];
         // Transform interfaces to inputs/outputs
         // This is needed, because the bagel GUI expects these to be set properly
         int numInputs = 0;
@@ -479,6 +479,52 @@ namespace xrock_gui_model
                 // TODO: Apply node alias if set
                 bagelGui->addNode(partType, name);
                 // TODO: Apply interface_aliases info
+                ConfigMap nodeMap = *(bagelGui->getNodeMap(name));
+                bool updateMap = false;
+
+                // exposed interfaces are stored in the input data within the bagel_gui
+                // so we have to create this information from the model interfaces
+                if(basicModel["versions"][0].hasKey("interfaces"))
+                {
+                    ConfigVector interfaces = basicModel["versions"][0]["interfaces"];
+                    //fprintf(stderr, "node: %s\n", nodeMap.toYamlString().c_str());
+                    for(auto interface: basicModel["versions"][0]["interfaces"])
+                    {
+                        if(interface.hasKey("linkToNode") && interface["linkToNode"] == it["name"])
+                        {
+                            // search for interface
+                            if(interface["direction"] == "INCOMING" || interface["direction"] == "BIDIRECTIONAL")
+                            {
+                                for(ConfigVector::iterator input = nodeMap["inputs"].begin();
+                                    input <nodeMap["inputs"].end(); ++input)
+                                {
+                                    if((*input)["name"] == interface["linkToInterface"])
+                                    {
+                                        updateMap = true;
+                                        (*input)["interface"] = 1;
+                                        (*input)["interfaceExportName"] = interface["name"];
+                                    }
+                                }
+                            } else {
+                                for(ConfigVector::iterator output = nodeMap["outputs"].begin();
+                                    output <nodeMap["outputs"].end(); ++output)
+                                {
+                                    if((*output)["name"] == interface["linkToInterface"])
+                                    {
+                                        updateMap = true;
+                                        (*output)["interface"] = 1;
+                                        (*output)["interfaceExportName"] = interface["name"];
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if(updateMap)
+                {
+                    bagelGui->updateNodeMap(name, nodeMap);
+                }
+
             }
             // After we have done the nodes, we can wire their interfaces together
             if (basicModel["versions"][0]["components"].hasKey("edges"))
@@ -498,6 +544,9 @@ namespace xrock_gui_model
                             + "_" + edge["fromNodeOutput"].getString()
                             + "_" + edge["toNode"].getString()
                             + "_" + edge["toNodeInput"].getString();
+                    }
+                    if(edge.hasKey("data") && edge["data"].hasKey("decouple")) {
+                      edge["decouple"] = edge["data"]["decouple"];
                     }
                     edge["smooth"] = true;
                     if (hasEdge(edge))
@@ -568,6 +617,7 @@ namespace xrock_gui_model
             // Update node configuration entry
             ConfigMap c(node["configuration"]);
             c["name"] = n["name"];
+            c["domain"] = n["model"]["domain"];
             mi["versions"][0]["components"]["configuration"]["nodes"].push_back(c);
         }
         // Update edges & configuration based on edgeMap

@@ -555,6 +555,7 @@ namespace xrock_gui_model
                                 {
                                     if((*input)["name"] == interface["linkToInterface"])
                                     {
+                                        updateMap = true;
                                         (*input)["interface"] = 1;
                                         (*input)["interfaceExportName"] = interface["name"];
                                     }
@@ -565,6 +566,7 @@ namespace xrock_gui_model
                                 {
                                     if((*output)["name"] == interface["linkToInterface"])
                                     {
+                                        updateMap = true;
                                         (*output)["interface"] = 1;
                                         (*output)["interfaceExportName"] = interface["name"];
                                     }

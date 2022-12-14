@@ -45,6 +45,7 @@ set(SOURCES
   src/ConfigureDialog.cpp
   src/MultiDBConfigDialog.cpp
   src/ConfigMapHelper.cpp
+  src/BasicModelHelper.cpp
   src/FileDB.cpp
   src/RestDB.cpp
   src/ServerlessDB.cpp
@@ -61,6 +62,7 @@ set(HEADERS
   src/ConfigureDialog.hpp
   src/MultiDBConfigDialog.hpp
   src/ConfigMapHelper.hpp
+  src/BasicModelHelper.hpp
   src/FileDB.hpp
   src/RestDB.hpp
   src/ServerlessDB.hpp

@@ -6,6 +6,7 @@
 #include "XRockGUI.hpp"
 #include "ComponentModelInterface.hpp"
 #include "ConfigMapHelper.hpp"
+#include "BasicModelHelper.hpp"
 #include <osg_graph_viz/Node.hpp>
 #include <bagel_gui/BagelGui.hpp>
 #include <QMessageBox>
@@ -537,44 +538,9 @@ namespace xrock_gui_model
                         }
                     }
                 }
-                // exposed interfaces are stored in the input data within the bagel_gui
-                // so we have to create this information from the model interfaces
-                if(basicModel["versions"][0].hasKey("interfaces"))
-                {
-                    ConfigVector interfaces = basicModel["versions"][0]["interfaces"];
-                    //fprintf(stderr, "node: %s\n", currentMap.toYamlString().c_str());
-                    for(auto interface: basicModel["versions"][0]["interfaces"])
-                    {
-                        if(interface.hasKey("linkToNode") && interface["linkToNode"] == it["name"])
-                        {
-                            // search for interface
-                            if(interface["direction"] == "INCOMING" || interface["direction"] == "BIDIRECTIONAL")
-                            {
-                                for(ConfigVector::iterator input = currentMap["inputs"].begin();
-                                    input <currentMap["inputs"].end(); ++input)
-                                {
-                                    if((*input)["name"] == interface["linkToInterface"])
-                                    {
-                                        updateMap = true;
-                                        (*input)["interface"] = 1;
-                                        (*input)["interfaceExportName"] = interface["name"];
-                                    }
-                                }
-                            } else {
-                                for(ConfigVector::iterator output = currentMap["outputs"].begin();
-                                    output <currentMap["outputs"].end(); ++output)
-                                {
-                                    if((*output)["name"] == interface["linkToInterface"])
-                                    {
-                                        updateMap = true;
-                                        (*output)["interface"] = 1;
-                                        (*output)["interfaceExportName"] = interface["name"];
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+
+                BasicModelHelper::updateExportedInterfacesFromModel(currentMap, basicModel);
+
                 bagelGui->updateNodeMap(name, currentMap);
             }
             // After we have done the nodes, we can wire their interfaces together
@@ -656,25 +622,37 @@ namespace xrock_gui_model
         // Update inner components & configuration based on nodeMap
         mi["versions"][0]["components"]["nodes"] = ConfigVector();
         mi["versions"][0]["components"]["configuration"]["nodes"] = ConfigVector();
-        for (auto& [id, node] : nodeMap)
+        BasicModelHelper::clearExportedInterfacesInModel(mi);
+        for (auto& [id, node_] : nodeMap)
         {
             // Update node entry
+            ConfigMap node = *bagelGui->getNodeMap(node_["name"]);
             ConfigMap n;
             n["name"] = node["name"];
             n["alias"] = node["alias"];
             n["model"]["name"] = node["model"]["name"];
             n["model"]["domain"] = node["model"]["domain"];
             n["model"]["version"] = node["model"]["versions"][0]["name"];
+
+            // update exported interfaces
+            BasicModelHelper::updateExportedInterfacesToModel(node, mi);
+
             // Update interface_aliases
             ConfigVector& inputs = node["inputs"];
             for (auto input : inputs)
             {
-                n["interface_aliases"][input["name"].getString()] = input["alias"];
+                if(input.hasKey("alias"))
+                {
+                    n["interface_aliases"][input["name"].getString()] = input["alias"];
+                }
             }
             ConfigVector& outputs = node["outputs"];
             for (auto output : outputs)
             {
-                n["interface_aliases"][output["name"].getString()] = output["alias"];
+                if(output.hasKey("alias"))
+                {
+                    n["interface_aliases"][output["name"].getString()] = output["alias"];
+                }
             }
             mi["versions"][0]["components"]["nodes"].push_back(n);
             // Update node configuration entry

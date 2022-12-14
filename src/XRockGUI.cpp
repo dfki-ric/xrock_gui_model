@@ -507,8 +507,8 @@ namespace xrock_gui_model
         {
             if (ModelInterface* m = bagelGui->getCurrentModel())
             {
-                bagelGui->closeCurrentTab();
                 ConfigMap currentModel = m->getModelInfo();
+                bagelGui->closeCurrentTab();
 
                 if (currentModel.hasKey("name"))
                 {

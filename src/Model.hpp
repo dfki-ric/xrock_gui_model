@@ -28,9 +28,9 @@ namespace xrock_gui_model {
     void preAddNode(unsigned long nodeId) {};
     // todo: handle update name
     bool updateNode(unsigned long nodeId,
-                    configmaps::ConfigMap node);
+                    configmaps::ConfigMap& node);
     bool updateEdge(unsigned long egdeId,
-                    configmaps::ConfigMap edge) {return true;}
+                    configmaps::ConfigMap& edge) {return true;}
     bool removeNode(unsigned long nodeId);
     bool removeEdge(unsigned long edgeId);
 

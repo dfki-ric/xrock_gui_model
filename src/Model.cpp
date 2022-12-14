@@ -535,7 +535,7 @@ namespace xrock_gui_model {
   }
 
   bool Model::updateNode(unsigned long nodeId,
-                         configmaps::ConfigMap node) {
+                         configmaps::ConfigMap& node) {
     if(node["type"] == "DES") return true;
     std::map<unsigned long, ConfigMap>::iterator it = nodeMap.find(nodeId);
     if(it != nodeMap.end()) {

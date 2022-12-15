@@ -162,7 +162,6 @@ namespace xrock_gui_model
     void ComponentModelEditorWidget::update_widgets(configmaps::ConfigMap& info)
     {
         // Lets iterate over model's properties
-        nl::json info_data = nl::json::parse(info.toJsonString());
         auto is_property_key = [&](const std::string& key) -> bool
         {
             ConfigMap props = xrockGui->db->getPropertiesOfComponentModel();
@@ -175,21 +174,21 @@ namespace xrock_gui_model
             }
             return false;
         };
-        for (auto it = info_data.begin(); it != info_data.end(); ++it)
+        for (auto it = info.begin(); it != info.end(); ++it)
         {
-            std::string key = it.key();
-            nl::json value = it.value();
+            std::string key = it->first;
+            ConfigItem value = it->second;
             if(is_property_key(key))
             {
-                this->update_prop_widget(key,  value);
+                this->update_prop_widget(key,  value.toString());
             }
 
         }
 
-        for (auto it = info_data["versions"][0].begin(); it != info_data["versions"][0].end(); ++it)
+        for (auto it = info["versions"][0].beginMap(); it != info["versions"][0].endMap(); ++it)
         {
-            std::string key = it.key();
-            nl::json value = it.value();
+            std::string key = it->first;
+            ConfigItem value = it->second;
 
             if(key == "name")
             {
@@ -197,11 +196,11 @@ namespace xrock_gui_model
             }
 
 
-            if(not is_property_key(key) or value.is_object())
+            if(not is_property_key(key) or !value.isAtom())
             {
                 continue; // skip interfaces .. non-properties
             }
-            this->update_prop_widget(key,  value);
+            this->update_prop_widget(key,  value.toString());
         }
         //if(info["versions"][0].hasKey("interfaces"))
         //{

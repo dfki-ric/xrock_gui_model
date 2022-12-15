@@ -8,8 +8,8 @@
 #include "ComponentModelEditorWidget.hpp"
 #include "ImportDialog.hpp"
 #include "FileDB.hpp"
-#include "RestDB.hpp"
-#include "ServerlessDB.hpp"
+//#include "RestDB.hpp"
+//#include "ServerlessDB.hpp"
 #include "VersionDialog.hpp"
 #include "ConfigureDialog.hpp"
 #include "ConfigMapHelper.hpp"
@@ -33,7 +33,15 @@ ToolbarBackend::ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface 
 
     // Backends
     cb_backends = new QComboBox;
-    for (auto const &e : DBInterface::loadBackends())
+    std::vector<std::string> backends;
+    if(xrockGui->ioLibrary)
+    {
+        backends = xrockGui->ioLibrary->getBackends();
+    }
+    else {
+        backends.push_back("FileDB");
+    }
+    for (auto const &e : backends)
     {
         cb_backends->addItem(QString::fromStdString(e));
     }
@@ -112,33 +120,27 @@ void ToolbarBackend::on_backend_changed(const QString &new_backend)
 
 void ToolbarBackend::on_db_path_changed(const QString &db_path)
 {
-    if (ServerlessDB *sdb = dynamic_cast<ServerlessDB *>(db))
-    {
-        std::string dbPath = mars::utils::pathJoin(std::getenv("AUTOPROJ_CURRENT_ROOT"), db_path.toStdString());
-        sdb->set_dbPath(dbPath);
-    }
+    std::string dbPath = mars::utils::pathJoin(std::getenv("AUTOPROJ_CURRENT_ROOT"), db_path.toStdString());
+    db->set_dbPath(dbPath);
 }
+
 void ToolbarBackend::on_url_changed(const QString &url)
 {
-    if (RestDB *rdb = dynamic_cast<RestDB *>(db))
-    {
-        std::string dbAddress = url.toStdString() + ':' + le_port->text().toStdString();
-        rdb->set_dbAddress(dbAddress);
-    }
+    std::string dbAddress = url.toStdString() + ':' + le_port->text().toStdString();
+    db->set_dbAddress(dbAddress);
 }
+
 void ToolbarBackend::on_port_changed(const QString &port)
 {
-    if (RestDB *rdb = dynamic_cast<RestDB *>(db))
-    {
-        std::string dbAddress = le_url->text().toStdString() + ':' + port.toStdString();
-        rdb->set_dbAddress(dbAddress);
-    }
+    std::string dbAddress = le_url->text().toStdString() + ':' + port.toStdString();
+    db->set_dbAddress(dbAddress);
 }
 
 void ToolbarBackend::on_graph_changed(const QString &graph)
 {
     db->set_dbGraph(graph.toStdString());
 }
+
 std::string ToolbarBackend::get_dbPath()
 {
     return le_db_path->text().toStdString();
@@ -149,6 +151,7 @@ std::string ToolbarBackend::get_dbAddress()
     std::string dbAddress = le_url->text().toStdString() + ':' + le_port->text().toStdString();
     return dbAddress;
 }
+
 std::string ToolbarBackend::get_graph()
 {
     return le_graph->text().toStdString();

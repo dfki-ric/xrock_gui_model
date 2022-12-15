@@ -27,6 +27,8 @@ namespace xrock_gui_model
         bool storeModel(const configmaps::ConfigMap &map_) override;;
 
         void set_dbAddress(const std::string & db_Address) override;
+        virtual configmaps::ConfigMap getPropertiesOfComponentModel();
+        virtual std::vector<std::string> getDomains();
 
     private:
         std::string dbAddress;

@@ -175,4 +175,22 @@ namespace xrock_gui_model
         dbAddress = db_Address;
     }
 
+    configmaps::ConfigMap FileDB::getPropertiesOfComponentModel()
+    {
+        configmaps::ConfigMap propMap;
+        propMap["name"]["value"] = "";
+        propMap["type"]["value"] = "";
+        propMap["domain"]["value"] = "";
+        propMap["domain"]["allowed_values"][0] = "SOFTWARE";
+        propMap["project"]["value"] = "";
+        return propMap;
+    }
+
+    std::vector<std::string> FileDB::getDomains()
+    {
+        std::vector<std::string> domains;
+        domains.push_back("SOFTWARE");
+        return domains;
+    }
+
 } // end of namespace xrock_gui_model

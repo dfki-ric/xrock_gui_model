@@ -16,6 +16,7 @@
 #include <QTableWidget>
 #include <QHeaderView>
 #include <mars/utils/misc.h>
+#include "XRockIOLibrary.hpp"
 
 namespace xrock_gui_model
 {
@@ -25,7 +26,7 @@ namespace xrock_gui_model
         Q_OBJECT
 
     public:
-       explicit  MultiDBConfigDialog(const std::string &conf_file);
+       explicit  MultiDBConfigDialog(const std::string &conf_file, XRockIOLibrary *ioLibrary);
         ~MultiDBConfigDialog();
 
         void load_config();
@@ -44,8 +45,7 @@ namespace xrock_gui_model
 
     private:
         std::string config_filename;
-
-    private:
+        XRockIOLibrary *ioLibrary;
         QVBoxLayout *vLayout;
         QComboBox *cb_main_server_type;
         QLineEdit *tf_main_server_path;

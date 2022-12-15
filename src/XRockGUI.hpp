@@ -17,6 +17,7 @@
 #include <mars/cfg_manager/CFGManagerInterface.h>
 #include "DBInterface.hpp"
 #include "ToolbarBackend.hpp"
+#include "XRockIOLibrary.hpp"
 
 namespace bagel_gui
 {
@@ -123,6 +124,7 @@ namespace xrock_gui_model
         void addComponent();
         // Stored a pointer to the currently selected XRock database backend instance
         std::unique_ptr<DBInterface> db;
+        XRockIOLibrary *ioLibrary;
 
     private:
         mars::main_gui::GuiInterface *gui;

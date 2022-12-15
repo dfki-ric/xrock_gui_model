@@ -8,6 +8,7 @@
 #include <QDesktopServices>
 #include <array>
 #include "DBInterface.hpp"
+#include "XRockIOLibrary.hpp"
 #include <configmaps/ConfigMap.hpp>
 
 // Needed for version check
@@ -19,8 +20,8 @@ using namespace configmaps;
 namespace xrock_gui_model
 {
 
-    MultiDBConfigDialog::MultiDBConfigDialog(const std::string &conf_file)
-        : config_filename(conf_file)
+    MultiDBConfigDialog::MultiDBConfigDialog(const std::string &conf_file, XRockIOLibrary *ioLibrary)
+        : config_filename(conf_file), ioLibrary(ioLibrary)
     {
         this->setWindowTitle("MultiDB Configuration");
         QHBoxLayout *mainLayout = new QHBoxLayout();
@@ -33,7 +34,17 @@ namespace xrock_gui_model
         label = new QLabel("Type:");
         hLayout->addWidget(label);
         cb_main_server_type = new QComboBox();
-        for (std::string backend : DBInterface::loadBackends())
+        std::vector<std::string> backends;
+        if(ioLibrary)
+        {
+            backends = ioLibrary->getBackends();
+        }
+        else
+        {
+            backends.push_back("FileDB");
+        }
+
+        for (std::string backend : backends)
         {
             if (backend != "MultiDbClient")
                 cb_main_server_type->addItem(QString::fromStdString(backend));
@@ -69,7 +80,7 @@ namespace xrock_gui_model
         QHBoxLayout *hbox = new QHBoxLayout();
 
         cb_new_type = new QComboBox();
-        for (std::string backend : DBInterface::loadBackends())
+        for (std::string backend : backends)
         {
             if (backend != "MultiDbClient")
                 cb_new_type->addItem(QString::fromStdString(backend));

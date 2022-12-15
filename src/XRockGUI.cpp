@@ -9,9 +9,9 @@
 #include "ComponentModelEditorWidget.hpp"
 #include "ImportDialog.hpp"
 #include "FileDB.hpp"
-#include "RestDB.hpp"
-#include "ServerlessDB.hpp"
-#include "MultiDB.hpp"
+//#include "RestDB.hpp"
+//#include "ServerlessDB.hpp"
+//#include "MultiDB.hpp"
 #include "MultiDBConfigDialog.hpp"
 #include "VersionDialog.hpp"
 #include "ConfigureDialog.hpp"
@@ -53,7 +53,7 @@ namespace xrock_gui_model
         return result;
     }
 
-    XRockGUI::XRockGUI(lib_manager::LibManager *theManager) : lib_manager::LibInterface(theManager)
+    XRockGUI::XRockGUI(lib_manager::LibManager *theManager) : lib_manager::LibInterface(theManager), ioLibrary(NULL)
     {
         initConfig();
         initBagelGui();
@@ -112,19 +112,14 @@ namespace xrock_gui_model
             mars::cfg_manager::cfgPropertyStruct prop_dbAddress;
             prop_dbAddress = cfg->getOrCreateProperty("XRockGUI", "dbAddress",
                                                       defaultAddress, this);
-            if (env.hasKey("dbType") and env["dbType"] == "RestDB")
+            ioLibrary = libManager->getLibraryAs<XRockIOLibrary>("xrock_io_library", true);
+            if(ioLibrary)
             {
-                db.reset(new RestDB());
-                std::cout << "Using restdb" << std::endl;
-            }
-            else if (env.hasKey("dbType") and env["dbType"] == "ServerlessDB" and env.hasKey("dbPath"))
-            {
-                std::string dbAbsPath = mars::utils::pathJoin(env["AUTOPROJ_CURRENT_ROOT"], env["dbPath"].toString());
-                db.reset(new ServerlessDB(dbAbsPath));
-                std::cout << "Using serverless where db path is: " << dbAbsPath << std::endl;
+                db.reset(ioLibrary->getDB(env));
             }
             else
             {
+                // if we don't have a ioLibrary we only support FileDB
                 prop_dbAddress.sValue = mars::utils::pathJoin(confDir, prop_dbAddress.sValue);
                 db.reset(new FileDB());
             }
@@ -475,30 +470,44 @@ namespace xrock_gui_model
         }
         case MenuActions::SELECT_SERVERLESS: // Serverless
         {
-            db.reset(new ServerlessDB(mars::utils::pathJoin(env["AUTOPROJ_CURRENT_ROOT"], env["dbPath"].getString()))); // Todo get this from a textfield
+            if(ioLibrary)
+            {
+                env["dbType"] = "ServerlessDB";
+                db.reset(ioLibrary->getDB(env));
+            }
             break;
         }
         case MenuActions::SELECT_CLIENT: // Client
         {
-            db.reset(new RestDB());
-            if (!db->isConnected())
+            if(ioLibrary)
             {
-                std::string msg = "Server is not running! Please run server using command:\njsondb -d " + toolbarBackend->get_dbPath();
-                QMessageBox::warning(nullptr, "Warning", msg.c_str(), QMessageBox::Ok);
+                env["dbType"] = "RestDB";
+                db.reset(ioLibrary->getDB(env));
+                if (!db->isConnected())
+                {
+                    std::string msg = "Server is not running! Please run server using command:\njsondb -d " + toolbarBackend->get_dbPath();
+                    QMessageBox::warning(nullptr, "Warning", msg.c_str(), QMessageBox::Ok);
+                }
             }
             break;
         }
         case MenuActions::SELECT_MULTIDB: // MultiDbClient
         {
+            if(ioLibrary)
+            {
                 std::string multidb_config_path = bagelGui->getConfigDir() + "/MultiDBConfig.yml";
-                MultiDBConfigDialog dialog(multidb_config_path);
+                MultiDBConfigDialog dialog(multidb_config_path, ioLibrary);
                 dialog.exec();
                 ConfigMap yaml_to_json = configmaps::ConfigMap::fromYamlFile(multidb_config_path);
-                db.reset(new MultiDB(nl::json::parse(yaml_to_json.toJsonString())));
+                env["dbType"] = "MultiDB";
+                env["multiDBConfig"] = yaml_to_json.toJsonString();
+                db.reset(ioLibrary->getDB(env));
+
                 if (!db->isConnected())
-            {
-                std::string msg = "import_servers type client requested! Please run server using command:\njsondb -d " + toolbarBackend->get_dbPath();
-                QMessageBox::warning(nullptr, "Warning", msg.c_str(), QMessageBox::Ok);
+                {
+                    std::string msg = "import_servers type client requested! Please run server using command:\njsondb -d " + toolbarBackend->get_dbPath();
+                    QMessageBox::warning(nullptr, "Warning", msg.c_str(), QMessageBox::Ok);
+                }
             }
             break;
         
@@ -1097,15 +1106,15 @@ namespace xrock_gui_model
         {
             cnd_export << " -t --tf_enhance -u " << urdf_file;
         }
-        if (dynamic_cast<ServerlessDB *>(db.get()))
+        if (env["dbType"] == "ServerlessDB")
         {
             cnd_export << " -b Serverless ";
         }
-        else if (dynamic_cast<RestDB *>(db.get()))
+        else if (env["dbType"] == "RestDB")
         {
             cnd_export << " -b Client ";
         }
-        else if(dynamic_cast<MultiDB*>(db.get()))
+        else if (env["dbType"] == "MultiDB")
         {
           cnd_export << " -b multidb ";
         }

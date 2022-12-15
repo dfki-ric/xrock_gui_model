@@ -31,11 +31,6 @@ pkg_check_modules(main_gui REQUIRED IMPORTED_TARGET main_gui)
 pkg_check_modules(config_map_gui REQUIRED IMPORTED_TARGET config_map_gui)
 pkg_check_modules(cfg_manager REQUIRED IMPORTED_TARGET cfg_manager)
 
-
-find_package(xdbi REQUIRED)
-find_package(xtypes REQUIRED)
-find_package( Boost COMPONENTS system thread REQUIRED)
-
 set(SOURCES 
   src/ComponentModelInterface.cpp
   src/XRockGUI.cpp
@@ -47,9 +42,6 @@ set(SOURCES
   src/ConfigMapHelper.cpp
   src/BasicModelHelper.cpp
   src/FileDB.cpp
-  src/RestDB.cpp
-  src/ServerlessDB.cpp
-  src/MultiDB.cpp
   src/ToolbarBackend.cpp
 )
 
@@ -64,10 +56,9 @@ set(HEADERS
   src/ConfigMapHelper.hpp
   src/BasicModelHelper.hpp
   src/FileDB.hpp
-  src/RestDB.hpp
-  src/ServerlessDB.hpp
-  src/MultiDB.hpp
   src/ToolbarBackend.hpp
+  src/DbInterface.hpp
+  src/XRockIOLibrary.hpp
 )
 
 set (QT_MOC_HEADER
@@ -110,17 +101,9 @@ target_link_libraries(${PROJECT_NAME}
         PkgConfig::config_map_gui
         PkgConfig::cfg_manager
         ${QT_LIBRARIES}
-        xtypes::xtypes_cpp
-        xtypes_generator::xtypes_generator_cpp
-        xdbi::xdbi_cpp
-        ${Boost_SYSTEM_LIBRARY} 	
 )
 
-add_executable(test_restdb test/test_restdb.cpp)
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17) # Use C++17
-target_link_libraries(test_restdb ${PROJECT_NAME}
-          PkgConfig::configmaps
-)
 
 if(WIN32)
   set(LIB_INSTALL_DIR bin) # .dll are in PATH, like executables

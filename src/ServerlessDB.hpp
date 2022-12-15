@@ -31,8 +31,6 @@ namespace xrock_gui_model
 
         virtual void set_dbGraph(const std::string &_dbGraph) override;
         virtual void set_dbPath(const fs::path &_dbPath);
-        virtual configmaps::ConfigMap getPropertiesOfComponentModel() override;
-        virtual std::vector<std::string> getDomains() override;
 
     private:
         std::unique_ptr<xdbi::Serverless> serverless;

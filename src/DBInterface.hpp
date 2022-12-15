@@ -7,6 +7,7 @@
 #pragma once
 #include <configmaps/ConfigMap.hpp>
 #include <xdbi/DbInterface.hpp>
+#include <xtypes/ComponentModel.hpp>
 
 namespace xrock_gui_model
 {
@@ -32,10 +33,40 @@ namespace xrock_gui_model
             return xdbi::DbInterface::get_available_backends();
         }
         virtual bool isConnected() { return false; };
-        virtual configmaps::ConfigMap getPropertiesOfComponentModel() {return configmaps::ConfigMap();};
-        virtual std::vector<std::string> getDomains() {
+
+        configmaps::ConfigMap getPropertiesOfComponentModel() {
+            configmaps::ConfigMap propMap;
+            const auto cm = xtypes::ComponentModel();
+            const nl::json props = cm.get_properties();
+            for (auto it = props.begin(); it != props.end(); ++it)
+            {
+                if (it->is_null())
+                    continue; // skip for now..
+
+                const std::string key = it.key();
+                propMap[key]["value"] = std::string(it.value());
+                const auto allowed_values = cm.get_allowed_property_values(key);
+                if (allowed_values.size() > 0)
+                {
+                    //propMap[key]["allowed_values"] = ConfigVector();
+                    size_t i = 0;
+                    for (const auto &allowed : allowed_values)
+                    {
+                        std::string s = allowed;
+                        propMap[key]["allowed_values"][i++] = s;
+                    }
+                }
+            }
+            return propMap;
+        };
+
+        std::vector<std::string> getDomains() {
             std::vector<std::string> domains;
-            domains.push_back("SOFTWARE");
+            const auto cm = xtypes::ComponentModel();
+            for (const auto &d : cm.get_allowed_property_values("domain"))
+            {
+                domains.push_back(d.get<std::string>());
+            }
             return domains;
         }
     };

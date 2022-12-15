@@ -44,6 +44,7 @@ namespace xrock_gui_model
         }
     }
 
+    // TODO: Check if this function is needed anymore. The updateExportedInterfacesToModel() function does not depend on it anymore!
     void BasicModelHelper::clearExportedInterfacesInModel(ConfigMap &model)
     {
         ConfigVector interfaces;
@@ -64,27 +65,43 @@ namespace xrock_gui_model
     void BasicModelHelper::updateExportedInterfacesToModel(ConfigMap &node, ConfigMap &model)
     {
 
-        fprintf(stderr, "node: %s\n", node.toYamlString().c_str());
+        //fprintf(stderr, "node: %s\n", node.toYamlString().c_str());
         // add exported interfaces of node to interface list
+        const std::string& nodeName(node["name"].getString());
+        const std::string& nodeAlias(node["alias"].getString());
         for(auto port: node["inputs"])
         {
+            const std::string& portName(port["name"].getString());
+            const std::string& portAlias(port["alias"].getString());
             if(port.hasKey("interface")) {
+                // TODO: What meaning has value 2?
                 if((int)port["interface"] == 1 || (int)port["interface"] == 2)
                 {
+                    // Search for the matching external interface first
+                    bool found = false;
+                    for (auto& interface : model["versions"][0]["interfaces"])
+                    {
+                        if (interface["name"] == port["interfaceExportName"])
+                        {
+                            // Interface already exists. Just update alias!
+                            interface["alias"] = (nodeAlias.empty() ? nodeName : nodeAlias) + std::string(":") + (portAlias.empty() ? portName : portAlias);
+                            found = true;
+                            break;
+                        }
+                    }
+                    // If the interface already exists, we are done here
+                    if (found) continue;
+
+                    // The interface does not yet exist, so we create a NEW one
                     ConfigMap interface;
                     interface["domain"] = port["domain"];
                     interface["direction"] = port["direction"];
                     interface["multiplicity"] = port["multiplicity"];
                     interface["type"] = port["type"];
-                    interface["linkToNode"] = node["name"];
-                    interface["linkToInterface"] = port["name"];
-                    if(port.hasKey("interfaceExportName"))
-                    {
-                        interface["name"] = port["interfaceExportName"];
-                    }
-                    else {
-                        interface["name"] = node["name"].getString() + std::string(":") + port["name"].getString();
-                    }
+                    interface["linkToNode"] = nodeName;
+                    interface["linkToInterface"] = portName;
+                    interface["name"] = nodeName + std::string(":") + portName;
+                    interface["alias"] = (nodeAlias.empty() ? nodeName : nodeAlias) + std::string(":") + (portAlias.empty() ? portName : portAlias);
                     model["versions"][0]["interfaces"].push_back(interface);
                 }
             }
@@ -92,10 +109,28 @@ namespace xrock_gui_model
 
         for(auto port: node["outputs"])
         {
+            const std::string& portName(port["name"].getString());
+            const std::string& portAlias(port["alias"].getString());
             if(port.hasKey("interface")) {
+                // TODO: What meaning has value 2?
                 if((int)port["interface"] == 1 || (int)port["interface"] == 2)
                 {
-                    fprintf(stderr, "... Export interface\n");
+                    // Search for the matching external interface first
+                    bool found = false;
+                    for (auto& interface : model["versions"][0]["interfaces"])
+                    {
+                        if (interface["name"] == port["interfaceExportName"])
+                        {
+                            // Interface already exists. Just update alias!
+                            interface["alias"] = (nodeAlias.empty() ? nodeName : nodeAlias) + std::string(":") + (portAlias.empty() ? portName : portAlias);
+                            found = true;
+                            break;
+                        }
+                    }
+                    // If the interface already exists, we are done here
+                    if (found) continue;
+
+                    // The interface does not yet exist, so we create a NEW one
                     ConfigMap interface;
                     interface["domain"] = port["domain"];
                     interface["direction"] = port["direction"];
@@ -103,13 +138,8 @@ namespace xrock_gui_model
                     interface["type"] = port["type"];
                     interface["linkToNode"] = node["name"];
                     interface["linkToInterface"] = port["name"];
-                    if(port.hasKey("interfaceExportName"))
-                    {
-                        interface["name"] = port["interfaceExportName"];
-                    }
-                    else {
-                        interface["name"] = node["name"].getString() + std::string(":") + port["name"].getString();
-                    }
+                    interface["name"] = nodeName + std::string(":") + portName;
+                    interface["alias"] = (nodeAlias.empty() ? nodeName : nodeAlias) + std::string(":") + (portAlias.empty() ? portName : portAlias);
                     model["versions"][0]["interfaces"].push_back(interface);
                 }
             }

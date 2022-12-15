@@ -60,6 +60,8 @@ set(HEADERS
   src/FileDB.hpp
   src/RestDB.hpp
   src/ServerlessDB.hpp
+  src/DBInterface.hpp
+  src/XRockIOLibrary.hpp
 )
 
 set (QT_MOC_HEADER

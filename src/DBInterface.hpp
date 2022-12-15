@@ -6,8 +6,6 @@
 
 #pragma once
 #include <configmaps/ConfigMap.hpp>
-#include <xdbi/DbInterface.hpp>
-#include <xtypes/ComponentModel.hpp>
 
 namespace xrock_gui_model
 {

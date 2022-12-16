@@ -57,7 +57,7 @@ set(HEADERS
   src/BasicModelHelper.hpp
   src/FileDB.hpp
   src/ToolbarBackend.hpp
-  src/DbInterface.hpp
+  src/DBInterface.hpp
   src/XRockIOLibrary.hpp
 )
 

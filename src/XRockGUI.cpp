@@ -383,9 +383,16 @@ namespace xrock_gui_model
         }
         case MenuActions::EDIT_LOCAL_MAP:
         {
-            // 20221102 MS: Did not work for me. Is this relevant?
-            // TODO: Create function in XRockGUI or in DBInterface or somewhere else
-            //widget->editLocalMap();
+            ComponentModelInterface *model = dynamic_cast<ComponentModelInterface *>(bagelGui->getCurrentModel());
+            if (!model)
+                return;
+            ConfigMap basicModel = model->getModelInfo();
+            {
+                ConfigureDialog cd(&basicModel, env, "Basic Model", true, true);
+                cd.resize(400, 400);
+                cd.exec();
+            }
+            model->setModelInfo(basicModel);
             break;
         }
         case MenuActions::CREATE_BAGEL_MOTION_CONTROL_TASK:
@@ -455,8 +462,7 @@ namespace xrock_gui_model
         }
         case MenuActions::EDIT_MODEL_DESCRIPTION:
         {
-            // TODO: What is this for?
-            //widget->editDescription();
+            // TODO: Once we have a toplvl property, we would not need this anymore. Then the ComponentModelEditorWidget would have a field for it.
             break;
         }
         case MenuActions::IMPORT_CND:

@@ -206,6 +206,8 @@ namespace xrock_gui_model
             libManager->releaseLibrary("main_gui");
         if (bagelGui)
             libManager->releaseLibrary("bagel_gui");
+        if(ioLibrary)
+            libManager->releaseLibrary("xrock_io_library");
         if (cfg)
         {
             std::string confDir = ".";

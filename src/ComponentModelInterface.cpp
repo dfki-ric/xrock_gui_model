@@ -482,6 +482,15 @@ namespace xrock_gui_model
     {
         // NOTE: basicModel holds the original data. So we just copy over.
         basicModel = map;
+
+        // extract the gui information and store it in seperate map
+        if(basicModel["versions"][0].hasKey("data") && basicModel["versions"][0]["data"].hasKey("gui"))
+        {
+            guiMap = basicModel["versions"][0]["data"]["gui"];
+            ConfigMap &dataMap = basicModel["versions"][0]["data"];
+            dataMap.erase("gui");
+        }
+
         //std::cout << "ComponentModelInterface::setModelInfo()\n" << basicModel.toJsonString() << "\n";
         // We now use the basic model to setup the GUI
         if (basicModel["versions"][0].hasKey("components") && basicModel["versions"][0]["components"].hasKey("nodes"))
@@ -606,20 +615,14 @@ namespace xrock_gui_model
 
     void ComponentModelInterface::applyPartLayout(configmaps::ConfigMap &map)
     {
-        if (!map["versions"][0].hasKey("data"))
+        if (!guiMap.hasKey("layouts"))
             return;
-        ConfigMap& dataMap = map["versions"][0]["data"];
-        if (!dataMap.hasKey("gui"))
-            return;
-        if (!dataMap["gui"].hasKey("layouts"))
+        if (!guiMap.hasKey("defaultLayout"))
             return;
         // Found a layout in the component model data field. Lets apply it.
-        ConfigMap& layoutMap = dataMap["gui"]["layouts"];
-        for (const auto &[layoutName, layoutPositions] : layoutMap)
-        {
-            // todo: where to handle the layout name
-            bagelGui->applyLayout(layoutPositions);
-        }
+        std::string defaultLayout = guiMap["defaultLayout"];
+        ConfigMap& layoutMap = guiMap["layouts"];
+        bagelGui->applyLayout(layoutMap[defaultLayout]);
     }
 
     // This function gets called whenever the XRockGui wants to know the current status of the model.
@@ -690,6 +693,10 @@ namespace xrock_gui_model
         // NOTE: There might be leftovers of the bagel specific data which will be ignored by the xtype specific data
         //std::cout << "ComponentModelInterface::getModelInfo():\n" << mi.toJsonString() << "\n";
         basicModel = mi;
+
+        // store gui information
+        updateCurrentLayout();
+        basicModel["versions"][0]["data"]["gui"] = guiMap;
         return basicModel;
     }
 
@@ -700,6 +707,50 @@ namespace xrock_gui_model
             // The node map already contains the default configuration
             map["configuration"] = map["model"]["versions"][0]["defaultConfiguration"];
         }
+    }
+
+    void ComponentModelInterface::updateCurrentLayout() {
+        if(guiMap.hasKey("defaultLayout"))
+        {
+            std::string currentLayout = guiMap["defaultLayout"];
+            guiMap["layouts"][currentLayout] = bagelGui->getLayout();
+        }
+    }
+
+    void ComponentModelInterface::selectLayout(std::string layout)
+    {
+        updateCurrentLayout();
+        guiMap["defaultLayout"] = layout;
+        if(guiMap.hasKey("layouts"))
+        {
+            if(guiMap["layouts"].hasKey(layout))
+            {
+                bagelGui->loadLayout(layout+".yml");
+                bagelGui->applyLayout(guiMap["layouts"][layout]);
+            }
+        }
+    }
+
+    void ComponentModelInterface::removeLayout(std::string layout)
+    {
+        if(guiMap["defaultLayout"].getString() == layout)
+        {
+            guiMap.erase("defaultLayout");
+        }
+        if(guiMap.hasKey("layouts"))
+        {
+            ConfigMap &layouts = guiMap["layouts"];
+            if(layouts.hasKey(layout))
+            {
+                layouts.erase(layout);
+            }
+        }
+    }
+
+    void ComponentModelInterface::addLayout(std::string layout)
+    {
+        guiMap["defaultLayout"] = layout;
+        updateCurrentLayout();
     }
 
 } // end of namespace xrock_gui_model

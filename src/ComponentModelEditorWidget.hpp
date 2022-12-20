@@ -72,8 +72,6 @@ namespace xrock_gui_model
         bagel_gui::ModelInterface* currentModel = nullptr;
 
         QListWidget *layouts;
-        configmaps::ConfigMap layoutMap;
-        std::string currentLayout;
         std::map<std::string, QCheckBox *> layoutCheckBoxes;
         QLineEdit *layoutName;
         QTextEdit *includes, *annotations, *interfaces;

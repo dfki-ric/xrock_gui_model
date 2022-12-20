@@ -36,7 +36,7 @@ namespace xrock_gui_model
             // 20221107 MS: Why does this widget set a model path?
             ConfigMap props = xrockGui->db->getPropertiesOfComponentModel();
 
-            fprintf(stderr, "props: %s\n", props.toYamlString().c_str());
+            //fprintf(stderr, "props: %s\n", props.toYamlString().c_str());
             for(auto it: props)
             {
                 ConfigMap prop = it.second;
@@ -124,7 +124,6 @@ namespace xrock_gui_model
 
             // 20221107 MS: Removed buttons in favor of the XRock Toolbar
             setLayout(vLayout);
-            currentLayout = "";
             this->clear();
 
             // 20221107 MS: What is the XRock config filter?
@@ -209,9 +208,34 @@ namespace xrock_gui_model
         //}
         if(info["versions"][0].hasKey("data"))
         {
-            std::string data = info["versions"][0]["data"].toYamlString().c_str();
-            annotations->setText(QString::fromStdString(data));
+            // filter gui annotations since they are handled by the bage_gui itself
+            ConfigMap data = info["versions"][0]["data"];
+            if(data.hasKey("gui"))
+            {
+                data.erase("gui");
+            }
+            std::string dataString = data.toYamlString().c_str();
+            annotations->setText(QString::fromStdString(dataString));
+
+            // update layout list (part of data field)
+            if(info["versions"][0]["data"].hasKey("gui"))
+            {
+                if(info["versions"][0]["data"]["gui"].hasKey("layouts"))
+                {
+                    std::string defLayout = info["versions"][0]["data"]["gui"]["defaultLayout"];
+                    for(auto it: (ConfigMap)info["versions"][0]["data"]["gui"]["layouts"])
+                    {
+                        layouts->addItem(it.first.c_str());
+                        if(it.first == defLayout)
+                        {
+                            layouts->setCurrentItem(layouts->item(layouts->count()-1));
+                        }
+                    }
+                }
+            }
         }
+
+
     }
 
     void ComponentModelEditorWidget::currentModelChanged(bagel_gui::ModelInterface *model)
@@ -315,13 +339,7 @@ namespace xrock_gui_model
             if (v.isValid())
             {
                 std::string layout = v.toString().toStdString();
-                updateCurrentLayout();
-                currentLayout = layout;
-                layout += ".yml";
-                layoutName->setText(currentLayout.c_str());
-
-                bagelGui->loadLayout(layout);
-                bagelGui->applyLayout(layoutMap[currentLayout]);
+                dynamic_cast<ComponentModelInterface *>(currentModel)->selectLayout(layout);
             }
         }
         catch (const std::exception &e)
@@ -348,31 +366,27 @@ namespace xrock_gui_model
                     {
                         QListWidgetItem *item = layouts->item(i);
                         delete item;
-                        layoutMap.erase(name);
+                        dynamic_cast<ComponentModelInterface *>(currentModel)->removeLayout(layout);
                         if (layouts->count() > 0)
                         {
                             layouts->setCurrentItem(layouts->item(0));
-                            currentLayout = layouts->item(0)->data(0).toString().toStdString();
+                            std::string currentLayout = layouts->item(0)->data(0).toString().toStdString();
                             layoutName->setText(currentLayout.c_str());
-                            bagelGui->applyLayout(layoutMap[currentLayout]);
+                            dynamic_cast<ComponentModelInterface *>(currentModel)->selectLayout(currentLayout);
                         }
                         else
                         {
-                            currentLayout = "";
                             layouts->setCurrentItem(0);
                         }
-                        updateModel();
+                        // we deleted the layout and return
                         return;
                     }
                 }
             }
-            updateCurrentLayout();
-            ConfigMap layout;
+            // if we get here we didn't find the layout and add a new one
             layouts->addItem(name.c_str());
             layouts->setCurrentItem(layouts->item(layouts->count() - 1));
-            currentLayout = name;
-            updateCurrentLayout();
-            updateModel();
+            dynamic_cast<ComponentModelInterface *>(currentModel)->addLayout(name);
         }
 
         catch (const std::exception &e)
@@ -381,15 +395,6 @@ namespace xrock_gui_model
             ss << "Exception thrown: " << e.what() << "\tAt " << __FILE__ << ':' << __LINE__ << '\n'
                << "\tAt " << __PRETTY_FUNCTION__ << '\n';
             QMessageBox::warning(nullptr, "Warning", QString::fromStdString(ss.str()), QMessageBox::Ok);
-        }
-    }
-
-    void ComponentModelEditorWidget::updateCurrentLayout()
-    {
-        if (!currentLayout.empty())
-        {
-            ConfigMap layout = bagelGui->getLayout();
-            layoutMap[currentLayout] = layout;
         }
     }
 
@@ -407,7 +412,6 @@ namespace xrock_gui_model
         annotations->clear();
         //interfaces->clear();
         layouts->clear();
-        layoutMap = ConfigMap();
     }
 
 

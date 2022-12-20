@@ -69,6 +69,9 @@ namespace xrock_gui_model
 
         // NOTE: If requested by the user, this function resets the node configuration to be the default config of the associated component model
         void resetConfig(configmaps::ConfigMap &map);
+        void selectLayout(std::string layout);
+        void removeLayout(std::string layout);
+        void addLayout(std::string layout);
 
     private:
         // We need a reference to the XRockGUI for DB accesses
@@ -85,12 +88,17 @@ namespace xrock_gui_model
         // If this changes the bagel model has to be updated to show the results in the GUI
         // NOTE: The bagel specific stuff based on the basic model is in the node, edge and nodeInfo maps
         configmaps::ConfigMap basicModel;
+        // holds information about layouts and gui properties
+        configmaps::ConfigMap guiMap;
+
         // This map stores the ORIGINAL info of the compponent models of the parts.
         // TODO: This might not be needed anymore, because we store the complete model in the nodeInfoMap as well.
         std::map<std::string, configmaps::ConfigMap> partModels;
 
         void loadNodeInfo(std::string path, bool orogen = false); // NOTE: Needed for bagel/shader stuff. Could be moved to XRockGui itself
         bool addOrogenInfo(configmaps::ConfigMap &model); // DEPRECATED
+
+        void updateCurrentLayout();
     };
 } // end of namespace xrock_gui_model
 

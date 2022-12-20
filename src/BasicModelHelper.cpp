@@ -74,8 +74,9 @@ namespace xrock_gui_model
             const std::string& portName(port["name"].getString());
             const std::string& portAlias(port["alias"].getString());
             if(port.hasKey("interface")) {
+                const int interfaceId = port["interface"];
                 // TODO: What meaning has value 2?
-                if((int)port["interface"] == 1 || (int)port["interface"] == 2)
+                if((interfaceId == 1) || (interfaceId == 2))
                 {
                     // Search for the matching external interface first
                     bool found = false;
@@ -104,6 +105,18 @@ namespace xrock_gui_model
                     interface["alias"] = (nodeAlias.empty() ? nodeName : nodeAlias) + std::string(":") + (portAlias.empty() ? portName : portAlias);
                     model["versions"][0]["interfaces"].push_back(interface);
                 }
+                else if (interfaceId == 0)
+                {
+                    // In this case the external interface shall be removed. We do this by copiing every interface except for matching ones
+                    ConfigVector keep;
+                    for (auto interface : model["versions"][0]["interfaces"])
+                    {
+                        if (interface["name"] == port["interfaceExportName"])
+                            continue;
+                        keep.push_back(interface);
+                    }
+                    model["versions"][0]["interfaces"] = keep;
+                }
             }
         }
 
@@ -112,8 +125,9 @@ namespace xrock_gui_model
             const std::string& portName(port["name"].getString());
             const std::string& portAlias(port["alias"].getString());
             if(port.hasKey("interface")) {
+                const int interfaceId = port["interface"];
                 // TODO: What meaning has value 2?
-                if((int)port["interface"] == 1 || (int)port["interface"] == 2)
+                if((interfaceId == 1) || (interfaceId == 2))
                 {
                     // Search for the matching external interface first
                     bool found = false;
@@ -141,6 +155,18 @@ namespace xrock_gui_model
                     interface["name"] = nodeName + std::string(":") + portName;
                     interface["alias"] = (nodeAlias.empty() ? nodeName : nodeAlias) + std::string(":") + (portAlias.empty() ? portName : portAlias);
                     model["versions"][0]["interfaces"].push_back(interface);
+                }
+                else if (interfaceId == 0)
+                {
+                    // In this case the external interface shall be removed. We do this by copiing every interface except for matching ones
+                    ConfigVector keep;
+                    for (auto interface : model["versions"][0]["interfaces"])
+                    {
+                        if (interface["name"] == port["interfaceExportName"])
+                            continue;
+                        keep.push_back(interface);
+                    }
+                    model["versions"][0]["interfaces"] = keep;
                 }
             }
         }

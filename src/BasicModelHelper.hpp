@@ -28,6 +28,14 @@ namespace xrock_gui_model
         // in the model itself
         static void updateExportedInterfacesToModel(configmaps::ConfigMap &node, configmaps::ConfigMap &model);
 
+        // Converts from the old basic model to the new representation:
+        //  - Store model information in sub-map
+        //  - Convert old domainData keys
+        //  - Check the types of annotation data in the model
+        static void convertFromLegacyModelFormat(configmaps::ConfigMap &model);
+
+        // Reverse conversion from convertFromLegacyModelFormat
+        static void convertToLegacyModelFormat(configmaps::ConfigMap &model);
     };
 } // end of namespace xrock_gui_model
 

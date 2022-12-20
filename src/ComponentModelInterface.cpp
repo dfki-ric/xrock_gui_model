@@ -543,6 +543,7 @@ namespace xrock_gui_model
 
                 bagelGui->updateNodeMap(name, currentMap);
             }
+
             // After we have done the nodes, we can wire their interfaces together
             if (basicModel["versions"][0]["components"].hasKey("edges"))
             {
@@ -562,15 +563,19 @@ namespace xrock_gui_model
                             + "_" + edge["toNode"].getString()
                             + "_" + edge["toNodeInput"].getString();
                     }
-                    if(edge.hasKey("data") && edge["data"].hasKey("decouple")) {
-                      edge["decouple"] = edge["data"]["decouple"];
+                    if(edge.hasKey("data") && edge["data"].hasKey("decouple"))
+                    {
+                        edge["decouple"] = edge["data"]["decouple"];
                     }
                     edge["smooth"] = true;
                     if (hasEdge(edge))
+                    {
                         continue;
+                    }
                     bagelGui->addEdge(edge);
                 }
             }
+
             // Add configuration update to nodes and edges
             if (basicModel["versions"][0]["components"].hasKey("configuration"))
             {
@@ -582,9 +587,13 @@ namespace xrock_gui_model
                         const std::string& nodeName(it["name"].getString());
                         ConfigMap currentMap = *bagelGui->getNodeMap(nodeName);
                         if (it.hasKey("data"))
+                        {
                             currentMap["configuration"]["data"] = it["data"];
+                        }
                         if (it.hasKey("submodel"))
+                        {
                             currentMap["configuration"]["submodel"] = it["submodel"];
+                        }
                         bagelGui->updateNodeMap(nodeName, currentMap);
                     }
                 }
@@ -608,6 +617,7 @@ namespace xrock_gui_model
         ConfigMap& layoutMap = dataMap["gui"]["layouts"];
         for (const auto &[layoutName, layoutPositions] : layoutMap)
         {
+            // todo: where to handle the layout name
             bagelGui->applyLayout(layoutPositions);
         }
     }

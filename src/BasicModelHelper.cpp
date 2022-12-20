@@ -65,7 +65,6 @@ namespace xrock_gui_model
     void BasicModelHelper::updateExportedInterfacesToModel(ConfigMap &node, ConfigMap &model)
     {
 
-        //fprintf(stderr, "node: %s\n", node.toYamlString().c_str());
         // add exported interfaces of node to interface list
         const std::string& nodeName(node["name"].getString());
         const std::string& nodeAlias(node["alias"].getString());
@@ -170,6 +169,59 @@ namespace xrock_gui_model
                 }
             }
         }
+    }
+
+    void BasicModelHelper::convertFromLegacyModelFormat(configmaps::ConfigMap &model)
+    {
+        //  - Store model information in sub-map
+        model["model"] = model;
+
+        //  - Convert old domainData keys
+        std::string domainData = model["domain"].getString() + "Data";
+        if (model["versions"][0].hasKey(domainData))
+        {
+            if(model["versions"][0][domainData].hasKey("data"))
+            {
+                if(model["versions"][0][domainData]["data"].isMap())
+                {
+                    model["versions"][0]["data"] = model["versions"][0][domainData]["data"];
+                    ((ConfigMap)model["versions"][0]).erase(model["domain"].getString() + "Data");
+                }
+                else
+                {
+                    model["versions"][0]["data"] = ConfigMap::fromYamlString(model["versions"][0][domainData]["data"]);
+                    ((ConfigMap)model["versions"][0]).erase(domainData);
+                }
+            }
+        }
+
+        //  - Check the types of annotation data in the model
+        //    - check if data properties of edges are in string format and convert them to map
+        if(model["versions"][0].hasKey("components"))
+        {
+            if(model["versions"][0]["components"].hasKey("edges"))
+            {
+                ConfigVector &edges = model["versions"][0]["components"]["edges"];
+                for(ConfigVector::iterator edge = edges.begin(); edge != edges.end(); ++edge)
+                {
+                    if(edge->hasKey("data") && !(*edge)["data"].isMap())
+                    {
+                        (*edge)["data"] = ConfigMap::fromYamlString((*edge)["data"]);
+                    }
+                }
+            }
+        }
+    }
+
+    // ToDo:
+    void BasicModelHelper::convertToLegacyModelFormat(configmaps::ConfigMap &model)
+    {
+        //  - Erase model information from sub-map
+        model.erase("model");
+
+        //  - Create old domainData key
+
+        //  - Check the types of annotation data in the model
     }
 
 } // end of namespace xrock_gui_model

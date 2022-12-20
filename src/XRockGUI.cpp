@@ -98,6 +98,10 @@ namespace xrock_gui_model
                     defaultAddress = "http://localhost:8183";
                 }
             }
+            else
+            {
+                env["dbType"] = "FileDB";
+            }
 
             std::string confDir2 = confDir + "/XRockGUI.yml";
             std::string confDir3 = confDir + "/MultiDB.yml";
@@ -120,8 +124,11 @@ namespace xrock_gui_model
             else
             {
                 // if we don't have a ioLibrary we only support FileDB
-                prop_dbAddress.sValue = mars::utils::pathJoin(confDir, prop_dbAddress.sValue);
                 db.reset(new FileDB());
+            }
+            if(env["dbType"] == "FileDB")
+            {
+                prop_dbAddress.sValue = mars::utils::pathJoin(confDir, prop_dbAddress.sValue);
             }
             db->set_dbAddress(prop_dbAddress.sValue);
             dbAddress_paramId = prop_dbAddress.paramId;
@@ -137,7 +144,17 @@ namespace xrock_gui_model
         {
             // NOTE: addModelInterface() is actually a registerModelInterface() function to setup a factory
             ComponentModelInterface* model = new ComponentModelInterface(bagelGui, this);
+            if (env.hasKey("initLoadModels") and (bool)env["initLoadModels"] == true)
+            {
+                std::vector<std::pair<std::string, std::string>> models = db->requestModelListByDomain("SOFTWARE");
+                for(auto it: models)
+                {
+                    ConfigMap modelMap = db->requestModel("SOFTWARE", it.first, "");
+                    model->addNodeInfo(model->deriveTypeFromNodeInfo(modelMap), modelMap);
+                }
+            }
             bagelGui->addModelInterface("xrock", model);
+            bagelGui->createView("xrock", "Model");
             bagelGui->addPlugin(this);
         }
         else

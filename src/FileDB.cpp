@@ -1,4 +1,6 @@
 #include "FileDB.hpp"
+#include "BasicModelHelper.hpp"
+
 #include <mars/utils/misc.h>
 #include <configmaps/ConfigVector.hpp>
 
@@ -23,8 +25,6 @@ namespace xrock_gui_model
     std::vector<std::pair<std::string, std::string>> FileDB::requestModelListByDomain(const std::string &domain)
     {
         std::vector<std::pair<std::string, std::string>> modelList;
-        if (domain != "SOFTWARE")
-            return modelList;
 
         // return content of info.yml
         std::string file = "info.yml";
@@ -40,8 +40,6 @@ namespace xrock_gui_model
     std::vector<std::string> FileDB::requestVersions(const std::string &domain, const std::string &model)
     {
         std::vector<std::string> versionList;
-        if (domain != "SOFTWARE")
-            return versionList;
 
         // return content of info.yml
         std::string file = "info.yml";
@@ -67,8 +65,6 @@ namespace xrock_gui_model
                                    const bool limit)
     {
         std::vector<std::string> versionList;
-        if (domain != "SOFTWARE")
-            return ConfigMap();
         if (limit)
         {
             versionList.push_back(version);
@@ -109,13 +105,15 @@ namespace xrock_gui_model
                 result["versions"].push_back(map["versions"][0]);
             }
         }
-
+        BasicModelHelper::convertFromLegacyModelFormat(result);
         return result;
     }
 
     bool FileDB::storeModel(const ConfigMap &map_)
     {
         ConfigMap map = map_;
+        BasicModelHelper::convertToLegacyModelFormat(map);
+
         std::string model = map["name"];
         std::string type = map["type"];
         std::string version = map["versions"][0]["name"];

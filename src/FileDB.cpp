@@ -191,4 +191,15 @@ namespace xrock_gui_model
         return domains;
     }
 
+    configmaps::ConfigMap FileDB::getEmptyComponentModel()
+    {
+        configmaps::ConfigMap emptyModel;
+        emptyModel["name"] = "";
+        emptyModel["domain"] = "SOFTWARE";
+        configmaps::ConfigMap emptyVersion;
+        emptyVersion["name"] = "v0.0.0";
+        emptyModel["versions"].push_back(emptyVersion);
+        return emptyModel;
+    }
+
 } // end of namespace xrock_gui_model

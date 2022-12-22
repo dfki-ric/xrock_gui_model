@@ -31,6 +31,7 @@ namespace xrock_gui_model
 
         virtual configmaps::ConfigMap getPropertiesOfComponentModel() = 0;
         virtual std::vector<std::string> getDomains() = 0;
+        virtual configmaps::ConfigMap getEmptyComponentModel() = 0;
     };
 } // end of namespace xrock_gui_model
 

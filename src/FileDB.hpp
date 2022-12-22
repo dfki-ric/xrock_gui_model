@@ -4,36 +4,33 @@
  * \brief Fuctions to communicate with the database
  **/
 
-#ifndef XROCK_GUI_MODEL_XROCK_DB_HPP
-#define XROCK_GUI_MODEL_XROCK_DB_HPP
-
+#pragma once
 #include <configmaps/ConfigMap.hpp>
 #include "DBInterface.hpp"
 
+namespace xrock_gui_model
+{
 
-namespace xrock_gui_model {
+    class FileDB : public DBInterface
+    {
 
-  class FileDB : public DBInterface {
+    public:
+        FileDB();
+        ~FileDB();
 
-  public:
-    FileDB();
-    ~FileDB();
+        std::vector<std::pair<std::string, std::string>> requestModelListByDomain(const std::string &domain) override;
+        std::vector<std::string> requestVersions(const std::string &domain, const std::string &model) override;
+        configmaps::ConfigMap requestModel(const std::string &domain,
+                                           const std::string &model,
+                                           const std::string &version,
+                                           const bool limit = false) override;
+        bool storeModel(const configmaps::ConfigMap &map_) override;;
 
-    std::vector<std::pair<std::string, std::string>> requestModelListByDomain(const std::string &domain) override;
-    std::vector<std::string> requestVersions(const std::string &domain, const std::string &model) override;
-    configmaps::ConfigMap requestModel(const std::string &domain,
-                                              const std::string &model,
-                                              const std::string &version,
-                                              const bool limit = false) override;
-    bool storeModel(const configmaps::ConfigMap &map);
+        void set_dbAddress(const std::string & db_Address) override;
+        virtual configmaps::ConfigMap getPropertiesOfComponentModel();
+        virtual std::vector<std::string> getDomains();
 
-    void set_dbAddress(const std::string &_dbAddress) override;
-
-  private:
-    std::string dbAddress;
-
-
-  };
+    private:
+        std::string dbAddress;
+    };
 } // end of namespace xrock_gui_model
-
-#endif // XROCK_GUI_MODEL_XROCK_DB_HPP

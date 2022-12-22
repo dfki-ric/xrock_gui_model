@@ -1,7 +1,7 @@
 Windows:
   - name: Docks
     type: string
-    value: NodeData%%ModelWidget%%NodeTypeWidget%%
+    value: NodeData%%ComponentModelEditorWidget%%NodeTypeWidget%%
   - name: HistoryWidget/Window Top
     type: int
     value: 40
@@ -50,28 +50,28 @@ Windows:
   - name: Mars Style
     type: bool
     value: false
-  - name: ModelWidget/Window Top
+  - name: ComponentModelEditorWidget/Window Top
     type: int
     value: 40
-  - name: ModelWidget/area
+  - name: ComponentModelEditorWidget/area
     type: int
     value: 2
-  - name: ModelWidget/floating
+  - name: ComponentModelEditorWidget/floating
     type: bool
     value: false
-  - name: ModelWidget/height
+  - name: ComponentModelEditorWidget/height
     type: int
     value: 882
-  - name: ModelWidget/hidden
+  - name: ComponentModelEditorWidget/hidden
     type: bool
     value: false
-  - name: ModelWidget/left
+  - name: ComponentModelEditorWidget/left
     type: int
     value: 1219
-  - name: ModelWidget/top
+  - name: ComponentModelEditorWidget/top
     type: int
     value: 44
-  - name: ModelWidget/width
+  - name: ComponentModelEditorWidget/width
     type: int
     value: 366
   - name: NodeData/Window Top

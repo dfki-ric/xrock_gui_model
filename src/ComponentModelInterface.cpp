@@ -635,15 +635,14 @@ namespace xrock_gui_model
         // Update inner components & configuration based on nodeMap
         mi["versions"][0]["components"]["nodes"] = ConfigVector();
         mi["versions"][0]["components"]["configuration"]["nodes"] = ConfigVector();
-        // FIXME: This function destroys already existing exported interfaces. Then their original name gets lost!!!
-        //BasicModelHelper::clearExportedInterfacesInModel(mi);
         for (auto& [id, node_] : nodeMap)
         {
             // Update node entry
             ConfigMap node = *bagelGui->getNodeMap(node_["name"]);
             ConfigMap n;
             n["name"] = node["name"];
-            n["alias"] = node["alias"];
+            if (node.hasKey("alias"))
+                n["alias"] = node["alias"];
             n["model"]["name"] = node["model"]["name"];
             n["model"]["domain"] = node["model"]["domain"];
             n["model"]["version"] = node["model"]["versions"][0]["name"];

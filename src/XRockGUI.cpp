@@ -157,8 +157,6 @@ namespace xrock_gui_model
                     model->addNodeInfo(model->deriveTypeFromNodeInfo(modelMap), modelMap);
                 }
             }
-            // Create a view with an empty component model
-            //newComponentModel();
         }
         else
         {

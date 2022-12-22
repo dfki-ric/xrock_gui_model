@@ -64,7 +64,6 @@ namespace xrock_gui_model
 
     void BasicModelHelper::updateExportedInterfacesToModel(ConfigMap &node, ConfigMap &model)
     {
-
         // add exported interfaces of node to interface list
         const std::string& nodeName(node["name"].getString());
         const std::string& nodeAlias(node["alias"].getString());

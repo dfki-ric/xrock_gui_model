@@ -39,6 +39,7 @@ namespace xrock_gui_model
         EXPORT_CND = 5,
         ADD_COMPONENT_FROM_DB = 6,
         LOAD_MODEL_FROM_DB = 7,
+        NEW_MODEL = 8,
         EDIT_LOCAL_MAP = 10,
         CREATE_BAGEL_MOTION_CONTROL_TASK = 11,
         CREATE_BAGEL_MODEL = 12,
@@ -107,6 +108,8 @@ namespace xrock_gui_model
                                                           const std::string &portName);
 
         // public slots:
+        // This function opens a new, empty component model to be edited
+        void newComponentModel();
         // This function adds a new component to the current component model (possibly asking the DB for it's model)
         void addComponent(const std::string& domain, const std::string& modelName, const std::string& version, std::string nodeName = "");
         // These function load a component model from DB or from a ConfigMap

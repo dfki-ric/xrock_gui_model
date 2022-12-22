@@ -142,8 +142,12 @@ namespace xrock_gui_model
         bagelGui = libManager->getLibraryAs<BagelGui>("bagel_gui");
         if (bagelGui)
         {
+            // Register this gui
+            bagelGui->addPlugin(this);
             // NOTE: addModelInterface() is actually a registerModelInterface() function to setup a factory
             ComponentModelInterface* model = new ComponentModelInterface(bagelGui, this);
+            bagelGui->addModelInterface("xrock", model);
+            // Preload the canvas with already defined models
             if (env.hasKey("initLoadModels") and (bool)env["initLoadModels"] == true)
             {
                 std::vector<std::pair<std::string, std::string>> models = db->requestModelListByDomain("SOFTWARE");
@@ -153,9 +157,8 @@ namespace xrock_gui_model
                     model->addNodeInfo(model->deriveTypeFromNodeInfo(modelMap), modelMap);
                 }
             }
-            bagelGui->addModelInterface("xrock", model);
-            bagelGui->createView("xrock", "Model");
-            bagelGui->addPlugin(this);
+            // Create a view with an empty component model
+            //newComponentModel();
         }
         else
         {
@@ -174,6 +177,7 @@ namespace xrock_gui_model
             gui->addGenericMenuAction("../File/Export/Model", static_cast<int>(MenuActions::SAVE_MODEL), this);
             gui->addGenericMenuAction("../File/Export/CNDModel", static_cast<int>(MenuActions::EXPORT_CND), this);
             gui->addGenericMenuAction("../File/Export/CNDModel With tf_enhance", static_cast<int>(MenuActions::EXPORT_CND_TFENHANCE), this);
+            gui->addGenericMenuAction("../Database/New Model", static_cast<int>(MenuActions::NEW_MODEL), this);
             gui->addGenericMenuAction("../Database/Add Component", static_cast<int>(MenuActions::ADD_COMPONENT_FROM_DB), this);
             gui->addGenericMenuAction("../Database/Store Model", static_cast<int>(MenuActions::STORE_MODEL_TO_DB), this);
             gui->addGenericMenuAction("../Database/Load Model", static_cast<int>(MenuActions::LOAD_MODEL_FROM_DB), this);
@@ -391,6 +395,11 @@ namespace xrock_gui_model
         {
             ImportDialog id(this, false);
             id.exec();
+            break;
+        }
+        case MenuActions::NEW_MODEL: // create new, empty model
+        {
+            newComponentModel();
             break;
         }
         case MenuActions::LOAD_MODEL_FROM_DB: // load model from database
@@ -736,6 +745,18 @@ namespace xrock_gui_model
     {
         ImportDialog id(this, false);
         id.exec();
+    }
+
+    void XRockGUI::newComponentModel()
+    {
+        // Create view will setup a NEW instance of a component model interface
+        bagelGui->createView("xrock", "New Model");
+        ComponentModelInterface* model = dynamic_cast<ComponentModelInterface*>(bagelGui->getCurrentModel());
+        // Set the model info of the ComponentModelInterface
+        ConfigMap emptyModel = db->getEmptyComponentModel();
+        model->setModelInfo(emptyModel);
+        // Afterwards we have to (re-)trigger the currentModelChanged() function
+        currentModelChanged(model);
     }
 
     // This function adds a new part to an already opened component model

@@ -72,10 +72,13 @@ namespace xrock_gui_model
         void selectLayout(std::string layout);
         void removeLayout(std::string layout);
         void addLayout(std::string layout);
+        void setSimpleTypeGen() { simpleTypeGen=true; }
 
     private:
         // We need a reference to the XRockGUI for DB accesses
         XRockGUI* xrockGui;
+
+        bool simpleTypeGen;
 
         std::map<unsigned long, configmaps::ConfigMap> nodeMap;
         std::map<unsigned long, configmaps::ConfigMap> edgeMap;

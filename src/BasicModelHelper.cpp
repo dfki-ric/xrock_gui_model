@@ -1,5 +1,7 @@
 #include "BasicModelHelper.hpp"
 
+#include <mars/utils/misc.h>
+
 using namespace configmaps;
 
 namespace xrock_gui_model
@@ -173,18 +175,18 @@ namespace xrock_gui_model
     void BasicModelHelper::convertFromLegacyModelFormat(configmaps::ConfigMap &model)
     {
         //  - Store model information in sub-map
-        model["model"] = model;
+        model["model"] = ConfigMap(model);
 
         //  - Convert old domainData keys
-        std::string domainData = model["domain"].getString() + "Data";
-        if (model["versions"][0].hasKey(domainData))
+        std::string domainData = mars::utils::tolower(model["domain"].getString()) + "Data";
+        if(model["versions"][0].hasKey(domainData))
         {
             if(model["versions"][0][domainData].hasKey("data"))
             {
                 if(model["versions"][0][domainData]["data"].isMap())
                 {
                     model["versions"][0]["data"] = model["versions"][0][domainData]["data"];
-                    ((ConfigMap)model["versions"][0]).erase(model["domain"].getString() + "Data");
+                    ((ConfigMap)model["versions"][0]).erase(domainData);
                 }
                 else
                 {
@@ -218,9 +220,42 @@ namespace xrock_gui_model
         //  - Erase model information from sub-map
         model.erase("model");
 
-        //  - Create old domainData key
+        //  - Convert data maps back to strings
+        std::string domainData = mars::utils::tolower(model["domain"].getString()) + "Data";
+        if(model["versions"][0].hasKey("data"))
+        {
+            std::string dataString;
+            if(model["versions"][0]["data"].isMap())
+            {
+                dataString = model["versions"][0]["data"].toYamlString();
+            }
+            else
+            {
+                dataString << model["versions"][0]["data"];
+            }
+            model["versions"][0][domainData]["data"] = dataString;
+            ConfigMap &m = model["versions"][0];
+            m.erase("data");
+        }
 
         //  - Check the types of annotation data in the model
+        if(model["versions"][0].hasKey("components"))
+        {
+            if(model["versions"][0]["components"].hasKey("edges"))
+            {
+                ConfigVector &edges = model["versions"][0]["components"]["edges"];
+                for(ConfigVector::iterator edge = edges.begin(); edge != edges.end(); ++edge)
+                {
+                    if(edge->hasKey("data") && (*edge)["data"].isMap())
+                    {
+                        std::string dataString = (*edge)["data"].toYamlString();
+                        ConfigMap &e = *edge;
+                        e.erase("data");
+                        e["data"] = dataString;
+                    }
+                }
+            }
+        }
     }
 
 } // end of namespace xrock_gui_model

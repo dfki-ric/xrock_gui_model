@@ -23,6 +23,7 @@ namespace xrock_gui_model
 
     ComponentModelInterface::ComponentModelInterface(BagelGui *bagelGui, XRockGUI* xrockGui) : ModelInterface(bagelGui), xrockGui(xrockGui)
     {
+        simpleTypeGen = false;
         std::string confDir = bagelGui->getConfigDir();
         ConfigMap config = ConfigMap::fromYamlFile(confDir + "/config_default.yml", true);
         if (mars::utils::pathExists(confDir + "/config.yml"))
@@ -94,7 +95,8 @@ namespace xrock_gui_model
           nodeMap(other->nodeMap),
           edgeMap(other->edgeMap),
           nodeInfoMap(other->nodeInfoMap),
-          basicModel(other->basicModel)
+          basicModel(other->basicModel),
+          simpleTypeGen(other->simpleTypeGen)
     {
     }
 
@@ -159,6 +161,10 @@ namespace xrock_gui_model
 
     std::string ComponentModelInterface::deriveTypeFrom(const std::string& domain, const std::string& name, const std::string& version)
     {
+        if(simpleTypeGen)
+        {
+            return name;
+        }
         return (domain + "::" + name + "::" + version);
     }
 
@@ -554,6 +560,7 @@ namespace xrock_gui_model
             }
 
             // After we have done the nodes, we can wire their interfaces together
+
             if (basicModel["versions"][0]["components"].hasKey("edges"))
             {
                 auto edges = basicModel["versions"][0]["components"]["edges"];
@@ -631,6 +638,7 @@ namespace xrock_gui_model
     {
         // NOTE: bagelInfo holds the data which might have been altered.
         ConfigMap mi(basicModel);
+
         // NOTE: The toplevel properties have already been updated at this point (see ComponentModelEditorWidget)
         // Update inner components & configuration based on nodeMap
         mi["versions"][0]["components"]["nodes"] = ConfigVector();
@@ -669,10 +677,13 @@ namespace xrock_gui_model
             }
             mi["versions"][0]["components"]["nodes"].push_back(n);
             // Update node configuration entry
-            ConfigMap c(node["configuration"]);
-            c["name"] = n["name"];
-            c["domain"] = n["model"]["domain"];
-            mi["versions"][0]["components"]["configuration"]["nodes"].push_back(c);
+            if(node.hasKey("configuration"))
+            {
+                ConfigMap c(node["configuration"]);
+                c["name"] = n["name"];
+                c["domain"] = n["model"]["domain"];
+                mi["versions"][0]["components"]["configuration"]["nodes"].push_back(c);
+            }
         }
         // Update edges & configuration based on edgeMap
         mi["versions"][0]["components"]["edges"] = ConfigVector();

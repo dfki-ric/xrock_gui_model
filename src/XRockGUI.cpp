@@ -8,6 +8,7 @@
 #include "ComponentModelInterface.hpp"
 #include "ComponentModelEditorWidget.hpp"
 #include "ImportDialog.hpp"
+#include "BasicModelHelper.hpp"
 #include "FileDB.hpp"
 //#include "RestDB.hpp"
 //#include "ServerlessDB.hpp"
@@ -16,6 +17,7 @@
 #include "VersionDialog.hpp"
 #include "ConfigureDialog.hpp"
 #include "ConfigMapHelper.hpp"
+
 #include <lib_manager/LibManager.hpp>
 #include <bagel_gui/BagelGui.hpp>
 #include <bagel_gui/BagelModel.hpp>
@@ -146,6 +148,11 @@ namespace xrock_gui_model
             bagelGui->addPlugin(this);
             // NOTE: addModelInterface() is actually a registerModelInterface() function to setup a factory
             ComponentModelInterface* model = new ComponentModelInterface(bagelGui, this);
+            if(env["dbType"] == "FileDB")
+            {
+                model->setSimpleTypeGen();
+            }
+
             bagelGui->addModelInterface("xrock", model);
             // Preload the canvas with already defined models
             if (env.hasKey("initLoadModels") and (bool)env["initLoadModels"] == true)
@@ -341,6 +348,7 @@ namespace xrock_gui_model
                                                             QFileDialog::DontUseNativeDialog);
 
             ConfigMap map = configmaps::ConfigMap::fromYamlFile(fileName.toStdString());
+            BasicModelHelper::convertFromLegacyModelFormat(map);
             loadComponentModelFrom(map);
 
             break;
@@ -355,6 +363,7 @@ namespace xrock_gui_model
             fileName = QFileDialog::getSaveFileName(NULL, QObject::tr("Select Model File"),
                                                             fileName, QObject::tr("YAML syntax (*.yml)"), 0,
                                                             QFileDialog::DontUseNativeDialog);
+            BasicModelHelper::convertToLegacyModelFormat(map);
             map.toYamlFile(fileName.toStdString());
             break;
         }

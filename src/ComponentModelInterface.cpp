@@ -92,11 +92,11 @@ namespace xrock_gui_model
     ComponentModelInterface::ComponentModelInterface(const ComponentModelInterface *other)
         : ModelInterface(other->bagelGui),
           xrockGui(other->xrockGui),
+          simpleTypeGen(other->simpleTypeGen),
           nodeMap(other->nodeMap),
           edgeMap(other->edgeMap),
           nodeInfoMap(other->nodeInfoMap),
-          basicModel(other->basicModel),
-          simpleTypeGen(other->simpleTypeGen)
+          basicModel(other->basicModel)
     {
     }
 

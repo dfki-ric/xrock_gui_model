@@ -325,11 +325,52 @@ namespace xrock_gui_model
         if (edgeMap.find(edgeId) != edgeMap.end())
             return false;
 
-        // TODO: Move this check to port compatibility function
-        //if (fromDomain != toDomain)
-        //{
-        //    return false;
-        //}
+        // Check if edge info is valid
+        // Check if nodes exist
+        const std::string& fromNodeName(map["fromNode"].getString());
+        const configmaps::ConfigMap* fromNodeMapPtr = bagelGui->getNodeMap(fromNodeName);
+        if (!fromNodeMapPtr)
+            return false;
+        ConfigMap fromNodeMap = *fromNodeMapPtr;
+
+        const std::string& toNodeName(map["toNode"].getString());
+        const configmaps::ConfigMap* toNodeMapPtr = bagelGui->getNodeMap(toNodeName);
+        if (!toNodeMapPtr)
+            return false;
+        ConfigMap toNodeMap = *toNodeMapPtr;
+
+        // Check if interfaces exist
+        {
+            const std::string& fromNodeOutputName(map["fromNodeOutput"].getString());
+            ConfigVector& outputs = fromNodeMap["outputs"];
+            bool found = false;
+            for (size_t i = 0; i < outputs.size(); i++)
+            {
+                if (outputs[i]["name"].getString() == fromNodeOutputName)
+                {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+                return false;
+        }
+        {
+            const std::string& toNodeInputName(map["toNodeInput"].getString());
+            ConfigVector& inputs = toNodeMap["inputs"];
+            bool found = false;
+            for (size_t i = 0; i < inputs.size(); i++)
+            {
+                if (inputs[i]["name"].getString() == toNodeInputName)
+                {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+                return false;
+        }
+
         edgeMap[edgeId] = map;
         return true;
     }

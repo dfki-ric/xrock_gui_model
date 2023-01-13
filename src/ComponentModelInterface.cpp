@@ -579,7 +579,7 @@ namespace xrock_gui_model
                             + "_" + edge["toNode"].getString()
                             + "_" + edge["toNodeInput"].getString();
                     }
-                    if(edge.hasKey("data") && edge["data"].hasKey("decouple"))
+                    if(edge.hasKey("data") && edge["data"].isMap() && edge["data"].hasKey("decouple"))
                     {
                         edge["decouple"] = edge["data"]["decouple"];
                     }

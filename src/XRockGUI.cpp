@@ -205,7 +205,7 @@ namespace xrock_gui_model
             mars::main_gui::MainGUI *main_gui = dynamic_cast<mars::main_gui::MainGUI *>(gui);
             main_gui->mainWindow_p()->setWindowIcon(QIcon(":/images/xrock_gui.ico"));
 
-            toolbarBackend = new ToolbarBackend(this, gui, db.get());
+            toolbarBackend = new ToolbarBackend(this, gui);
 
             widget = new ComponentModelEditorWidget(cfg, bagelGui, this);
             if (!widget->getHiddenCloseState())

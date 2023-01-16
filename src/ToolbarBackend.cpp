@@ -26,8 +26,8 @@
 #include <mars/utils/misc.h>
     using namespace xrock_gui_model;
 
-ToolbarBackend::ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface *gui, DBInterface *db)
-    : xrockGui(xrockGui), db(db), main_gui(dynamic_cast<mars::main_gui::MainGUI *>(gui))
+ToolbarBackend::ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface *gui)
+    : xrockGui(xrockGui), main_gui(dynamic_cast<mars::main_gui::MainGUI *>(gui))
 {
     QToolBar *toolbar = main_gui->getToolbar("Actions");
 
@@ -104,8 +104,6 @@ void ToolbarBackend::on_backend_changed(const QString &new_backend)
         le_url->setDisabled(true);
         le_port->setDisabled(true);
         le_db_path->setEnabled(true);
-        
-        
     }
     else if (new_backend == "Client")
     {
@@ -115,30 +113,33 @@ void ToolbarBackend::on_backend_changed(const QString &new_backend)
         le_db_path->setDisabled(true);
     }
     else if (new_backend == "MultiDbClient")
+    {
         xrockGui->menuAction(static_cast<int>(MenuActions::SELECT_MULTIDB));
+    }
 }
 
 void ToolbarBackend::on_db_path_changed(const QString &db_path)
 {
     std::string dbPath = mars::utils::pathJoin(std::getenv("AUTOPROJ_CURRENT_ROOT"), db_path.toStdString());
-    db->set_dbPath(dbPath);
+    xrockGui->db->set_dbPath(dbPath);
 }
 
 void ToolbarBackend::on_url_changed(const QString &url)
 {
     std::string dbAddress = url.toStdString() + ':' + le_port->text().toStdString();
-    db->set_dbAddress(dbAddress);
+    xrockGui->db->set_dbAddress(dbAddress);
 }
 
 void ToolbarBackend::on_port_changed(const QString &port)
 {
     std::string dbAddress = le_url->text().toStdString() + ':' + port.toStdString();
-    db->set_dbAddress(dbAddress);
+    xrockGui->db->set_dbAddress(dbAddress);
 }
 
 void ToolbarBackend::on_graph_changed(const QString &graph)
 {
-    db->set_dbGraph(graph.toStdString());
+    std::string _graph_name = graph.toStdString();
+    xrockGui->db->set_dbGraph(_graph_name);
 }
 
 std::string ToolbarBackend::get_dbPath()

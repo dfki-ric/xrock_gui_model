@@ -32,7 +32,7 @@ namespace xrock_gui_model
         Q_OBJECT
     public:
         /** \brief The constructor adds the actions to the File menu */
-        ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface *gui, DBInterface *db);
+        ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface *gui);
         virtual ~ToolbarBackend();
        /** \brief getters */
         std::string get_dbPath();
@@ -48,7 +48,6 @@ namespace xrock_gui_model
 
     private:
         XRockGUI *xrockGui;
-        DBInterface *db;
         mars::main_gui::MainGUI *main_gui;
         QComboBox *cb_backends;
         QLineEdit *le_db_path;

@@ -38,6 +38,7 @@ namespace xrock_gui_model
             {
                std::string key = it.first;
                 ConfigMap prop = it.second;
+                std::cout << "prop"  << prop["type"].toYamlString()<< std::endl;
                 QLabel *label = new QLabel(it.first.c_str());
                 layout->addWidget(label, i, 0);
                 if(prop["type"] =="array")
@@ -276,31 +277,33 @@ namespace xrock_gui_model
         return false;
     }
 
-    std::string ComponentModelEditorWidget::get_prop_widget_text(const std::string &prop_name)
+    configmaps::ConfigAtom ComponentModelEditorWidget::get_prop_widget_value(const std::string &prop_name)
     {
         for (auto &[label, widget] : widgets)
         {
             if (label->text().toStdString() == prop_name)
             {
                 if (QComboBox *cb = dynamic_cast<QComboBox *>(widget))
-                    return cb->currentText().toStdString();
-
-                return dynamic_cast<QLineEdit *>(widget)->text().toStdString();
+                    return ConfigAtom(cb->currentText().toStdString());
+                else if(QLineEdit* le= dynamic_cast<QLineEdit *>(widget))
+                    return ConfigAtom(le->text().toStdString());
+                else if(QCheckBox* cbx = dynamic_cast<QCheckBox *>(widget))
+                    return ConfigAtom(cbx->isChecked());
             }
         }
         throw std::runtime_error("no prop found with name " + prop_name);
     }
-
     void ComponentModelEditorWidget::updateModel()
     {
         if (!currentModel) return;
+        std::cout << "current" << currentModel->getModelInfo().toYamlString() << std::endl;
         ConfigMap updatedMap(currentModel->getModelInfo());
         // Update toplvl properties
-        for (auto &it : updatedMap)
+        for (auto &[key, value] : updatedMap)
         {
-            if (!has_prop_widget(it.first))
+            if (!has_prop_widget(key))
                 continue;
-            it.second = get_prop_widget_text(it.first);
+            value = get_prop_widget_value(key);
         }
         // Update 'second' level properties (all due to having the basic model legacy :/)
         ConfigMap& secondLevel(updatedMap["versions"][0]);
@@ -312,7 +315,7 @@ namespace xrock_gui_model
                 key = "version";
             if (!has_prop_widget(key))
                 continue;
-            it.second = get_prop_widget_text(key);
+            it.second = get_prop_widget_value(key);
         }
         // Special property 'data'
         updatedMap["data"] = ConfigMap::fromYamlString(annotations->toPlainText().toStdString());

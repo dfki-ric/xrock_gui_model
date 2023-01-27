@@ -7,6 +7,7 @@
 #pragma once
 #include <mars/main_gui/BaseWidget.h>
 #include <configmaps/ConfigMap.hpp>
+#include <configmaps/ConfigAtom.hpp>
 #include "ComponentModelInterface.hpp"
 
 #include <QWidget>
@@ -61,7 +62,7 @@ namespace xrock_gui_model
         // check whether or not we have a widget handling a certain property
         bool has_prop_widget(const std::string& prop_name);
         // get the text by name
-        std::string get_prop_widget_text(const std::string &prop_name);
+        configmaps::ConfigAtom get_prop_widget_value(const std::string &prop_name);
         // update widget with thr properties and as well as fact information
         void update_widgets(configmaps::ConfigMap &info);
 

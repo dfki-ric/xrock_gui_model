@@ -36,10 +36,11 @@ namespace xrock_gui_model
             ConfigMap props = xrockGui->db->getPropertiesOfComponentModel();
             for(auto it: props)
             {
+               std::string key = it.first;
                 ConfigMap prop = it.second;
                 QLabel *label = new QLabel(it.first.c_str());
                 layout->addWidget(label, i, 0);
-                if(prop.hasKey("allowed_values"))
+                if(prop["type"] =="array")
                 {
                     // if property has some allowed values, its a combobox
                     QComboBox *combobox = new QComboBox();
@@ -51,13 +52,24 @@ namespace xrock_gui_model
                     connect(combobox, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(updateModel()));
                     widgets[label] = combobox;
                 }
-                else
+                else if(prop["type"] =="string")
                 {
                     // if property has no allowed values, its a qlineedit
                     QLineEdit *linedit = new QLineEdit();
                     layout->addWidget(linedit, i++, 1);
                     connect(linedit, SIGNAL(textChanged(const QString &)), this, SLOT(updateModel()));
                     widgets[label] = linedit;
+                }
+                else if(prop["type"] =="boolean")
+                {
+                    // if property has no allowed values, its a QCheckBox
+                    QCheckBox *checkbox = new QCheckBox();
+                    layout->addWidget(checkbox, i++, 1);
+                    if(key == "atomic")
+                        checkbox->setEnabled(false);
+                    connect(checkbox,  SIGNAL(clicked(bool)), this, SLOT(updateModel()));
+                    widgets[label] = checkbox;
+
                 }
             }
 

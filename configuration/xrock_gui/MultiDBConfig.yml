@@ -1,6 +1,7 @@
 main_server:
   type: Serverless
   path: modkom/component_db
+  graph: graph_test
 import_servers:
   - type: Serverless
     path: database/atomic_component_db

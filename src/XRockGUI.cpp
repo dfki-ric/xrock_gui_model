@@ -10,9 +10,7 @@
 #include "ImportDialog.hpp"
 #include "BasicModelHelper.hpp"
 #include "FileDB.hpp"
-//#include "RestDB.hpp"
-//#include "ServerlessDB.hpp"
-//#include "MultiDB.hpp"
+
 #include "MultiDBConfigDialog.hpp"
 #include "VersionDialog.hpp"
 #include "ConfigureDialog.hpp"
@@ -536,19 +534,22 @@ namespace xrock_gui_model
         }
         case MenuActions::SELECT_MULTIDB: // MultiDbClient
         {
-            if(ioLibrary)
+            if (ioLibrary)
             {
                 std::string multidb_config_path = bagelGui->getConfigDir() + "/MultiDBConfig.yml";
                 MultiDBConfigDialog dialog(multidb_config_path, ioLibrary);
                 dialog.exec();
-                ConfigMap yaml_to_json = configmaps::ConfigMap::fromYamlFile(multidb_config_path);
+                ConfigMap multidb_config = configmaps::ConfigMap::fromYamlFile(multidb_config_path);
+                std::cout << "multidb config after finish: \n"
+                          << multidb_config.toYamlString() << std::endl;
                 env["dbType"] = "MultiDB";
-                env["multiDBConfig"] = yaml_to_json.toJsonString();
+                env["multiDBConfig"] = multidb_config.toJsonString();
                 db.reset(ioLibrary->getDB(env));
-
-                if (!db->isConnected())
+                if (multidb_config["main_server"]["type"] == "Client" or
+                    std::any_of(multidb_config["import_servers"].begin(), multidb_config["import_servers"].end(), [](ConfigItem &is)
+                                { return is["type"] == "Client"; }))
                 {
-                    std::string msg = "import_servers type client requested! Please run server using command:\njsondb -d " + toolbarBackend->get_dbPath();
+                    std::string msg = "MultiDB is requesting a client server! Please run server using command:\njsondb -d YOUR_DB_PATH";
                     QMessageBox::warning(nullptr, "Warning", msg.c_str(), QMessageBox::Ok);
                 }
             }

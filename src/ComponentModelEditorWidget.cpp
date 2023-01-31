@@ -38,7 +38,6 @@ namespace xrock_gui_model
             {
                std::string key = it.first;
                 ConfigMap prop = it.second;
-                std::cout << "prop"  << prop["type"].toYamlString()<< std::endl;
                 QLabel *label = new QLabel(it.first.c_str());
                 layout->addWidget(label, i, 0);
                 if(prop["type"] =="array")

@@ -19,6 +19,7 @@ namespace xrock_gui_model
         ~XRockIOLibrary() {}
         virtual DBInterface* getDB(configmaps::ConfigMap &env) = 0;
         virtual std::vector<std::string> getBackends() = 0;
+        virtual configmaps::ConfigMap getMultiDbDefaultConfig() = 0;
     };
 } // end of namespace xrock_gui_model
 

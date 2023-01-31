@@ -38,6 +38,7 @@ namespace xrock_gui_model
         std::string get_dbPath();
         std::string get_dbAddress();
         std::string get_graph();
+        
 
     private slots:
         void on_backend_changed(const QString &new_backend);
@@ -54,6 +55,16 @@ namespace xrock_gui_model
         QLineEdit *le_url;
         QLineEdit *le_port;
         QLineEdit *le_graph;
+        QAction* widgetActionUrl;
+        QAction* widgetActionPath;
+        QAction* widgetActionPort;
+        QAction* widgetActionGraph;
+        QAction* ActionLabelUrl;
+        QAction* ActionLabelPath;
+        QAction* ActionLabelPort;
+        QAction* ActionLabelGraph;
+        std::vector<QAction *> actions;
+       
     };
 
 } // end of namespace xrock_gui_model

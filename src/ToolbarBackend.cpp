@@ -34,6 +34,7 @@ ToolbarBackend::ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface 
     // Backends
     cb_backends = new QComboBox;
     std::vector<std::string> backends;
+    
     if(xrockGui->ioLibrary)
     {
         backends = xrockGui->ioLibrary->getBackends();
@@ -53,8 +54,11 @@ ToolbarBackend::ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface 
     le_db_path = new QLineEdit;
     le_db_path->setText("modkom/component_db");
     le_db_path->setFixedWidth(150);
-    toolbar->addWidget(label);
-    toolbar->addWidget(le_db_path);
+    ActionLabelPath = toolbar->addWidget(label);
+    widgetActionPath = toolbar->addWidget(le_db_path);
+    actions.push_back(ActionLabelPath);
+    actions.push_back(widgetActionPath);
+    //QAction* widgetAction1 = toolbar->addWidget(le_db_path);
     connect(le_db_path, SIGNAL(textChanged(const QString &)), this, SLOT(on_db_path_changed(const QString &)));
 
     // URL
@@ -63,8 +67,10 @@ ToolbarBackend::ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface 
     le_url->setText("http://0.0.0.0");
     le_url->setDisabled(true);
     le_url->setFixedWidth(120);
-    toolbar->addWidget(label);
-    toolbar->addWidget(le_url);
+    ActionLabelUrl = toolbar->addWidget(label);
+    widgetActionUrl = toolbar->addWidget(le_url);
+    actions.push_back(ActionLabelUrl);
+    actions.push_back(widgetActionUrl);
     connect(le_url, SIGNAL(textChanged(const QString &)), this, SLOT(on_url_changed(const QString &)));
 
     // Port
@@ -73,8 +79,10 @@ ToolbarBackend::ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface 
     le_port->setText("8183");
     le_port->setDisabled(true);
     le_port->setFixedWidth(100);
-    toolbar->addWidget(label);
-    toolbar->addWidget(le_port);
+    ActionLabelPort = toolbar->addWidget(label);
+    widgetActionPort = toolbar->addWidget(le_port);
+    actions.push_back(ActionLabelPort);
+    actions.push_back(widgetActionPort);
     connect(le_port, SIGNAL(textChanged(const QString &)), this, SLOT(on_port_changed(const QString &)));
 
     // Graph
@@ -82,9 +90,13 @@ ToolbarBackend::ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface 
     le_graph = new QLineEdit;
     le_graph->setText("graph_test");
     le_graph->setFixedWidth(120);
-    toolbar->addWidget(label);
-    toolbar->addWidget(le_graph);
+    ActionLabelGraph = toolbar->addWidget(label);
+    widgetActionGraph =toolbar->addWidget(le_graph);
+    actions.push_back(ActionLabelGraph);
+    actions.push_back(widgetActionGraph);
     connect(le_graph, SIGNAL(textChanged(const QString &)), this, SLOT(on_graph_changed(const QString &)));
+
+    this->on_backend_changed("Serverless");
 }
 
 ToolbarBackend::~ToolbarBackend()
@@ -100,21 +112,40 @@ void ToolbarBackend::on_backend_changed(const QString &new_backend)
 {
     if (new_backend == "Serverless")
     {
+        widgetActionUrl->setVisible(false);
+        ActionLabelUrl->setVisible(false);
+        widgetActionPath->setVisible(true);
+        ActionLabelPath->setVisible(true);
+        widgetActionPort->setVisible(false);
+        ActionLabelPort->setVisible(false);
+        widgetActionGraph->setVisible(true);
+        ActionLabelGraph->setVisible(true);
         xrockGui->menuAction(static_cast<int>(MenuActions::SELECT_SERVERLESS));
-        le_url->setDisabled(true);
-        le_port->setDisabled(true);
-        le_db_path->setEnabled(true);
     }
     else if (new_backend == "Client")
     {
+        widgetActionUrl->setVisible(true);
+        ActionLabelUrl->setVisible(true);
+        widgetActionPort->setVisible(true);
+        ActionLabelPort->setVisible(true);
+        widgetActionGraph->setVisible(true);
+        ActionLabelGraph->setVisible(true);
+        widgetActionPath->setVisible(false);
+        ActionLabelPath->setVisible(false);
         xrockGui->menuAction(static_cast<int>(MenuActions::SELECT_CLIENT));
-        le_url->setEnabled(true);
-        le_port->setEnabled(true);
-        le_db_path->setDisabled(true);
+ 
     }
     else if (new_backend == "MultiDbClient")
     {
+        for (auto &action : actions)
+        {
+            action->setVisible(false);
+        }
+      
         xrockGui->menuAction(static_cast<int>(MenuActions::SELECT_MULTIDB));
+    }
+    else {
+        throw std::runtime_error("Unhandled backend type " + new_backend.toStdString());
     }
 }
 

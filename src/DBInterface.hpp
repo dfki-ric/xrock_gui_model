@@ -6,7 +6,16 @@
 
 #pragma once
 #include <configmaps/ConfigMap.hpp>
-
+#if __has_include(<filesystem>)
+    #include <filesystem>
+    namespace fs = std::filesystem;
+#elif __has_include(<experimental/filesystem>)
+    #include <experimental/filesystem>
+    namespace fs = std::experimental::filesystem;
+#else
+    #include <boost/filesystem.hpp>
+    namespace fs = boost::filesystem;
+#endif
 namespace xrock_gui_model
 {
 
@@ -26,7 +35,7 @@ namespace xrock_gui_model
         virtual bool storeModel(const configmaps::ConfigMap &map) = 0;
         virtual void set_dbGraph(const std::string &_dbGraph){};
         virtual void set_dbAddress(const std::string &_dbAddress){};
-        virtual void set_dbPath(const std::string &_dbPath){};
+        virtual void set_dbPath(const fs::path&_dbPath){};
         virtual bool isConnected() { return false; };
 
         virtual configmaps::ConfigMap getPropertiesOfComponentModel() = 0;

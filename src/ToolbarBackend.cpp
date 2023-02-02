@@ -60,24 +60,27 @@ ToolbarBackend::ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface 
     actions.push_back(widgetActionPath);
     //QAction* widgetAction1 = toolbar->addWidget(le_db_path);
     connect(le_db_path, SIGNAL(textChanged(const QString &)), this, SLOT(on_db_path_changed(const QString &)));
-
+ 
     // URL
     label = new QLabel(" URL: ");
     le_url = new QLineEdit;
     le_url->setText("http://0.0.0.0");
-    le_url->setDisabled(true);
+    label->hide();
+    le_url->hide();
     le_url->setFixedWidth(120);
     ActionLabelUrl = toolbar->addWidget(label);
     widgetActionUrl = toolbar->addWidget(le_url);
     actions.push_back(ActionLabelUrl);
     actions.push_back(widgetActionUrl);
+
     connect(le_url, SIGNAL(textChanged(const QString &)), this, SLOT(on_url_changed(const QString &)));
 
     // Port
     label = new QLabel(" Port: ");
     le_port = new QLineEdit;
     le_port->setText("8183");
-    le_port->setDisabled(true);
+    label->hide();
+    le_port->hide();
     le_port->setFixedWidth(100);
     ActionLabelPort = toolbar->addWidget(label);
     widgetActionPort = toolbar->addWidget(le_port);
@@ -95,8 +98,6 @@ ToolbarBackend::ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface 
     actions.push_back(ActionLabelGraph);
     actions.push_back(widgetActionGraph);
     connect(le_graph, SIGNAL(textChanged(const QString &)), this, SLOT(on_graph_changed(const QString &)));
-
-    this->on_backend_changed("Serverless");
 }
 
 ToolbarBackend::~ToolbarBackend()
@@ -112,14 +113,15 @@ void ToolbarBackend::on_backend_changed(const QString &new_backend)
 {
     if (new_backend == "Serverless")
     {
-        widgetActionUrl->setVisible(false);
-        ActionLabelUrl->setVisible(false);
+
         widgetActionPath->setVisible(true);
         ActionLabelPath->setVisible(true);
-        widgetActionPort->setVisible(false);
-        ActionLabelPort->setVisible(false);
         widgetActionGraph->setVisible(true);
         ActionLabelGraph->setVisible(true);
+        widgetActionUrl->setVisible(false);
+        ActionLabelUrl->setVisible(false);
+        widgetActionPort->setVisible(false);
+        ActionLabelPort->setVisible(false);
         xrockGui->menuAction(static_cast<int>(MenuActions::SELECT_SERVERLESS));
     }
     else if (new_backend == "Client")

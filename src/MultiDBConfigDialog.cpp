@@ -217,9 +217,17 @@ namespace xrock_gui_model
         {
             if (ioLibrary)
             {
-                auto default_config = ioLibrary->getMultiDbDefaultConfig();
-                default_config.toYamlFile(this->config_filename);
-                load_config();
+                auto default_config = ioLibrary->getDefaultConfig();
+
+                if (!default_config.empty())
+                {
+                    default_config.toYamlFile(this->config_filename);
+                    load_config();
+                }
+                else
+                {
+                    QMessageBox::warning(this, "Warning", "Please select a bundle from where you want to load your default config.", QMessageBox::Ok);
+                }
             }
         }
     }

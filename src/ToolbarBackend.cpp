@@ -8,8 +8,8 @@
 #include "ComponentModelEditorWidget.hpp"
 #include "ImportDialog.hpp"
 #include "FileDB.hpp"
-//#include "RestDB.hpp"
-//#include "ServerlessDB.hpp"
+// #include "RestDB.hpp"
+// #include "ServerlessDB.hpp"
 #include "VersionDialog.hpp"
 #include "ConfigureDialog.hpp"
 #include "ConfigMapHelper.hpp"
@@ -24,7 +24,7 @@
 #include <QVBoxLayout>
 #include <cstdlib>
 #include <mars/utils/misc.h>
-    using namespace xrock_gui_model;
+using namespace xrock_gui_model;
 
 ToolbarBackend::ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface *gui)
     : xrockGui(xrockGui), main_gui(dynamic_cast<mars::main_gui::MainGUI *>(gui))
@@ -34,12 +34,13 @@ ToolbarBackend::ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface 
     // Backends
     cb_backends = new QComboBox;
     std::vector<std::string> backends;
-    
-    if(xrockGui->ioLibrary)
+
+    if (xrockGui->ioLibrary)
     {
         backends = xrockGui->ioLibrary->getBackends();
     }
-    else {
+    else
+    {
         backends.push_back("FileDB");
     }
     for (auto const &e : backends)
@@ -58,9 +59,8 @@ ToolbarBackend::ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface 
     widgetActionPath = toolbar->addWidget(le_db_path);
     actions.push_back(ActionLabelPath);
     actions.push_back(widgetActionPath);
-    //QAction* widgetAction1 = toolbar->addWidget(le_db_path);
     connect(le_db_path, SIGNAL(textChanged(const QString &)), this, SLOT(on_db_path_changed(const QString &)));
- 
+
     // URL
     label = new QLabel(" URL: ");
     le_url = new QLineEdit;
@@ -91,14 +91,38 @@ ToolbarBackend::ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface 
     // Graph
     label = new QLabel(" Graph: ");
     le_graph = new QLineEdit;
-    le_graph->setText("graph_test");
+    //le_graph->setText("graph_test");
     le_graph->setFixedWidth(120);
     ActionLabelGraph = toolbar->addWidget(label);
-    widgetActionGraph =toolbar->addWidget(le_graph);
+    widgetActionGraph = toolbar->addWidget(le_graph);
     actions.push_back(ActionLabelGraph);
     actions.push_back(widgetActionGraph);
     connect(le_graph, SIGNAL(textChanged(const QString &)), this, SLOT(on_graph_changed(const QString &)));
-}
+
+    // Load default values 
+    if (xrockGui->ioLibrary)
+    {
+
+        auto default_config = xrockGui->ioLibrary->getDefaultConfig();
+        if (!default_config.empty() )
+        {
+            if(default_config.hasKey("Serverless"))
+            {
+                le_db_path->setText(QString::fromStdString((std::string)default_config["Serverless"]["path"]));
+                le_graph->setText(QString::fromStdString((std::string)default_config["Serverless"]["graph"]));
+            }
+            if(default_config.hasKey("Client"))
+            {
+                std::string full_url = (std::string)default_config["Client"]["url"];
+                std::string url= full_url.substr(0, full_url.find_last_of(':'));
+                std::string port= full_url.substr(url.size()+1);
+                le_url->setText(QString::fromStdString(url));
+                le_port->setText(QString::fromStdString(port));
+                le_graph->setText(QString::fromStdString((std::string)default_config["Client"]["graph"]));
+            }
+        }
+    }
+}   
 
 ToolbarBackend::~ToolbarBackend()
 {
@@ -135,7 +159,6 @@ void ToolbarBackend::on_backend_changed(const QString &new_backend)
         widgetActionPath->setVisible(false);
         ActionLabelPath->setVisible(false);
         xrockGui->menuAction(static_cast<int>(MenuActions::SELECT_CLIENT));
- 
     }
     else if (new_backend == "MultiDbClient")
     {
@@ -143,10 +166,11 @@ void ToolbarBackend::on_backend_changed(const QString &new_backend)
         {
             action->setVisible(false);
         }
-      
+
         xrockGui->menuAction(static_cast<int>(MenuActions::SELECT_MULTIDB));
     }
-    else {
+    else
+    {
         throw std::runtime_error("Unhandled backend type " + new_backend.toStdString());
     }
 }

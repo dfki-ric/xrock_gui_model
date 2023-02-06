@@ -219,9 +219,9 @@ namespace xrock_gui_model
             {
                 auto default_config = ioLibrary->getDefaultConfig();
 
-                if (!default_config.empty())
+                if (!default_config.empty() && default_config.hasKey("MultiDbClient"))
                 {
-                    default_config.toYamlFile(this->config_filename);
+                    default_config["MultiDbClient"].toYamlFile(this->config_filename);
                     load_config();
                 }
                 else

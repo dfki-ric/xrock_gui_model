@@ -128,6 +128,7 @@ namespace xrock_gui_model
         // Stored a pointer to the currently selected XRock database backend instance
         std::unique_ptr<DBInterface> db;
         XRockIOLibrary *ioLibrary;
+        std::string getBackend();
 
     private:
         mars::main_gui::GuiInterface *gui;

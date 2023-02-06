@@ -116,10 +116,45 @@ namespace xrock_gui_model
             mars::cfg_manager::cfgPropertyStruct prop_dbAddress;
             prop_dbAddress = cfg->getOrCreateProperty("XRockGUI", "dbAddress",
                                                       defaultAddress, this);
+            env["backend"] = env["dbType"];
             ioLibrary = libManager->getLibraryAs<XRockIOLibrary>("xrock_io_library", true);
             if(ioLibrary)
             {
-                db.reset(ioLibrary->getDB(env));
+                ConfigMap dbConfig = ioLibrary->getDefaultConfig();
+                if(!dbConfig.empty())
+                {
+                    fprintf(stderr, "---    default config\n%s", dbConfig.toYamlString().c_str());
+                    std::string dbType = dbConfig.begin()->first;
+                    ConfigMap &config = dbConfig.begin()->second;
+                    env["backend"] = dbType;
+                    if(dbType == "Serverless")
+                    {
+                        env["dbType"] = "ServerlessDB";
+                        env["dbPath"] = config["path"];
+                        db.reset(ioLibrary->getDB(env));
+                    }
+                    else if(dbType == "Client")
+                    {
+                        env["dbType"] = "RestDB";
+                        db.reset(ioLibrary->getDB(env));
+                        db->set_dbAddress(config["url"]);
+                    }
+                    else if(dbType == "MultiDbClient")
+                    {
+                        env["dbType"] = "MultiDB";
+                        env["multiDBConfig"] = config.toJsonString();
+                        db.reset(ioLibrary->getDB(env));
+                        fprintf(stderr, "---    Set MultiDB from default config\n");
+                    }
+                    {
+                        // todo: print error config db key wrong
+                        db.reset(ioLibrary->getDB(env));
+                    }
+                }
+                else
+                {
+                    db.reset(ioLibrary->getDB(env));
+                }
             }
             else
             {
@@ -1482,6 +1517,11 @@ namespace xrock_gui_model
         {
             // TODO: Is something missing here?
         }
+    }
+
+    std::string XRockGUI::getBackend()
+    {
+        return env["backend"].getString();
     }
 
 } // end of namespace xrock_gui_model

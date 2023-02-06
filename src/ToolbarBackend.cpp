@@ -43,11 +43,20 @@ ToolbarBackend::ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface 
     {
         backends.push_back("FileDB");
     }
+    int i = 0;
+    std::string backend;
     for (auto const &e : backends)
     {
         cb_backends->addItem(QString::fromStdString(e));
+        if(e == xrockGui->getBackend())
+        {
+            cb_backends->setCurrentIndex(i);
+            backend = e;
+        }
+        ++i;
     }
     toolbar->addWidget(cb_backends);
+
     connect(cb_backends, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(on_backend_changed(const QString &)));
 
     // Db Path
@@ -122,7 +131,27 @@ ToolbarBackend::ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface 
             }
         }
     }
-}   
+
+    // switch initial visibility
+    if (backend == "Client")
+    {
+        widgetActionUrl->setVisible(true);
+        ActionLabelUrl->setVisible(true);
+        widgetActionPort->setVisible(true);
+        ActionLabelPort->setVisible(true);
+        widgetActionGraph->setVisible(true);
+        ActionLabelGraph->setVisible(true);
+        widgetActionPath->setVisible(false);
+        ActionLabelPath->setVisible(false);
+    }
+    else if (backend == "MultiDbClient")
+    {
+        for (auto &action : actions)
+        {
+            action->setVisible(false);
+        }
+    }
+}
 
 ToolbarBackend::~ToolbarBackend()
 {

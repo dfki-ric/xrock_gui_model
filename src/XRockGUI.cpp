@@ -146,6 +146,7 @@ namespace xrock_gui_model
                         db.reset(ioLibrary->getDB(env));
                         fprintf(stderr, "---    Set MultiDB from default config\n");
                     }
+                    else
                     {
                         // todo: print error config db key wrong
                         db.reset(ioLibrary->getDB(env));

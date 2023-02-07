@@ -65,8 +65,11 @@ namespace xrock_gui_model
                     // if property has no allowed values, its a QCheckBox
                     QCheckBox *checkbox = new QCheckBox();
                     layout->addWidget(checkbox, i++, 1);
-                    if(key == "atomic")
+                    if(key == "can_have_parts")
+                    {
                         checkbox->setEnabled(false);
+                        checkbox->setChecked(true);
+                    }
                     connect(checkbox,  SIGNAL(clicked(bool)), this, SLOT(updateModel()));
                     widgets[label] = checkbox;
 

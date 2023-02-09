@@ -42,20 +42,23 @@ namespace xrock_gui_model
         
         struct BackendItem
         {
+            QString name;
             QString type;
             QString url_or_path;
             QString graph;
+
             bool operator==(const BackendItem &other) const
             {
                 if (&other == this)
                     return true;
-                return type == other.type && url_or_path == other.url_or_path && graph == other.graph;
+                return name == other.name;
             }
         };
     
         std::vector<BackendItem> backends;
         QTableWidget *table_backends;
         QComboBox *cb_new_type;
+        QLineEdit *tf_new_name;
         QLineEdit *tf_new_url_or_path;
         QLineEdit *tf_new_graph;
         QPushButton *btn_add_new, *btn_remove;

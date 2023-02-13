@@ -38,6 +38,9 @@ namespace xrock_gui_model
         std::string get_dbPath();
         std::string get_dbAddress();
         std::string get_graph();
+        private:
+        void hide_toolbar_widgets(const QString &backend);
+        void show_toolbar_widgets(const QString &backend);
         
 
     private slots:
@@ -63,7 +66,7 @@ namespace xrock_gui_model
         QAction* ActionLabelPath;
         QAction* ActionLabelPort;
         QAction* ActionLabelGraph;
-        std::vector<QAction *> actions;
+        
        
     };
 

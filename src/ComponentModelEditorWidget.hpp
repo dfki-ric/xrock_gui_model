@@ -57,12 +57,12 @@ namespace xrock_gui_model
         void addRemoveLayout();
         void openUrl(const QUrl &);
         void validateYamlSyntax();
-        // update property widget with the name and value
-        void update_prop_widget(const std::string &prop_name, const std::string &value);
         // check whether or not we have a widget handling a certain property
         bool has_prop_widget(const std::string& prop_name);
         // get the text by name
         configmaps::ConfigAtom get_prop_widget_value(const std::string &prop_name);
+        // update property widget with the name and value
+        void update_prop_widget(const std::string &prop_name, configmaps::ConfigAtom &value);
         // update widget with thr properties and as well as fact information
         void update_widgets(configmaps::ConfigMap &info);
 

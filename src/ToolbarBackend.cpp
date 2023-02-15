@@ -26,6 +26,15 @@
 #include <mars/utils/misc.h>
 using namespace xrock_gui_model;
 
+static std::string xrock_backend_to_xdbi(const std::string& b) {
+    static const std::map<std::string, std::string> backend_aliases {
+        {"ServerlessDB", "Serverless"},
+        {"RestDB", "Client"},
+        {"MultiDB", "MultiDbClient"},
+    };
+    return backend_aliases.at(b);
+}
+
 ToolbarBackend::ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface *gui)
     : xrockGui(xrockGui), main_gui(dynamic_cast<mars::main_gui::MainGUI *>(gui))
 {
@@ -43,18 +52,9 @@ ToolbarBackend::ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface 
     {
         backends.push_back("FileDB");
     }
-    int i = 0;
-    std::string backend;
     for (auto const &e : backends)
-    {
         cb_backends->addItem(QString::fromStdString(e));
-        if(e == xrockGui->getBackend())
-        {
-            cb_backends->setCurrentIndex(i);
-            backend = e;
-        }
-        ++i;
-    }
+    cb_backends->setCurrentIndex(cb_backends->findText(QString::fromStdString(xrock_backend_to_xdbi(xrockGui->getBackend())), Qt::MatchFixedString));
     toolbar->addWidget(cb_backends);
 
     connect(cb_backends, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(on_backend_changed(const QString &)));
@@ -66,65 +66,51 @@ ToolbarBackend::ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface 
     le_db_path->setFixedWidth(150);
     ActionLabelPath = toolbar->addWidget(label);
     widgetActionPath = toolbar->addWidget(le_db_path);
-    actions.push_back(ActionLabelPath);
-    actions.push_back(widgetActionPath);
     connect(le_db_path, SIGNAL(textChanged(const QString &)), this, SLOT(on_db_path_changed(const QString &)));
 
     // URL
     label = new QLabel(" URL: ");
     le_url = new QLineEdit;
     le_url->setText("http://0.0.0.0");
-    label->hide();
-    le_url->hide();
     le_url->setFixedWidth(120);
     ActionLabelUrl = toolbar->addWidget(label);
     widgetActionUrl = toolbar->addWidget(le_url);
-    actions.push_back(ActionLabelUrl);
-    actions.push_back(widgetActionUrl);
-
     connect(le_url, SIGNAL(textChanged(const QString &)), this, SLOT(on_url_changed(const QString &)));
 
     // Port
     label = new QLabel(" Port: ");
     le_port = new QLineEdit;
     le_port->setText("8183");
-    label->hide();
-    le_port->hide();
     le_port->setFixedWidth(100);
     ActionLabelPort = toolbar->addWidget(label);
     widgetActionPort = toolbar->addWidget(le_port);
-    actions.push_back(ActionLabelPort);
-    actions.push_back(widgetActionPort);
     connect(le_port, SIGNAL(textChanged(const QString &)), this, SLOT(on_port_changed(const QString &)));
 
     // Graph
     label = new QLabel(" Graph: ");
     le_graph = new QLineEdit;
-    //le_graph->setText("graph_test");
+    le_graph->setText("graph_test");
     le_graph->setFixedWidth(120);
     ActionLabelGraph = toolbar->addWidget(label);
     widgetActionGraph = toolbar->addWidget(le_graph);
-    actions.push_back(ActionLabelGraph);
-    actions.push_back(widgetActionGraph);
     connect(le_graph, SIGNAL(textChanged(const QString &)), this, SLOT(on_graph_changed(const QString &)));
 
-    // Load default values 
+    // Load default values
     if (xrockGui->ioLibrary)
     {
-
         auto default_config = xrockGui->ioLibrary->getDefaultConfig();
-        if (!default_config.empty() )
+        if (!default_config.empty())
         {
-            if(default_config.hasKey("Serverless"))
+            if (default_config.hasKey("Serverless"))
             {
                 le_db_path->setText(QString::fromStdString((std::string)default_config["Serverless"]["path"]));
                 le_graph->setText(QString::fromStdString((std::string)default_config["Serverless"]["graph"]));
             }
-            if(default_config.hasKey("Client"))
+            if (default_config.hasKey("Client"))
             {
                 std::string full_url = (std::string)default_config["Client"]["url"];
-                std::string url= full_url.substr(0, full_url.find_last_of(':'));
-                std::string port= full_url.substr(url.size()+1);
+                std::string url = full_url.substr(0, full_url.find_last_of(':'));
+                std::string port = full_url.substr(url.size() + 1);
                 le_url->setText(QString::fromStdString(url));
                 le_port->setText(QString::fromStdString(port));
                 le_graph->setText(QString::fromStdString((std::string)default_config["Client"]["graph"]));
@@ -133,24 +119,8 @@ ToolbarBackend::ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface 
     }
 
     // switch initial visibility
-    if (backend == "Client")
-    {
-        widgetActionUrl->setVisible(true);
-        ActionLabelUrl->setVisible(true);
-        widgetActionPort->setVisible(true);
-        ActionLabelPort->setVisible(true);
-        widgetActionGraph->setVisible(true);
-        ActionLabelGraph->setVisible(true);
-        widgetActionPath->setVisible(false);
-        ActionLabelPath->setVisible(false);
-    }
-    else if (backend == "MultiDbClient")
-    {
-        for (auto &action : actions)
-        {
-            action->setVisible(false);
-        }
-    }
+    show_toolbar_widgets(QString::fromStdString(xrock_backend_to_xdbi(xrockGui->getBackend())));
+
 }
 
 ToolbarBackend::~ToolbarBackend()
@@ -162,22 +132,24 @@ ToolbarBackend::~ToolbarBackend()
     delete le_graph;
 }
 
-void ToolbarBackend::on_backend_changed(const QString &new_backend)
+void ToolbarBackend::hide_toolbar_widgets(const QString &backend)
 {
-    if (new_backend == "Serverless")
+    if (backend == "Client")
     {
-
-        widgetActionPath->setVisible(true);
-        ActionLabelPath->setVisible(true);
-        widgetActionGraph->setVisible(true);
-        ActionLabelGraph->setVisible(true);
         widgetActionUrl->setVisible(false);
         ActionLabelUrl->setVisible(false);
         widgetActionPort->setVisible(false);
         ActionLabelPort->setVisible(false);
-        xrockGui->menuAction(static_cast<int>(MenuActions::SELECT_SERVERLESS));
     }
-    else if (new_backend == "Client")
+    else if (backend == "Serverless")
+    {
+        widgetActionPath->setVisible(false);
+        ActionLabelPath->setVisible(false);
+    }
+}
+void ToolbarBackend::show_toolbar_widgets(const QString &backend)
+{
+    if (backend == "Client")
     {
         widgetActionUrl->setVisible(true);
         ActionLabelUrl->setVisible(true);
@@ -185,23 +157,43 @@ void ToolbarBackend::on_backend_changed(const QString &new_backend)
         ActionLabelPort->setVisible(true);
         widgetActionGraph->setVisible(true);
         ActionLabelGraph->setVisible(true);
-        widgetActionPath->setVisible(false);
-        ActionLabelPath->setVisible(false);
+        hide_toolbar_widgets("Serverless");
+    }
+    else if (backend == "Serverless")
+    {
+        widgetActionGraph->setVisible(true);
+        ActionLabelGraph->setVisible(true);
+        widgetActionPath->setVisible(true);
+        ActionLabelPath->setVisible(true);
+        hide_toolbar_widgets("Client");
+    }
+    else if (backend == "MultiDbClient"){
+        hide_toolbar_widgets("Serverless");
+        hide_toolbar_widgets("Client");
+        widgetActionGraph->setVisible(false);
+        ActionLabelGraph->setVisible(false);
+    }
+}
+
+void ToolbarBackend::on_backend_changed(const QString &new_backend)
+{
+    show_toolbar_widgets(new_backend);
+    if (new_backend == "Serverless")
+    {
+        xrockGui->menuAction(static_cast<int>(MenuActions::SELECT_SERVERLESS));
+    }
+    else if (new_backend == "Client")
+    {
         xrockGui->menuAction(static_cast<int>(MenuActions::SELECT_CLIENT));
     }
     else if (new_backend == "MultiDbClient")
     {
-        for (auto &action : actions)
-        {
-            action->setVisible(false);
-        }
-
         xrockGui->menuAction(static_cast<int>(MenuActions::SELECT_MULTIDB));
     }
     else
     {
         throw std::runtime_error("Unhandled backend type " + new_backend.toStdString());
-    }
+    } 
 }
 
 void ToolbarBackend::on_db_path_changed(const QString &db_path)

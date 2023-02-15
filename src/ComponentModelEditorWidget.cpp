@@ -179,7 +179,7 @@ namespace xrock_gui_model
             ConfigItem value = it->second;
             if(is_property_key(key))
             {
-                this->update_prop_widget(key,  value.toString());
+                this->update_prop_widget(key,  value);
             }
 
         }
@@ -199,7 +199,7 @@ namespace xrock_gui_model
             {
                 continue; // skip interfaces .. non-properties
             }
-            this->update_prop_widget(key,  value.toString());
+            this->update_prop_widget(key,  value);
         }
         //if(info["versions"][0].hasKey("interfaces"))
         //{
@@ -248,7 +248,7 @@ namespace xrock_gui_model
         currentModel = newModel;
     }
 
-    void ComponentModelEditorWidget::update_prop_widget(const std::string &prop_name, const std::string &value)
+    void ComponentModelEditorWidget::update_prop_widget(const std::string &prop_name, configmaps::ConfigAtom &value)
     {
         for (auto &[label, widget] : widgets)
         {
@@ -256,15 +256,21 @@ namespace xrock_gui_model
             {
                 if(QLineEdit * le = dynamic_cast<QLineEdit *>(widget))
                 {
-                    le->setText(QString::fromStdString(value));
+                    le->setText(QString::fromStdString((std::string)value));
                     break;
                 }
                 else if(QComboBox * cb = dynamic_cast<QComboBox *>(widget))
                 {
 
-                    cb->setCurrentIndex(cb->findData(QString::fromStdString(value), Qt::DisplayRole)); // <- refers to the item text
+                    cb->setCurrentIndex(cb->findData(QString::fromStdString((std::string)value), Qt::DisplayRole)); // <- refers to the item text
                     break;
                 }
+                else if(QCheckBox * ckb = dynamic_cast<QCheckBox *>(widget))
+                {
+                    ckb->setChecked((bool)value);
+                    break;
+                }
+                
             }
         }
     }

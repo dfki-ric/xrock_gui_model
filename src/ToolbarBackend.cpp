@@ -26,15 +26,6 @@
 #include <mars/utils/misc.h>
 using namespace xrock_gui_model;
 
-static std::string xrock_backend_to_xdbi(const std::string& b) {
-    static const std::map<std::string, std::string> backend_aliases {
-        {"ServerlessDB", "Serverless"},
-        {"RestDB", "Client"},
-        {"MultiDB", "MultiDbClient"},
-    };
-    return backend_aliases.at(b);
-}
-
 ToolbarBackend::ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface *gui)
     : xrockGui(xrockGui), main_gui(dynamic_cast<mars::main_gui::MainGUI *>(gui))
 {
@@ -54,7 +45,7 @@ ToolbarBackend::ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface 
     }
     for (auto const &e : backends)
         cb_backends->addItem(QString::fromStdString(e));
-    cb_backends->setCurrentIndex(cb_backends->findText(QString::fromStdString(xrock_backend_to_xdbi(xrockGui->getBackend())), Qt::MatchFixedString));
+    cb_backends->setCurrentIndex(cb_backends->findText(QString::fromStdString(xrockGui->getBackend()), Qt::MatchFixedString));
     toolbar->addWidget(cb_backends);
 
     connect(cb_backends, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(on_backend_changed(const QString &)));
@@ -119,7 +110,7 @@ ToolbarBackend::ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface 
     }
 
     // switch initial visibility
-    show_toolbar_widgets(QString::fromStdString(xrock_backend_to_xdbi(xrockGui->getBackend())));
+    show_toolbar_widgets(QString::fromStdString(xrockGui->getBackend()));
 
 }
 

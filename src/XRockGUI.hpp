@@ -49,6 +49,7 @@ namespace xrock_gui_model
         SELECT_SERVERLESS = 21,
         SELECT_CLIENT = 22,
         SELECT_MULTIDB = 23,
+        SELECT_FILEDB = 24,
         RELOAD_MODEL_FROM_DB = 30,
         EXPORT_CND_TFENHANCE = 31
     };

@@ -181,6 +181,10 @@ void ToolbarBackend::on_backend_changed(const QString &new_backend)
     {
         xrockGui->menuAction(static_cast<int>(MenuActions::SELECT_MULTIDB));
     }
+    else if (new_backend == "FileDB")
+    {
+        xrockGui->menuAction(static_cast<int>(MenuActions::SELECT_FILEDB));
+    }
     else
     {
         throw std::runtime_error("Unhandled backend type " + new_backend.toStdString());

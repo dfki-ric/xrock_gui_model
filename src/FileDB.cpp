@@ -7,7 +7,7 @@
 #include <iostream>
 #include <iomanip>
 #include <ctime>
-
+#include<QMessageBox>
 using namespace configmaps;
 using namespace mars::utils;
 
@@ -29,12 +29,21 @@ namespace xrock_gui_model
         // return content of info.yml
         std::string file = "info.yml";
         handleFilenamePrefix(&file, dbAddress);
-        ConfigMap info = ConfigMap::fromYamlFile(file);
-        for (auto it : info["models"])
+        if (mars::utils::pathExists(file))
         {
-            modelList.push_back(std::make_pair(it["name"], it["type"]));
+            ConfigMap info = ConfigMap::fromYamlFile(file);
+            for (auto it : info["models"])
+            {
+                modelList.push_back(std::make_pair(it["name"], it["type"]));
+            }
+
+            return modelList;
         }
-        return modelList;
+        else 
+        {
+            QMessageBox::warning(nullptr, "Warning",  QString::fromStdString(file + " doesn't exist"), QMessageBox::Ok);
+            return {};
+        }
     }
 
     std::vector<std::string> FileDB::requestVersions(const std::string &domain, const std::string &model)
@@ -44,19 +53,27 @@ namespace xrock_gui_model
         // return content of info.yml
         std::string file = "info.yml";
         handleFilenamePrefix(&file, dbAddress);
-        ConfigMap info = ConfigMap::fromYamlFile(file);
-        for (auto it : info["models"])
+        if (mars::utils::pathExists(file))
         {
-            if (it["name"] == model)
+            ConfigMap info = ConfigMap::fromYamlFile(file);
+            for (auto it : info["models"])
             {
-                for (auto it2 : it["versions"])
+                if (it["name"] == model)
                 {
-                    versionList.push_back(it2["name"]);
+                    for (auto it2 : it["versions"])
+                    {
+                        versionList.push_back(it2["name"]);
+                    }
+                    break;
                 }
-                break;
             }
+            return versionList;
         }
-        return versionList;
+        else 
+        {
+            QMessageBox::warning(nullptr, "Warning",  QString::fromStdString(file + " doesn't exist"), QMessageBox::Ok);
+            return {};
+        }
     }
 
     ConfigMap FileDB::requestModel(const std::string &domain,
@@ -74,19 +91,27 @@ namespace xrock_gui_model
             // get available versions
             std::string file = "info.yml";
             handleFilenamePrefix(&file, dbAddress);
-            ConfigMap info = configmaps::ConfigMap::fromYamlFile(file);
-            for (auto it : info["models"])
+            if (mars::utils::pathExists(file))
             {
-                if (it["name"] == model)
+                ConfigMap info = configmaps::ConfigMap::fromYamlFile(file);
+                for (auto it : info["models"])
                 {
-                    for (auto it2 : it["versions"])
+                    if (it["name"] == model)
                     {
-                        versionList.push_back(it2["name"]);
+                        for (auto it2 : it["versions"])
+                        {
+                            versionList.push_back(it2["name"]);
+                        }
+                        break;
                     }
-                    break;
                 }
             }
+            else 
+            {
+                QMessageBox::warning(nullptr, "Warning",  QString::fromStdString(file + " doesn't exist"), QMessageBox::Ok);
+            }
         }
+
 
         bool first = true;
         ConfigMap result;
@@ -94,15 +119,23 @@ namespace xrock_gui_model
         {
             std::string file = model + "/" + it + "/model.yml";
             handleFilenamePrefix(&file, dbAddress);
-            ConfigMap map = configmaps::ConfigMap::fromYamlFile(file);
-            if (first)
+            if (mars::utils::pathExists(file))
             {
-                result = map;
-                first = false;
+                ConfigMap map = configmaps::ConfigMap::fromYamlFile(file);
+                if (first)
+                {
+                    result = map;
+                    first = false;
+                }
+                else
+                {
+                    result["versions"].push_back(map["versions"][0]);
+                }
             }
             else
             {
-                result["versions"].push_back(map["versions"][0]);
+                QMessageBox::warning(nullptr, "Warning",  QString::fromStdString(file + " doesn't exist"), QMessageBox::Ok);
+                break;
             }
         }
         BasicModelHelper::convertFromLegacyModelFormat(result);
@@ -121,7 +154,16 @@ namespace xrock_gui_model
         // add to indexing
         std::string file = "info.yml";
         handleFilenamePrefix(&file, dbAddress);
-        ConfigMap info = ConfigMap::fromYamlFile(file);
+        ConfigMap info;
+        if (mars::utils::pathExists(file))
+        {
+            info = ConfigMap::fromYamlFile(file);
+        }
+        else
+        {
+            QMessageBox::warning(nullptr, "Warning",  QString::fromStdString(file + " doesn't exist"), QMessageBox::Ok);
+            return false;
+        }
         bool foundModel = false;
         bool foundVersion = false;
         size_t i = 0;
@@ -177,10 +219,14 @@ namespace xrock_gui_model
     {
         configmaps::ConfigMap propMap;
         propMap["name"]["value"] = "";
+        propMap["name"]["type"] = "string";
         propMap["type"]["value"] = "";
+        propMap["type"]["type"] = "string";
         propMap["domain"]["value"] = "";
+        propMap["domain"]["type"] = "array";
         propMap["domain"]["allowed_values"][0] = "SOFTWARE";
         propMap["project"]["value"] = "";
+        propMap["project"]["type"] = "string";
         return propMap;
     }
 

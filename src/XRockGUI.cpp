@@ -159,15 +159,14 @@ namespace xrock_gui_model
             }
             else
             {
+                
                 // if we don't have a ioLibrary we only support FileDB
+                env["backend"] = "FileDB";
                 db.reset(new FileDB());
-            }
-            if(env["dbType"] == "FileDB")
-            {
                 prop_dbAddress.sValue = mars::utils::pathJoin(confDir, prop_dbAddress.sValue);
+                db->set_dbAddress(prop_dbAddress.sValue);
+                dbAddress_paramId = prop_dbAddress.paramId;
             }
-            db->set_dbAddress(prop_dbAddress.sValue);
-            dbAddress_paramId = prop_dbAddress.paramId;
         }
         else
             std::cerr << "Error: Failed to load library cfg_manager!" << std::endl;
@@ -591,6 +590,14 @@ namespace xrock_gui_model
             }
             break;
         
+        }
+        case MenuActions::SELECT_FILEDB: // FileDB
+        {
+            if (!ioLibrary)
+            {
+               db.reset(new FileDB());
+            }
+            break;
         }
         case MenuActions::RELOAD_MODEL_FROM_DB: // Reload
         {

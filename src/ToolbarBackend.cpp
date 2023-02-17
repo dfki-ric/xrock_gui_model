@@ -199,6 +199,7 @@ void ToolbarBackend::on_backend_changed(const QString &new_backend)
 void ToolbarBackend::on_db_path_changed(const QString &db_path)
 {
     std::string dbPath = mars::utils::pathJoin(std::getenv("AUTOPROJ_CURRENT_ROOT"), db_path.toStdString());
+    std::cout << "on_db_path_changed: " << db_path.toStdString() << std::endl;
     xrockGui->db->set_dbPath(dbPath);
 }
 
@@ -222,6 +223,7 @@ void ToolbarBackend::on_graph_changed(const QString &graph)
 
 std::string ToolbarBackend::get_dbPath()
 {
+    std::cout << le_db_path->text().toStdString() << std::endl;
     return le_db_path->text().toStdString();
 }
 

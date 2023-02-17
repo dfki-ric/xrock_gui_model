@@ -417,8 +417,9 @@ namespace xrock_gui_model
             if (!storeComponentModel())
             {
                 QMessageBox::critical(nullptr, "Error", "Could not store component model to database", QMessageBox::Ok);
+                break;
             }
-            QMessageBox::information(nullptr, "Success", "Component model has been sucessfully stored into database", QMessageBox::Ok);
+            QMessageBox::information(nullptr, "Success", "Component model has been successfully stored into database", QMessageBox::Ok);
             break;
         }
         case MenuActions::EXPORT_CND:

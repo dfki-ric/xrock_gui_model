@@ -51,7 +51,10 @@ namespace xrock_gui_model
             {
                 if (&other == this)
                     return true;
-                return name == other.name;
+                return name == other.name and
+                       type == other.type and
+                       url_or_path == other.url_or_path and 
+                       graph == other.graph;
             }
         };
     

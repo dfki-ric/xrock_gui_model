@@ -8,8 +8,6 @@
 #include "ComponentModelEditorWidget.hpp"
 #include "ImportDialog.hpp"
 #include "FileDB.hpp"
-// #include "RestDB.hpp"
-// #include "ServerlessDB.hpp"
 #include "VersionDialog.hpp"
 #include "ConfigureDialog.hpp"
 #include "ConfigMapHelper.hpp"
@@ -194,7 +192,6 @@ void ToolbarBackend::on_backend_changed(const QString &new_backend)
 void ToolbarBackend::on_db_path_changed(const QString &db_path)
 {
     std::string dbPath = mars::utils::pathJoin(std::getenv("AUTOPROJ_CURRENT_ROOT"), db_path.toStdString());
-    std::cout << "on_db_path_changed: " << db_path.toStdString() << std::endl;
     xrockGui->db->set_dbPath(dbPath);
 }
 

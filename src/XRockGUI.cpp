@@ -93,7 +93,7 @@ namespace xrock_gui_model
             mars::utils::handleFilenamePrefix(&defaultAddress, confDir);
             if (env.hasKey("dbType"))
             {
-                if (env["dbType"] == "RestDB")
+                if (env["dbType"] == "Client")
                 {
                     defaultAddress = "http://localhost:8183";
                 }
@@ -129,19 +129,19 @@ namespace xrock_gui_model
                     env["backend"] = dbType;
                     if(dbType == "Serverless")
                     {
-                        env["dbType"] = "ServerlessDB";
+                        env["dbType"] = "Serverless";
                         env["dbPath"] = config["path"];
                         db.reset(ioLibrary->getDB(env));
                     }
                     else if(dbType == "Client")
                     {
-                        env["dbType"] = "RestDB";
+                        env["dbType"] = "Client";
                         db.reset(ioLibrary->getDB(env));
                         db->set_dbAddress(config["url"]);
                     }
                     else if(dbType == "MultiDbClient")
                     {
-                        env["dbType"] = "MultiDB";
+                        env["dbType"] = "MultiDbClient";
                         env["multiDBConfig"] = config.toJsonString();
                         db.reset(ioLibrary->getDB(env));
                         fprintf(stderr, "---    Set MultiDB from default config\n");
@@ -551,7 +551,7 @@ namespace xrock_gui_model
         {
             if(ioLibrary)
             {
-                env["dbType"] = "ServerlessDB";
+                env["dbType"] = "Serverless";
                 db.reset(ioLibrary->getDB(env));
             }
             break;
@@ -560,7 +560,7 @@ namespace xrock_gui_model
         {
             if(ioLibrary)
             {
-                env["dbType"] = "RestDB";
+                env["dbType"] = "Client";
                 db.reset(ioLibrary->getDB(env));
                 if (!db->isConnected())
                 {
@@ -580,7 +580,7 @@ namespace xrock_gui_model
                 ConfigMap multidb_config = configmaps::ConfigMap::fromYamlFile(multidb_config_path);
                 std::cout << "multidb config after finish: \n"
                           << multidb_config.toYamlString() << std::endl;
-                env["dbType"] = "MultiDB";
+                env["dbType"] = "MultiDbClient";
                 env["multiDBConfig"] = multidb_config.toJsonString();
                 db.reset(ioLibrary->getDB(env));
                 if (multidb_config["main_server"]["type"] == "Client" or
@@ -1208,19 +1208,8 @@ namespace xrock_gui_model
         {
             cnd_export << " -t --tf_enhance -u " << urdf_file;
         }
-        if (env["dbType"] == "ServerlessDB")
-        {
-            cnd_export << " -b Serverless ";
-        }
-        else if (env["dbType"] == "RestDB")
-        {
-            cnd_export << " -b Client ";
-        }
-        else if (env["dbType"] == "MultiDB")
-        {
-          cnd_export << " -b multidb ";
-        }
-
+        cnd_export << " -b " << (std::string)env["dbType"];
+      
         int ret = std::system(cnd_export.str().c_str());
         if (ret == EXIT_SUCCESS)
             QMessageBox::information(nullptr, "Export", "Successfully exported", QMessageBox::Ok);

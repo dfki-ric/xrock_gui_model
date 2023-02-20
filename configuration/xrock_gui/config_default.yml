@@ -3,5 +3,5 @@ HeaderFontSize: 10
 PortFontSize: 8
 PortIconScale: 1.3333
 retinaScale: 1.
-dbType: ServerlessDB # or RestDB
+dbType: Serverless # one of [Serverless, Client, MultiDBClient]
 dbPath: modkom/component_db

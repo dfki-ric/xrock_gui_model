@@ -575,8 +575,12 @@ namespace xrock_gui_model
             if (ioLibrary)
             {
                 std::string multidb_config_path = bagelGui->getConfigDir() + "/MultiDBConfig.yml";
-                MultiDBConfigDialog dialog(multidb_config_path, ioLibrary);
-                dialog.exec();
+                if(!std::filesystem::is_empty(fs::path(multidb_config_path)))
+                    {
+                    MultiDBConfigDialog dialog(multidb_config_path, ioLibrary);
+                    dialog.exec();
+                    
+                    }
                 ConfigMap multidb_config = configmaps::ConfigMap::fromYamlFile(multidb_config_path);
                 std::cout << "multidb config after finish: \n"
                           << multidb_config.toYamlString() << std::endl;

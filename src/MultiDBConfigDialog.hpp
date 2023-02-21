@@ -29,7 +29,7 @@ namespace xrock_gui_model
        explicit  MultiDBConfigDialog(const std::string &conf_file, XRockIOLibrary *ioLibrary);
         ~MultiDBConfigDialog();
 
-        void load_config();
+        bool load_state();
     
     private:
         std::string config_filename;

@@ -122,15 +122,22 @@ namespace xrock_gui_model
         hbox2->addWidget(btn_finish);
 
         vLayout->addLayout(hbox2);
-
-        // if there is an existing config .yml load it to gui
-        load_config();
-
+        
         mainLayout->addLayout(vLayout);
         setLayout(mainLayout);
+
+        // if there is an existing previous saved config state, load it to gui
+        if(load_state())
+        {
+            std::cout << "Loaded previous MultiDbConfig state successfully" << std::endl;
+        }
+        else {
+            // no previous saved state to load! load default config from selected bundle (if any)
+            this->on_reset_to_default_btn_clicked();
+        }
     }
 
-    void MultiDBConfigDialog::load_config()
+    bool MultiDBConfigDialog::load_state()
     {
         if (mars::utils::pathExists(config_filename))
         {
@@ -150,6 +157,10 @@ namespace xrock_gui_model
                 backends.push_back(std::move(w));
             }
             update_backends_widget();
+            return true;
+        }
+        else {
+            return false;
         }
     }
     void MultiDBConfigDialog::update_backends_widget()
@@ -237,8 +248,8 @@ namespace xrock_gui_model
                 auto default_config = ioLibrary->getDefaultConfig();
                 if (!default_config.empty())
                 {
-                    default_config.toYamlFile(this->config_filename);
-                    load_config();
+                    default_config["MultiDbClient"].toYamlFile(this->config_filename);
+                    load_state();
                 }
                 else
                 {

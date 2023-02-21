@@ -133,7 +133,7 @@ namespace xrock_gui_model
         }
         else {
             // no previous saved state to load! load default config from selected bundle (if any)
-            this->on_reset_to_default_btn_clicked();
+            this->reset_to_default();
         }
     }
 
@@ -238,24 +238,28 @@ namespace xrock_gui_model
         }
     }
 
+    void MultiDBConfigDialog::reset_to_default(){
+        if (ioLibrary)
+        {
+            auto default_config = ioLibrary->getDefaultConfig();
+            if (!default_config.empty())
+            {
+                //std::cout << "loading" << default_config.toYamlString() << std::endl;
+                default_config["MultiDbClient"].toYamlFile(this->config_filename);
+                load_state();
+            }
+            else
+            {
+                QMessageBox::warning(this, "Warning", "Select bundle from where you want to load your default config.", QMessageBox::Ok);
+            }
+        }
+    }
     void MultiDBConfigDialog::on_reset_to_default_btn_clicked()
     {
         if (QMessageBox::question(this, "Warning",
                                   "Are you sure you want to reset the config to default?", QMessageBox::Yes | QMessageBox::Cancel) == QMessageBox::Yes)
         {
-            if (ioLibrary)
-            {
-                auto default_config = ioLibrary->getDefaultConfig();
-                if (!default_config.empty())
-                {
-                    default_config["MultiDbClient"].toYamlFile(this->config_filename);
-                    load_state();
-                }
-                else
-                {
-                    QMessageBox::warning(this, "Warning", "Select bundle from where you want to load your default config.", QMessageBox::Ok);
-                }
-            }
+            reset_to_default();
         }
     }
 

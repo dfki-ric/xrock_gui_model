@@ -30,7 +30,7 @@ namespace xrock_gui_model
         ~MultiDBConfigDialog();
 
         bool load_state();
-    
+        void reset_to_default();
     private:
         std::string config_filename;
         XRockIOLibrary *ioLibrary;

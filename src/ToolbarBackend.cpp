@@ -84,7 +84,7 @@ ToolbarBackend::ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface 
     widgetActionGraph = toolbar->addWidget(le_graph);
     connect(le_graph, SIGNAL(textChanged(const QString &)), this, SLOT(on_graph_changed(const QString &)));
 
-    // Load default values
+    // Load default values to toolbar widgets if any bundle was selected
     if (xrockGui->ioLibrary)
     {
         auto default_config = xrockGui->ioLibrary->getDefaultConfig();

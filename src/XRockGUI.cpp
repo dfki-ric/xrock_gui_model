@@ -575,24 +575,23 @@ namespace xrock_gui_model
             if (ioLibrary)
             {
                 std::string multidb_config_path = bagelGui->getConfigDir() + "/MultiDBConfig.yml";
-                if(!std::filesystem::is_empty(fs::path(multidb_config_path)))
-                    {
-                    MultiDBConfigDialog dialog(multidb_config_path, ioLibrary);
-                    dialog.exec();
-                    
-                    }
-                ConfigMap multidb_config = configmaps::ConfigMap::fromYamlFile(multidb_config_path);
-                std::cout << "multidb config after finish: \n"
-                          << multidb_config.toYamlString() << std::endl;
-                env["dbType"] = "MultiDbClient";
-                env["multiDBConfig"] = multidb_config.toJsonString();
-                db.reset(ioLibrary->getDB(env));
-                if (multidb_config["main_server"]["type"] == "Client" or
-                    std::any_of(multidb_config["import_servers"].begin(), multidb_config["import_servers"].end(), [](ConfigItem &is)
-                                { return is["type"] == "Client"; }))
+                MultiDBConfigDialog dialog(multidb_config_path, ioLibrary);
+                dialog.exec();
+                if(mars::utils::pathExists(multidb_config_path))
                 {
-                    std::string msg = "MultiDB is requesting a client server! Please run server using command:\njsondb -d YOUR_DB_PATH";
-                    QMessageBox::warning(nullptr, "Warning", msg.c_str(), QMessageBox::Ok);
+                    ConfigMap multidb_config = configmaps::ConfigMap::fromYamlFile(multidb_config_path);
+                    std::cout << "multidb config after finish: \n"
+                            << multidb_config.toYamlString() << std::endl;
+                    env["dbType"] = "MultiDbClient";
+                    env["multiDBConfig"] = multidb_config.toJsonString();
+                    db.reset(ioLibrary->getDB(env));
+                    if (multidb_config["main_server"]["type"] == "Client" or
+                        std::any_of(multidb_config["import_servers"].begin(), multidb_config["import_servers"].end(), [](ConfigItem &is)
+                                    { return is["type"] == "Client"; }))
+                    {
+                        std::string msg = "MultiDB is requesting a client server! Please run server using command:\njsondb -d YOUR_DB_PATH";
+                        QMessageBox::warning(nullptr, "Warning", msg.c_str(), QMessageBox::Ok);
+                    }
                 }
             }
             break;

@@ -549,19 +549,23 @@ namespace xrock_gui_model
         }
         case MenuActions::SELECT_SERVERLESS: // Serverless
         {
-            if(ioLibrary)
+            if (ioLibrary)
             {
                 env["dbType"] = "Serverless";
+                env["dbPath"] = toolbarBackend->get_dbPath();
                 db.reset(ioLibrary->getDB(env));
+                db->set_dbGraph(toolbarBackend->get_graph());
             }
             break;
         }
         case MenuActions::SELECT_CLIENT: // Client
         {
-            if(ioLibrary)
+            if (ioLibrary)
             {
                 env["dbType"] = "Client";
                 db.reset(ioLibrary->getDB(env));
+                db->set_dbGraph(toolbarBackend->get_graph());
+                db->set_dbAddress(toolbarBackend->get_dbAddress());
                 if (!db->isConnected())
                 {
                     std::string msg = "Server is not running! Please run server using command:\njsondb -d " + toolbarBackend->get_dbPath();

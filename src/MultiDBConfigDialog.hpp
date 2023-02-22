@@ -26,25 +26,25 @@ namespace xrock_gui_model
         Q_OBJECT
 
     public:
-       explicit  MultiDBConfigDialog(const std::string &conf_file, XRockIOLibrary *ioLibrary);
+       explicit  MultiDBConfigDialog(const std::string &confFile, XRockIOLibrary *ioLibrary);
         ~MultiDBConfigDialog();
 
-        bool load_state();
-        void reset_to_default();
+        bool loadState();
+        void resetToDefault();
     private:
-        std::string config_filename;
+        std::string configFilename;
         XRockIOLibrary *ioLibrary;
         QVBoxLayout *vLayout;
-        QComboBox *cb_main_server_type;
-        QLabel* lb_main_server_path_or_url;
-        QLineEdit *tf_main_server_path;
-        QLineEdit *tf_main_server_graph;
+        QComboBox *cbMainServerType;
+        QLabel* lbMainServerPathOrUrl;
+        QLineEdit *tfMainServerPath;
+        QLineEdit *tfMainServerGraph;
         
         struct BackendItem
         {
             QString name;
             QString type;
-            QString url_or_path;
+            QString urlOrPath;
             QString graph;
 
             bool operator==(const BackendItem &other) const
@@ -53,32 +53,32 @@ namespace xrock_gui_model
                     return true;
                 return name == other.name and
                        type == other.type and
-                       url_or_path == other.url_or_path and 
+                       urlOrPath == other.urlOrPath and 
                        graph == other.graph;
             }
         };
     
         std::vector<BackendItem> backends;
-        QTableWidget *table_backends;
-        QComboBox *cb_new_type;
-        QLineEdit *tf_new_name;
-        QLineEdit *tf_new_url_or_path;
-        QLineEdit *tf_new_graph;
-        QPushButton *btn_add_new, *btn_remove;
-        QPushButton *btn_finish;
-        QPushButton *btn_reset_to_default;
+        QTableWidget *tableBackends;
+        QComboBox *cbNewType;
+        QLineEdit *tfNewName;
+        QLineEdit *tfNewUrlOrPath;
+        QLineEdit *tfNewGraph;
+        QPushButton *btnAddNew, *btnRemove;
+        QPushButton *saveAndClose;
+        QPushButton *btnResetToDefault;
 
-        void update_backends_widget();
+        void updateBackendsWidget();
         void closeEvent(QCloseEvent *e);
         
 
     private slots:
-        void on_add_btn_clicked();
-        void on_remove_btn_clicked();
-        void on_finish_btn_clicked();
-        void on_reset_to_default_btn_clicked();
-        void on_main_server_backend_change(const QString &new_backend);
-        void on_table_backends_cell_change(int row, int column);
+        void onAddBtnClicked();
+        void onRemoveBtnClicked();
+        void onFinishBtnClicked();
+        void onResetToDefaultBtnClicked();
+        void onMainServerBackendChange(const QString &newBackend);
+        void onTableBackendsCellChange(int row, int column);
 
     };
 } // end of namespace xrock_gui_model

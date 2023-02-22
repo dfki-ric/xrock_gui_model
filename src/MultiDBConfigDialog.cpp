@@ -19,8 +19,8 @@ using namespace configmaps;
 namespace xrock_gui_model
 {
 
-    MultiDBConfigDialog::MultiDBConfigDialog(const std::string &conf_file, XRockIOLibrary *ioLibrary)
-        : config_filename(conf_file), ioLibrary(ioLibrary)
+    MultiDBConfigDialog::MultiDBConfigDialog(const std::string &confFile, XRockIOLibrary *ioLibrary)
+        : configFilename(confFile), ioLibrary(ioLibrary)
     {
         this->setWindowTitle("MultiDB Configuration");
         QHBoxLayout *mainLayout = new QHBoxLayout();
@@ -32,7 +32,7 @@ namespace xrock_gui_model
 
         label = new QLabel("Type:");
         hLayout->addWidget(label);
-        cb_main_server_type = new QComboBox();
+        cbMainServerType = new QComboBox();
 
         std::vector<std::string> backends;
         if (ioLibrary)
@@ -48,78 +48,78 @@ namespace xrock_gui_model
         for (std::string backend : backends)
         {
             if (backend != "MultiDbClient")
-                cb_main_server_type->addItem(QString::fromStdString(backend));
+                cbMainServerType->addItem(QString::fromStdString(backend));
         }
-        hLayout->addWidget(cb_main_server_type);
-        this->lb_main_server_path_or_url = new QLabel("Path:");
-        hLayout->addWidget(this->lb_main_server_path_or_url);
-        connect(cb_main_server_type, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(on_main_server_backend_change(const QString &)));
-        tf_main_server_path = new QLineEdit();
-        hLayout->addWidget(tf_main_server_path);
+        hLayout->addWidget(cbMainServerType);
+        this->lbMainServerPathOrUrl = new QLabel("Path:");
+        hLayout->addWidget(this->lbMainServerPathOrUrl);
+        connect(cbMainServerType, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(onMainServerBackendChange(const QString &)));
+        tfMainServerPath = new QLineEdit();
+        hLayout->addWidget(tfMainServerPath);
         // vLayout->addLayout(hLayout);
-        tf_main_server_graph = new QLineEdit();
+        tfMainServerGraph = new QLineEdit();
         QLabel *l_graph = new QLabel("Graph:");
         hLayout->addWidget(l_graph);
-        hLayout->addWidget(tf_main_server_graph);
+        hLayout->addWidget(tfMainServerGraph);
         vLayout->addLayout(hLayout);
 
         label = new QLabel("Import Servers:");
         vLayout->addWidget(label);
 
-        table_backends = new QTableWidget();
-        table_backends->setColumnCount(4);
-        table_backends->setHorizontalHeaderLabels(QStringList() << "Name"
+        tableBackends = new QTableWidget();
+        tableBackends->setColumnCount(4);
+        tableBackends->setHorizontalHeaderLabels(QStringList() << "Name"
                                                                 << "Backend Type"
                                                                 << "URL/Path"
                                                                 << "Graph");
 #if QT_VERSION >= 0x050000
-        table_backends->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+        tableBackends->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 #else
-        table_backends->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+        tableBackends->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
 #endif
-        table_backends->setSelectionBehavior(QAbstractItemView::SelectRows);
-        connect(table_backends, SIGNAL(cellChanged(int, int)), this, SLOT(on_table_backends_cell_change(int, int)));
+        tableBackends->setSelectionBehavior(QAbstractItemView::SelectRows);
+        connect(tableBackends, SIGNAL(cellChanged(int, int)), this, SLOT(onTableBackendsCellChange(int, int)));
 
-        vLayout->addWidget(table_backends);
-        btn_remove = new QPushButton();
-        btn_remove->setText("remove selected");
-        connect(btn_remove, SIGNAL(clicked()), this, SLOT(on_remove_btn_clicked()));
-        vLayout->addWidget(btn_remove);
+        vLayout->addWidget(tableBackends);
+        btnRemove = new QPushButton();
+        btnRemove->setText("remove selected");
+        connect(btnRemove, SIGNAL(clicked()), this, SLOT(onRemoveBtnClicked()));
+        vLayout->addWidget(btnRemove);
 
         QHBoxLayout *hbox = new QHBoxLayout();
         QHBoxLayout *hbox2 = new QHBoxLayout();
 
-        cb_new_type = new QComboBox();
+        cbNewType = new QComboBox();
         for (std::string backend : backends)
         {
             if (backend != "MultiDbClient")
-                cb_new_type->addItem(QString::fromStdString(backend));
+                cbNewType->addItem(QString::fromStdString(backend));
         }
 
-        tf_new_name = new QLineEdit();
-        tf_new_name->setPlaceholderText("Name");
-        tf_new_url_or_path = new QLineEdit();
-        tf_new_url_or_path->setPlaceholderText("URL/Path");
-        tf_new_graph = new QLineEdit();
-        tf_new_graph->setPlaceholderText("Graph");
+        tfNewName = new QLineEdit();
+        tfNewName->setPlaceholderText("Name");
+        tfNewUrlOrPath = new QLineEdit();
+        tfNewUrlOrPath->setPlaceholderText("URL/Path");
+        tfNewGraph = new QLineEdit();
+        tfNewGraph->setPlaceholderText("Graph");
 
-        btn_add_new = new QPushButton();
-        btn_add_new->setText("add");
-        connect(btn_add_new, SIGNAL(clicked()), this, SLOT(on_add_btn_clicked()));
-        hbox->addWidget(tf_new_name);
-        hbox->addWidget(cb_new_type);
-        hbox->addWidget(tf_new_url_or_path);
-        hbox->addWidget(tf_new_graph);
-        hbox->addWidget(btn_add_new);
+        btnAddNew = new QPushButton();
+        btnAddNew->setText("add");
+        connect(btnAddNew, SIGNAL(clicked()), this, SLOT(onAddBtnClicked()));
+        hbox->addWidget(tfNewName);
+        hbox->addWidget(cbNewType);
+        hbox->addWidget(tfNewUrlOrPath);
+        hbox->addWidget(tfNewGraph);
+        hbox->addWidget(btnAddNew);
         vLayout->addLayout(hbox);
 
-        btn_reset_to_default = new QPushButton("reset to default");
-        hbox2->addWidget(btn_reset_to_default);
-        connect(btn_reset_to_default, SIGNAL(clicked()), this, SLOT(on_reset_to_default_btn_clicked()));
+        btnResetToDefault = new QPushButton("reset to default");
+        hbox2->addWidget(btnResetToDefault);
+        connect(btnResetToDefault, SIGNAL(clicked()), this, SLOT(onResetToDefaultBtnClicked()));
 
-        btn_finish = new QPushButton("finish");
-        connect(btn_finish, SIGNAL(clicked()), this, SLOT(on_finish_btn_clicked()));
-        hbox2->addWidget(btn_finish);
+        saveAndClose = new QPushButton("save and close");
+        connect(saveAndClose, SIGNAL(clicked()), this, SLOT(onFinishBtnClicked()));
+        hbox2->addWidget(saveAndClose);
 
         vLayout->addLayout(hbox2);
         
@@ -127,24 +127,24 @@ namespace xrock_gui_model
         setLayout(mainLayout);
 
         // if there is an existing previous saved config state, load it to gui
-        if(load_state())
+        if(loadState())
         {
             std::cout << "Loaded previous MultiDbConfig state successfully" << std::endl;
         }
         else {
             // no previous saved state to load! load default config from selected bundle (if any)
-            this->reset_to_default();
+            this->resetToDefault();
         }
     }
 
-    bool MultiDBConfigDialog::load_state()
+    bool MultiDBConfigDialog::loadState()
     {
-        if (mars::utils::pathExists(config_filename))
+        if (mars::utils::pathExists(configFilename))
         {
-            ConfigMap config = ConfigMap::fromYamlFile(config_filename);
-            tf_main_server_path->setText(QString::fromStdString(config["main_server"]["path"]));
-            tf_main_server_graph->setText(QString::fromStdString(config["main_server"]["graph"]));
-            lb_main_server_path_or_url->setText(config["main_server"]["type"] == "Client" ? "URL" : "Path");
+            ConfigMap config = ConfigMap::fromYamlFile(configFilename);
+            tfMainServerPath->setText(QString::fromStdString(config["main_server"]["path"]));
+            tfMainServerGraph->setText(QString::fromStdString(config["main_server"]["graph"]));
+            lbMainServerPathOrUrl->setText(config["main_server"]["type"] == "Client" ? "URL" : "Path");
 
             backends.clear();
             for (auto &backend : config["import_servers"])
@@ -152,85 +152,85 @@ namespace xrock_gui_model
                 BackendItem w;
                 w.name = QString::fromStdString(backend["name"]);
                 w.type = QString::fromStdString(backend["type"]);
-                w.url_or_path = QString::fromStdString(backend["type"] == std::string("Client") ? backend["url"] : backend["path"]);
+                w.urlOrPath = QString::fromStdString(backend["type"] == std::string("Client") ? backend["url"] : backend["path"]);
                 w.graph = QString::fromStdString(backend["graph"]);
                 backends.push_back(std::move(w));
             }
-            update_backends_widget();
+            updateBackendsWidget();
             return true;
         }
         else {
             return false;
         }
     }
-    void MultiDBConfigDialog::update_backends_widget()
+    void MultiDBConfigDialog::updateBackendsWidget()
     {
-        table_backends->setRowCount(0);
+        tableBackends->setRowCount(0);
         for (const BackendItem &w : backends)
         {
-            int rowPosition = table_backends->rowCount();
-            table_backends->insertRow(rowPosition);
+            int rowPosition = tableBackends->rowCount();
+            tableBackends->insertRow(rowPosition);
 
-            table_backends->setItem(rowPosition, 0, new QTableWidgetItem(w.name));
-            table_backends->setItem(rowPosition, 1, new QTableWidgetItem(w.type));
-            table_backends->setItem(rowPosition, 2, new QTableWidgetItem(w.url_or_path));
-            table_backends->setItem(rowPosition, 3, new QTableWidgetItem(w.graph));
+            tableBackends->setItem(rowPosition, 0, new QTableWidgetItem(w.name));
+            tableBackends->setItem(rowPosition, 1, new QTableWidgetItem(w.type));
+            tableBackends->setItem(rowPosition, 2, new QTableWidgetItem(w.urlOrPath));
+            tableBackends->setItem(rowPosition, 3, new QTableWidgetItem(w.graph));
         }
     }
 
-    void MultiDBConfigDialog::on_remove_btn_clicked()
+    void MultiDBConfigDialog::onRemoveBtnClicked()
     {
-        if (table_backends->selectionModel()->hasSelection())
+        if (tableBackends->selectionModel()->hasSelection())
         {
             if (QMessageBox::question(this, "Warning", "Are you sure you want to delete the selected server?", QMessageBox::Yes | QMessageBox::Cancel) == QMessageBox::Yes)
             {
-                auto index = table_backends->selectionModel()->currentIndex();
+                auto index = tableBackends->selectionModel()->currentIndex();
 
                 BackendItem w;
                 w.name = index.sibling(index.row(), 0).data().toString();
                 w.type = index.sibling(index.row(), 1).data().toString();
-                w.url_or_path = index.sibling(index.row(), 2).data().toString();
+                w.urlOrPath = index.sibling(index.row(), 2).data().toString();
                 w.graph = index.sibling(index.row(), 3).data().toString();
 
                 auto it = std::find(backends.begin(), backends.end(), w);
                 if (it != backends.end())
                 {
                     backends.erase(it);
-                    update_backends_widget();
+                    updateBackendsWidget();
                 }
             }
         }
     }
 
-    void MultiDBConfigDialog::on_add_btn_clicked()
+    void MultiDBConfigDialog::onAddBtnClicked()
     {
-        if (tf_new_name->text().isEmpty())
+        if (tfNewName->text().isEmpty())
         {
             QMessageBox::warning(this, "Warning", "Name is empty!", QMessageBox::Ok);
             return;
         }
-        if (tf_new_url_or_path->text().isEmpty())
+        if (tfNewUrlOrPath->text().isEmpty())
         {
             QMessageBox::warning(this, "Warning", "URL/Path is empty!", QMessageBox::Ok);
             return;
         }
-        if (tf_new_graph->text().isEmpty())
+        if (tfNewGraph->text().isEmpty())
         {
             QMessageBox::warning(this, "Warning", "Graph is empty!", QMessageBox::Ok);
             return;
         }
         BackendItem b;
-        b.name = tf_new_name->text();
-        b.type = cb_new_type->currentText();
-        b.url_or_path = tf_new_url_or_path->text();
-        b.graph = tf_new_graph->text();
+        b.name = tfNewName->text();
+        b.type = cbNewType->currentText();
+        b.urlOrPath = tfNewUrlOrPath->text();
+        b.graph = tfNewGraph->text();
 
         // if backend doesn't exists, add it
         auto it = std::find(backends.begin(), backends.end(), b);
         if (it == backends.end()) // add
         {
             backends.push_back(std::move(b));
-            update_backends_widget();
+            updateBackendsWidget();
         }
         else
         {
@@ -238,15 +238,15 @@ namespace xrock_gui_model
         }
     }
 
-    void MultiDBConfigDialog::reset_to_default(){
+    void MultiDBConfigDialog::resetToDefault(){
         if (ioLibrary)
         {
-            auto default_config = ioLibrary->getDefaultConfig();
-            if (!default_config.empty())
+            auto defaultConfig = ioLibrary->getDefaultConfig();
+            if (!defaultConfig.empty())
             {
-                //std::cout << "loading" << default_config.toYamlString() << std::endl;
-                default_config["MultiDbClient"].toYamlFile(this->config_filename);
-                load_state();
+                //std::cout << "loading" << defaultConfig.toYamlString() << std::endl;
+                defaultConfig["MultiDbClient"].toYamlFile(this->configFilename);
+                loadState();
             }
             else
             {
@@ -254,20 +254,20 @@ namespace xrock_gui_model
             }
         }
     }
-    void MultiDBConfigDialog::on_reset_to_default_btn_clicked()
+    void MultiDBConfigDialog::onResetToDefaultBtnClicked()
     {
         if (QMessageBox::question(this, "Warning",
                                   "Are you sure you want to reset the config to default?", QMessageBox::Yes | QMessageBox::Cancel) == QMessageBox::Yes)
         {
-            reset_to_default();
+            resetToDefault();
         }
     }
 
-    void MultiDBConfigDialog::on_finish_btn_clicked()
+    void MultiDBConfigDialog::onFinishBtnClicked()
     {
-        QString main_server_type = cb_main_server_type->currentText();
-        QString main_server_path = tf_main_server_path->text();
-        QString main_server_graph = tf_main_server_graph->text();
+        QString main_server_type = cbMainServerType->currentText();
+        QString main_server_path = tfMainServerPath->text();
+        QString main_server_graph = tfMainServerGraph->text();
 
         if (main_server_path.isEmpty())
         {
@@ -288,8 +288,8 @@ namespace xrock_gui_model
         ConfigMap config;
         config["main_server"]["type"] = main_server_type.toStdString();
         config["main_server"]["graph"] = main_server_graph.toStdString();
-        std::string url_or_path = config["main_server"]["type"] == "Client" ? "url" : "path";
-        config["main_server"][url_or_path] = main_server_path.toStdString();
+        std::string urlOrPath = config["main_server"]["type"] == "Client" ? "url" : "path";
+        config["main_server"][urlOrPath] = main_server_path.toStdString();
 
         for (const BackendItem &w : backends)
         {
@@ -297,47 +297,47 @@ namespace xrock_gui_model
             backend["name"] = w.name.toStdString();
             backend["type"] = w.type.toStdString();
             if (backend["type"].getString() == "Client")
-                backend["url"] = w.url_or_path.toStdString();
+                backend["url"] = w.urlOrPath.toStdString();
             else
-                backend["path"] = w.url_or_path.toStdString();
+                backend["path"] = w.urlOrPath.toStdString();
             backend["graph"] = w.graph.toStdString();
             config["import_servers"].push_back(std::move(backend));
         }
 
         // user can click finish without adding servers
-        config.toYamlFile(this->config_filename);
+        config.toYamlFile(this->configFilename);
         done(0);
     }
-    void MultiDBConfigDialog::on_table_backends_cell_change(int row, int column)
+    void MultiDBConfigDialog::onTableBackendsCellChange(int row, int column)
     {
         // std::cout << "updated row: " << row <<", column: "<< column << std::endl;
         switch (column)
         {
         case 0: // backend name
-            backends[row].name = table_backends->item(row, column)->text();
+            backends[row].name = tableBackends->item(row, column)->text();
             break;
         case 1: // backend type
-            backends[row].type = table_backends->item(row, column)->text();
+            backends[row].type = tableBackends->item(row, column)->text();
             break;
         case 2: // URL/path
-            backends[row].url_or_path = table_backends->item(row, column)->text();
+            backends[row].urlOrPath = tableBackends->item(row, column)->text();
             break;
         case 3: // graph
-            backends[row].graph = table_backends->item(row, column)->text();
+            backends[row].graph = tableBackends->item(row, column)->text();
             break;
         default:
             throw std::runtime_error("Invalid table column");
         }
     }
-    void MultiDBConfigDialog::on_main_server_backend_change(const QString &new_backend)
+    void MultiDBConfigDialog::onMainServerBackendChange(const QString &newBackend)
     {
-        if (new_backend == "Serverless")
+        if (newBackend == "Serverless")
         {
-            lb_main_server_path_or_url->setText("Path");
+            lbMainServerPathOrUrl->setText("Path");
         }
-        else if (new_backend == "Client")
+        else if (newBackend == "Client")
         {
-            lb_main_server_path_or_url->setText("URL");
+            lbMainServerPathOrUrl->setText("URL");
         }
     }
     void MultiDBConfigDialog::closeEvent(QCloseEvent *event)
@@ -357,22 +357,22 @@ namespace xrock_gui_model
     MultiDBConfigDialog::~MultiDBConfigDialog()
     {
         delete vLayout;
-        delete cb_main_server_type;
-        delete lb_main_server_path_or_url;
-        delete tf_main_server_path;
-        delete tf_main_server_graph;
+        delete cbMainServerType;
+        delete lbMainServerPathOrUrl;
+        delete tfMainServerPath;
+        delete tfMainServerGraph;
 
-        delete table_backends;
+        delete tableBackends;
 
-        delete cb_new_type;
-        delete tf_new_name;
-        delete tf_new_url_or_path;
-        delete tf_new_graph;
+        delete cbNewType;
+        delete tfNewName;
+        delete tfNewUrlOrPath;
+        delete tfNewGraph;
 
-        delete btn_add_new;
-        delete btn_remove;
-        delete btn_finish;
-        delete btn_reset_to_default;
+        delete btnAddNew;
+        delete btnRemove;
+        delete saveAndClose;
+        delete btnResetToDefault;
     }
 
 } // end of namespace xrock_gui_model

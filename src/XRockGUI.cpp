@@ -237,8 +237,8 @@ namespace xrock_gui_model
             gui->addGenericMenuAction("../Actions/Reload", static_cast<int>(MenuActions::RELOAD_MODEL_FROM_DB), this, 0,
                                       icon + "reload.png", true);
 
-            mars::main_gui::MainGUI *main_gui = dynamic_cast<mars::main_gui::MainGUI *>(gui);
-            main_gui->mainWindow_p()->setWindowIcon(QIcon(":/images/xrock_gui.ico"));
+            mars::main_gui::MainGUI *mainGui = dynamic_cast<mars::main_gui::MainGUI *>(gui);
+            mainGui->mainWindow_p()->setWindowIcon(QIcon(":/images/xrock_gui.ico"));
 
             toolbarBackend = new ToolbarBackend(this, gui);
 
@@ -554,9 +554,9 @@ namespace xrock_gui_model
                 if (ioLibrary)
                 {
                     env["dbType"] = "Serverless";
-                    env["dbPath"] = toolbarBackend->get_dbPath();
+                    env["dbPath"] = toolbarBackend->getDbPath();
                     db.reset(ioLibrary->getDB(env));
-                    db->set_dbGraph(toolbarBackend->get_graph());
+                    db->set_dbGraph(toolbarBackend->getGraph());
                 }
                 break;
             }
@@ -566,11 +566,11 @@ namespace xrock_gui_model
                 {
                     env["dbType"] = "Client";
                     db.reset(ioLibrary->getDB(env));
-                    db->set_dbGraph(toolbarBackend->get_graph());
-                    db->set_dbAddress(toolbarBackend->get_dbAddress());
+                    db->set_dbGraph(toolbarBackend->getGraph());
+                    db->set_dbAddress(toolbarBackend->getdbAddress());
                     if (!db->isConnected())
                     {
-                        std::string msg = "Server is not running! Please run server using command:\njsondb -d " + toolbarBackend->get_dbPath();
+                        std::string msg = "Server is not running! Please run server using command:\njsondb -d " + toolbarBackend->getDbPath();
                         QMessageBox::warning(nullptr, "Warning", msg.c_str(), QMessageBox::Ok);
                     }
                 }

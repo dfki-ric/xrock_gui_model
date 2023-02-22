@@ -34,44 +34,43 @@ namespace xrock_gui_model
         /** \brief The constructor adds the actions to the File menu */
         ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface *gui);
         virtual ~ToolbarBackend();
-       /** \brief getters */
-        std::string get_dbPath();
-        std::string get_dbAddress();
-        std::string get_graph();
+        /** \brief getters */
+        std::string getDbPath();
+        std::string getdbAddress();
+        std::string getGraph();
+
     private:
-        void hide_toolbar_widgets(const QString &backend);
-        void show_toolbar_widgets(const QString &backend);
-        
+        void hideToolbarWidgets(const QString &backend);
+        void showToolbarWidgets(const QString &backend);
 
     private slots:
-        void on_backend_changed(const QString &new_backend);
-        void on_db_path_changed(const QString &db_path);
-        void on_url_changed(const QString &url);
-        void on_port_changed(const QString &port);
-        void on_graph_changed(const QString &graph);
+        void onBackendChanged(const QString &newBackend);
+        void onDbPathChanged(const QString &Path);
+        void onUrlChanged(const QString &url);
+        void onPortChanged(const QString &port);
+        void onGraphChanged(const QString &graph);
         void popUpConfigDialog();
 
     private:
         XRockGUI *xrockGui;
-        mars::main_gui::MainGUI *main_gui;
-        QComboBox *cb_backends;
-        QLineEdit *le_db_path;
-        QLineEdit *le_url;
-        QLineEdit *le_port;
-        QLineEdit *le_s_graph;
-        QLineEdit *le_c_graph;
-        QAction* widgetActionUrl;
-        QAction* widgetActionPath;
-        QAction* widgetActionPort;
-        QAction* widgetActionGraphS;
-         QAction* widgetActionGraphC;
-        QAction* ActionLabelUrl;
-        QAction* ActionLabelPath;
-        QAction* ActionLabelPort;
-        QAction* ActionLabelGraph;
+        mars::main_gui::MainGUI *mainGui;
+        QComboBox *cbBackends;
+        QLineEdit *leDbPath;
+        QLineEdit *leUrl;
+        QLineEdit *lePort;
+        QLineEdit *leSgraph;
+        QLineEdit *leCgraph;
+        QAction *widgetActionUrl;
+        QAction *widgetActionPath;
+        QAction *widgetActionPort;
+        QAction *widgetActionGraphS;
+        QAction *widgetActionGraphC;
+        QAction *ActionLabelUrl;
+        QAction *ActionLabelPath;
+        QAction *ActionLabelPort;
+        QAction *ActionLabelGraph;
 
-        QAction* configDialogAction;
-       
+        QAction *configDialogAction;
     };
 
 } // end of namespace xrock_gui_model

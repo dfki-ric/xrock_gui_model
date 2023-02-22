@@ -25,12 +25,12 @@
 using namespace xrock_gui_model;
 
 ToolbarBackend::ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface *gui)
-    : xrockGui(xrockGui), main_gui(dynamic_cast<mars::main_gui::MainGUI *>(gui))
+    : xrockGui(xrockGui), mainGui(dynamic_cast<mars::main_gui::MainGUI *>(gui))
 {
-    QToolBar *toolbar = main_gui->getToolbar("Actions");
+    QToolBar *toolbar = mainGui->getToolbar("Actions");
 
     // Backends
-    cb_backends = new QComboBox;
+    cbBackends = new QComboBox;
     std::vector<std::string> backends;
 
     if (xrockGui->ioLibrary)
@@ -42,100 +42,99 @@ ToolbarBackend::ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface 
         backends.push_back("FileDB");
     }
     for (auto const &e : backends)
-        cb_backends->addItem(QString::fromStdString(e));
-    cb_backends->setCurrentIndex(cb_backends->findText(QString::fromStdString(xrockGui->getBackend()), Qt::MatchFixedString));
-    toolbar->addWidget(cb_backends);
+        cbBackends->addItem(QString::fromStdString(e));
+    cbBackends->setCurrentIndex(cbBackends->findText(QString::fromStdString(xrockGui->getBackend()), Qt::MatchFixedString));
+    toolbar->addWidget(cbBackends);
 
-    connect(cb_backends, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(on_backend_changed(const QString &)));
+    connect(cbBackends, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(onBackendChanged(const QString &)));
 
     // Db Path
     QLabel *label = new QLabel(" DB Path: ");
-    le_db_path = new QLineEdit;
-    le_db_path->setText("modkom/component_db");
-    le_db_path->setFixedWidth(150);
+    leDbPath = new QLineEdit;
+    leDbPath->setText("modkom/component_db");
+    leDbPath->setFixedWidth(150);
     ActionLabelPath = toolbar->addWidget(label);
-    widgetActionPath = toolbar->addWidget(le_db_path);
-    connect(le_db_path, SIGNAL(textChanged(const QString &)), this, SLOT(on_db_path_changed(const QString &)));
+    widgetActionPath = toolbar->addWidget(leDbPath);
+    connect(leDbPath, SIGNAL(textChanged(const QString &)), this, SLOT(onDbPathChanged(const QString &)));
 
     // URL
     label = new QLabel(" URL: ");
-    le_url = new QLineEdit;
-    le_url->setText("http://0.0.0.0");
-    le_url->setFixedWidth(120);
+    leUrl = new QLineEdit;
+    leUrl->setText("http://0.0.0.0");
+    leUrl->setFixedWidth(120);
     ActionLabelUrl = toolbar->addWidget(label);
-    widgetActionUrl = toolbar->addWidget(le_url);
-    connect(le_url, SIGNAL(textChanged(const QString &)), this, SLOT(on_url_changed(const QString &)));
+    widgetActionUrl = toolbar->addWidget(leUrl);
+    connect(leUrl, SIGNAL(textChanged(const QString &)), this, SLOT(onUrlChanged(const QString &)));
 
     // Port
     label = new QLabel(" Port: ");
-    le_port = new QLineEdit;
-    le_port->setText("8183");
-    le_port->setFixedWidth(100);
+    lePort = new QLineEdit;
+    lePort->setText("8183");
+    lePort->setFixedWidth(100);
     ActionLabelPort = toolbar->addWidget(label);
-    widgetActionPort = toolbar->addWidget(le_port);
-    connect(le_port, SIGNAL(textChanged(const QString &)), this, SLOT(on_port_changed(const QString &)));
+    widgetActionPort = toolbar->addWidget(lePort);
+    connect(lePort, SIGNAL(textChanged(const QString &)), this, SLOT(onPortChanged(const QString &)));
 
     // Graph
     label = new QLabel(" Graph: ");
-    le_s_graph = new QLineEdit;
-    le_s_graph->setText("graph_test");
-    le_s_graph->setFixedWidth(120);
-    le_c_graph = new QLineEdit;
-    le_c_graph->setText("graph_test");
-    le_c_graph->setFixedWidth(120);
+    leSgraph = new QLineEdit;
+    leSgraph->setText("graph_test");
+    leSgraph->setFixedWidth(120);
+    leCgraph = new QLineEdit;
+    leCgraph->setText("graph_test");
+    leCgraph->setFixedWidth(120);
     ActionLabelGraph = toolbar->addWidget(label);
-    widgetActionGraphS = toolbar->addWidget(le_s_graph);
-    widgetActionGraphC = toolbar->addWidget(le_c_graph);
-    connect(le_s_graph, SIGNAL(textChanged(const QString &)), this, SLOT(on_graph_changed(const QString &)));
-    connect(le_c_graph, SIGNAL(textChanged(const QString &)), this, SLOT(on_graph_changed(const QString &)));
-    //multidb config dialog icon 
+    widgetActionGraphS = toolbar->addWidget(leSgraph);
+    widgetActionGraphC = toolbar->addWidget(leCgraph);
+    connect(leSgraph, SIGNAL(textChanged(const QString &)), this, SLOT(onGraphChanged(const QString &)));
+    connect(leCgraph, SIGNAL(textChanged(const QString &)), this, SLOT(onGraphChanged(const QString &)));
+
+    // multidb config dialog icon
     configDialogAction = toolbar->addAction("Open MultiDbClient Config");
     const std::string icon = mars::utils::pathJoin(XROCK_DEFAULT_RESOURCES_PATH, "xrock_gui_model/resources/images/");
     configDialogAction->setIcon(QIcon(QString::fromStdString(icon + "config.png")));
     toolbar->addAction(configDialogAction);
     connect(configDialogAction, SIGNAL(triggered()), this, SLOT(popUpConfigDialog()));
 
-
     // Load default values to toolbar widgets if any bundle was selected
     if (xrockGui->ioLibrary)
     {
-        auto default_config = xrockGui->ioLibrary->getDefaultConfig();
-        if (!default_config.empty())
+        auto defaultConfig = xrockGui->ioLibrary->getDefaultConfig();
+        if (!defaultConfig.empty())
         {
-
-            if (default_config.hasKey("Client"))
+            if (defaultConfig.hasKey("Client"))
             {
-                std::string full_url = (std::string)default_config["Client"]["url"];
-                std::string url = full_url.substr(0, full_url.find_last_of(':'));
-                std::string port = full_url.substr(url.size() + 1);
-                le_url->setText(QString::fromStdString(url));
-                le_port->setText(QString::fromStdString(port));
-                le_c_graph->setText(QString::fromStdString((std::string)default_config["Client"]["graph"]));
+                std::string fullUrl = (std::string)defaultConfig["Client"]["url"];
+                std::string url = fullUrl.substr(0, fullUrl.find_last_of(':'));
+                std::string port = fullUrl.substr(url.size() + 1);
+                leUrl->setText(QString::fromStdString(url));
+                lePort->setText(QString::fromStdString(port));
+                leCgraph->setText(QString::fromStdString((std::string)defaultConfig["Client"]["graph"]));
             }
 
-            if (default_config.hasKey("Serverless"))
+            if (defaultConfig.hasKey("Serverless"))
             {
-                le_db_path->setText(QString::fromStdString((std::string)default_config["Serverless"]["path"]));
-                le_s_graph->setText(QString::fromStdString((std::string)default_config["Serverless"]["graph"]));
+                leDbPath->setText(QString::fromStdString((std::string)defaultConfig["Serverless"]["path"]));
+                leSgraph->setText(QString::fromStdString((std::string)defaultConfig["Serverless"]["graph"]));
             }
         }
     }
 
     // switch initial visibility
-    show_toolbar_widgets(QString::fromStdString(xrockGui->getBackend()));
+    showToolbarWidgets(QString::fromStdString(xrockGui->getBackend()));
 }
 
 ToolbarBackend::~ToolbarBackend()
 {
-    delete cb_backends;
-    delete le_db_path;
-    delete le_url;
-    delete le_port;
-    delete le_c_graph;
-    delete le_s_graph;
+    delete cbBackends;
+    delete leDbPath;
+    delete leUrl;
+    delete lePort;
+    delete leCgraph;
+    delete leSgraph;
 }
 
-void ToolbarBackend::hide_toolbar_widgets(const QString &backend)
+void ToolbarBackend::hideToolbarWidgets(const QString &backend)
 {
     if (backend == "Client")
     {
@@ -153,12 +152,12 @@ void ToolbarBackend::hide_toolbar_widgets(const QString &backend)
         widgetActionGraphS->setVisible(false);
         configDialogAction->setVisible(false);
     }
-    else if(backend == "MultiDbClient")
+    else if (backend == "MultiDbClient")
     {
         configDialogAction->setVisible(false);
     }
 }
-void ToolbarBackend::show_toolbar_widgets(const QString &backend)
+void ToolbarBackend::showToolbarWidgets(const QString &backend)
 {
     if (backend == "Client")
     {
@@ -168,7 +167,7 @@ void ToolbarBackend::show_toolbar_widgets(const QString &backend)
         ActionLabelPort->setVisible(true);
         widgetActionGraphC->setVisible(true);
         ActionLabelGraph->setVisible(true);
-        hide_toolbar_widgets("Serverless");
+        hideToolbarWidgets("Serverless");
     }
     else if (backend == "Serverless")
     {
@@ -176,11 +175,12 @@ void ToolbarBackend::show_toolbar_widgets(const QString &backend)
         ActionLabelPath->setVisible(true);
         widgetActionGraphS->setVisible(true);
         ActionLabelGraph->setVisible(true);
-        hide_toolbar_widgets("Client");
+        hideToolbarWidgets("Client");
     }
-    else if (backend == "MultiDbClient"){
-        hide_toolbar_widgets("Serverless");
-        hide_toolbar_widgets("Client");
+    else if (backend == "MultiDbClient")
+    {
+        hideToolbarWidgets("Serverless");
+        hideToolbarWidgets("Client");
         widgetActionGraphS->setVisible(false);
         widgetActionGraphC->setVisible(false);
         ActionLabelGraph->setVisible(false);
@@ -188,74 +188,76 @@ void ToolbarBackend::show_toolbar_widgets(const QString &backend)
     }
 }
 
-void ToolbarBackend::on_backend_changed(const QString &new_backend)
+void ToolbarBackend::onBackendChanged(const QString &newBackend)
 {
-    show_toolbar_widgets(new_backend);
-    if (new_backend == "Serverless")
+    showToolbarWidgets(newBackend);
+    if (newBackend == "Serverless")
     {
         xrockGui->menuAction(static_cast<int>(MenuActions::SELECT_SERVERLESS));
     }
-    else if (new_backend == "Client")
+    else if (newBackend == "Client")
     {
         xrockGui->menuAction(static_cast<int>(MenuActions::SELECT_CLIENT));
     }
-    else if (new_backend == "MultiDbClient")
+    else if (newBackend == "MultiDbClient")
     {
         xrockGui->menuAction(static_cast<int>(MenuActions::SELECT_MULTIDB));
     }
-    else if (new_backend == "FileDB")
+    else if (newBackend == "FileDB")
     {
         xrockGui->menuAction(static_cast<int>(MenuActions::SELECT_FILEDB));
     }
     else
     {
-        throw std::runtime_error("Unhandled backend type " + new_backend.toStdString());
-    } 
+        throw std::runtime_error("Unhandled backend type " + newBackend.toStdString());
+    }
 }
 
-void ToolbarBackend::on_db_path_changed(const QString &db_path)
+void ToolbarBackend::onDbPathChanged(const QString &Path)
 {
-    std::string dbPath = mars::utils::pathJoin(std::getenv("AUTOPROJ_CURRENT_ROOT"), db_path.toStdString());
+    std::string dbPath = mars::utils::pathJoin(std::getenv("AUTOPROJ_CURRENT_ROOT"), Path.toStdString());
     xrockGui->db->set_dbPath(dbPath);
 }
 
-void ToolbarBackend::on_url_changed(const QString &url)
+void ToolbarBackend::onUrlChanged(const QString &url)
 {
-    std::string dbAddress = url.toStdString() + ':' + le_port->text().toStdString();
+    std::string dbAddress = url.toStdString() + ':' + lePort->text().toStdString();
     xrockGui->db->set_dbAddress(dbAddress);
 }
 
-void ToolbarBackend::on_port_changed(const QString &port)
+void ToolbarBackend::onPortChanged(const QString &port)
 {
-    std::string dbAddress = le_url->text().toStdString() + ':' + port.toStdString();
+    std::string dbAddress = leUrl->text().toStdString() + ':' + port.toStdString();
     xrockGui->db->set_dbAddress(dbAddress);
 }
 
-void ToolbarBackend::on_graph_changed(const QString &graph)
+void ToolbarBackend::onGraphChanged(const QString &graph)
 {
     std::string _graph_name = graph.toStdString();
     xrockGui->db->set_dbGraph(_graph_name);
 }
 
-std::string ToolbarBackend::get_dbPath()
+std::string ToolbarBackend::getDbPath()
 {
-    return le_db_path->text().toStdString();
+    return leDbPath->text().toStdString();
 }
 
-std::string ToolbarBackend::get_dbAddress()
+std::string ToolbarBackend::getdbAddress()
 {
-    std::string dbAddress = le_url->text().toStdString() + ':' + le_port->text().toStdString();
+    std::string dbAddress = leUrl->text().toStdString() + ':' + lePort->text().toStdString();
     return dbAddress;
 }
 
-std::string ToolbarBackend::get_graph()
+std::string ToolbarBackend::getGraph()
 {
-    if(cb_backends->currentText() == "Serverless")
-        return le_s_graph->text().toStdString();
-    else if (cb_backends->currentText() == "Client")
-        return le_c_graph->text().toStdString();
+    if (cbBackends->currentText() == "Serverless")
+        return leSgraph->text().toStdString();
+    else if (cbBackends->currentText() == "Client")
+        return leCgraph->text().toStdString();
     else
-        throw std::runtime_error("could not get graph for selected backend: "+cb_backends->currentText().toStdString());
+        throw std::runtime_error("could not get graph for selected backend: " + cbBackends->currentText().toStdString());
+}
+
 void ToolbarBackend::popUpConfigDialog()
 {
     xrockGui->menuAction(static_cast<int>(MenuActions::SELECT_MULTIDB));

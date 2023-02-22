@@ -166,9 +166,9 @@ namespace xrock_gui_model
             if(env["dbType"] == "FileDB")
             {
                 prop_dbAddress.sValue = mars::utils::pathJoin(confDir, prop_dbAddress.sValue);
+                db->set_dbAddress(prop_dbAddress.sValue);
+                dbAddress_paramId = prop_dbAddress.paramId;
             }
-            db->set_dbAddress(prop_dbAddress.sValue);
-            dbAddress_paramId = prop_dbAddress.paramId;
         }
         else
             std::cerr << "Error: Failed to load library cfg_manager!" << std::endl;

@@ -374,282 +374,288 @@ namespace xrock_gui_model
 
     void XRockGUI::menuAction(int action, bool checked)
     {
-        switch (static_cast<MenuActions>(action))
+        try
         {
-        case MenuActions::LOAD_MODEL:
-        {
-            QString fileName = QFileDialog::getOpenFileName(NULL, QObject::tr("Select Model File"),
-                                                            ".", QObject::tr("YAML syntax (*.yml)"), 0,
-                                                            QFileDialog::DontUseNativeDialog);
+            switch (static_cast<MenuActions>(action))
+            {
+            case MenuActions::LOAD_MODEL:
+            {
+                QString fileName = QFileDialog::getOpenFileName(NULL, QObject::tr("Select Model File"),
+                                                                ".", QObject::tr("YAML syntax (*.yml)"), 0,
+                                                                QFileDialog::DontUseNativeDialog);
 
-            ConfigMap map = configmaps::ConfigMap::fromYamlFile(fileName.toStdString());
-            BasicModelHelper::convertFromLegacyModelFormat(map);
-            loadComponentModelFrom(map);
+                ConfigMap map = configmaps::ConfigMap::fromYamlFile(fileName.toStdString());
+                BasicModelHelper::convertFromLegacyModelFormat(map);
+                loadComponentModelFrom(map);
 
-            break;
-        }
-        case MenuActions::SAVE_MODEL:
-        {
-            ComponentModelInterface *model = dynamic_cast<ComponentModelInterface *>(bagelGui->getCurrentModel());
-            if (!model)
-                return;
-            ConfigMap map = model->getModelInfo();
-            QString fileName = QString::fromStdString(map["name"].getString() + ".yml");
-            fileName = QFileDialog::getSaveFileName(NULL, QObject::tr("Select Model File"),
-                                                            fileName, QObject::tr("YAML syntax (*.yml)"), 0,
-                                                            QFileDialog::DontUseNativeDialog);
-            BasicModelHelper::convertToLegacyModelFormat(map);
-            map.toYamlFile(fileName.toStdString());
-            break;
-        }
-        case MenuActions::TOGGLE_MODEL_WIDGET:
-        {
-            if (widget->isHidden())
-            {
-                gui->addDockWidget((void *)widget, 1);
-            }
-            else
-            {
-                gui->removeDockWidget((void *)widget, 1);
-            }
-            break;
-        }
-        case MenuActions::STORE_MODEL_TO_DB: // store model
-        {
-            if (!storeComponentModel())
-            {
-                QMessageBox::critical(nullptr, "Error", "Could not store component model to database", QMessageBox::Ok);
                 break;
             }
-            QMessageBox::information(nullptr, "Success", "Component model has been successfully stored into database", QMessageBox::Ok);
-            break;
-        }
-        case MenuActions::EXPORT_CND:
-        {
-            QString fileName = QFileDialog::getSaveFileName(NULL, QObject::tr("Select Model"),
-                                                            "export.cnd", QObject::tr("YAML syntax (*.cnd)"), 0,
-                                                            QFileDialog::DontUseNativeDialog);
-            if (!fileName.isNull())
+            case MenuActions::SAVE_MODEL:
             {
-                ConfigMap map = bagelGui->createConfigMap();
-                exportCnd(map, fileName.toStdString());
+                ComponentModelInterface *model = dynamic_cast<ComponentModelInterface *>(bagelGui->getCurrentModel());
+                if (!model)
+                    return;
+                ConfigMap map = model->getModelInfo();
+                QString fileName = QString::fromStdString(map["name"].getString() + ".yml");
+                fileName = QFileDialog::getSaveFileName(NULL, QObject::tr("Select Model File"),
+                                                        fileName, QObject::tr("YAML syntax (*.yml)"), 0,
+                                                        QFileDialog::DontUseNativeDialog);
+                BasicModelHelper::convertToLegacyModelFormat(map);
+                map.toYamlFile(fileName.toStdString());
+                break;
             }
-            break;
-        }
-        case MenuActions::ADD_COMPONENT_FROM_DB: // add component from database
-        {
-            ImportDialog id(this, false);
-            id.exec();
-            break;
-        }
-        case MenuActions::NEW_MODEL: // create new, empty model
-        {
-            newComponentModel();
-            break;
-        }
-        case MenuActions::LOAD_MODEL_FROM_DB: // load model from database
-        {
-            requestModel();
-            break;
-        }
-        case MenuActions::EDIT_LOCAL_MAP:
-        {
-            ComponentModelInterface *model = dynamic_cast<ComponentModelInterface *>(bagelGui->getCurrentModel());
-            if (!model)
-                return;
-            ConfigMap basicModel = model->getModelInfo();
+            case MenuActions::TOGGLE_MODEL_WIDGET:
             {
-                ConfigureDialog cd(&basicModel, env, "Basic Model", true, true);
-                cd.resize(400, 400);
-                cd.exec();
-            }
-            model->setModelInfo(basicModel);
-            break;
-        }
-        case MenuActions::CREATE_BAGEL_MOTION_CONTROL_TASK:
-        {
-            // 20221102 MS: Why is this here? Has nothing todo with XROCK.
-            ModelInterface *model = bagelGui->getCurrentModel();
-            if (model)
-            {
-                ConfigMap localMap = model->getModelInfo();
-                std::string domain = "SOFTWARE";
-                std::string type = "system_modelling::task_graph::Task";
-                std::string name = "behavior_graph::MotionControlTask.yml";
-                std::string version = localMap["name"];
-                std::string graphPath = "tmp/bagel/" + version;
-                std::string graphFile;
-                handleFilenamePrefix(&graphPath, env["wsd"].getString());
-                createDirectory(graphPath);
-                graphFile = graphPath + "/" + version + ".yml";
-                bagelGui->setLoadPath(graphPath);
-                if (pathExists(graphFile))
+                if (widget->isHidden())
                 {
-                    bagelGui->load(graphFile);
+                    gui->addDockWidget((void *)widget, 1);
                 }
                 else
                 {
-                    bagelGui->createView("bagel", version);
+                    gui->removeDockWidget((void *)widget, 1);
                 }
-                std::string smurfPath = "tmp/models/assembly/";
-                handleFilenamePrefix(&smurfPath, env["wsd"].getString());
-                smurfPath += version + "/" + localMap["versions"][0]["name"].getString() + "/smurf/" + version + ".smurf";
-                BagelModel *bagelModel = dynamic_cast<BagelModel *>(bagelGui->getCurrentModel());
-                if (bagelModel)
+                break;
+            }
+            case MenuActions::STORE_MODEL_TO_DB: // store model
+            {
+                if (!storeComponentModel())
                 {
-                    bagelModel->importSmurf(smurfPath);
-                    ConfigMap map;
-                    map["domain"] = domain;
-                    map["name"] = name;
-                    map["type"] = type;
-                    map["versions"][0]["name"] = version;
-                    map["versions"][0]["maturity"] = "INPROGRESS";
-                    handleFilenamePrefix(&graphFile, getCurrentWorkingDir());
-
-                    map["graphFile"] = graphFile;
-                    ConfigMap interfaces;
-                    interfaces["i"][0]["direction"] = "OUTGOING";
-                    interfaces["i"][0]["name"] = "joint_commands";
-                    interfaces["i"][0]["type"] = "::base::samples::Joints";
-                    map["interfaces"] = interfaces["i"].toYamlString();
-
-                    map["versions"][0]["defaultConfiguration"]["data"]["config"]["graphFilename"] = graphFile;
-                    model->setModelInfo(map);
+                    QMessageBox::critical(nullptr, "Error", "Could not store component model to database", QMessageBox::Ok);
+                    break;
                 }
+                QMessageBox::information(nullptr, "Success", "Component model has been successfully stored into database", QMessageBox::Ok);
+                break;
             }
-            break;
-        }
-        case MenuActions::CREATE_BAGEL_MODEL:
-        {
-            // 20221102 MS: Why is this here? Has nothing todo with XROCK.
-            createBagelModel();
-            break;
-        }
-        case MenuActions::CREATE_BAGEL_TASK:
-        {
-            // 20221102 MS: Why is this here? Has nothing todo with XROCK.
-            createBagelTask();
-            break;
-        }
-        case MenuActions::EDIT_MODEL_DESCRIPTION:
-        {
-            // TODO: Once we have a toplvl property, we would not need this anymore. Then the ComponentModelEditorWidget would have a field for it.
-            break;
-        }
-        case MenuActions::IMPORT_CND:
-        {
-            QString fileName = QFileDialog::getOpenFileName(NULL, QObject::tr("Select Model"),
-                                                            ".", QObject::tr("YAML syntax (*.cnd)"), 0,
-                                                            QFileDialog::DontUseNativeDialog);
-            if (!fileName.isNull())
+            case MenuActions::EXPORT_CND:
             {
-                importCND(fileName.toStdString());
-            }
-            break;
-        }
-        case MenuActions::SELECT_SERVERLESS: // Serverless
-        {
-            if (ioLibrary)
-            {
-                env["dbType"] = "Serverless";
-                env["dbPath"] = toolbarBackend->get_dbPath();
-                db.reset(ioLibrary->getDB(env));
-                db->set_dbGraph(toolbarBackend->get_graph());
-            }
-            break;
-        }
-        case MenuActions::SELECT_CLIENT: // Client
-        {
-            if (ioLibrary)
-            {
-                env["dbType"] = "Client";
-                db.reset(ioLibrary->getDB(env));
-                db->set_dbGraph(toolbarBackend->get_graph());
-                db->set_dbAddress(toolbarBackend->get_dbAddress());
-                if (!db->isConnected())
+                QString fileName = QFileDialog::getSaveFileName(NULL, QObject::tr("Select Model"),
+                                                                "export.cnd", QObject::tr("YAML syntax (*.cnd)"), 0,
+                                                                QFileDialog::DontUseNativeDialog);
+                if (!fileName.isNull())
                 {
-                    std::string msg = "Server is not running! Please run server using command:\njsondb -d " + toolbarBackend->get_dbPath();
-                    QMessageBox::warning(nullptr, "Warning", msg.c_str(), QMessageBox::Ok);
+                    ConfigMap map = bagelGui->createConfigMap();
+                    exportCnd(map, fileName.toStdString());
                 }
+                break;
             }
-            break;
-        }
-        case MenuActions::SELECT_MULTIDB: // MultiDbClient
-        {
-            if (ioLibrary)
+            case MenuActions::ADD_COMPONENT_FROM_DB: // add component from database
             {
-                std::string multidb_config_path = bagelGui->getConfigDir() + "/MultiDBConfig.yml";
-                MultiDBConfigDialog dialog(multidb_config_path, ioLibrary);
-                dialog.exec();
-                if(mars::utils::pathExists(multidb_config_path))
+                ImportDialog id(this, false);
+                id.exec();
+                break;
+            }
+            case MenuActions::NEW_MODEL: // create new, empty model
+            {
+                newComponentModel();
+                break;
+            }
+            case MenuActions::LOAD_MODEL_FROM_DB: // load model from database
+            {
+                requestModel();
+                break;
+            }
+            case MenuActions::EDIT_LOCAL_MAP:
+            {
+                ComponentModelInterface *model = dynamic_cast<ComponentModelInterface *>(bagelGui->getCurrentModel());
+                if (!model)
+                    return;
+                ConfigMap basicModel = model->getModelInfo();
                 {
-                    ConfigMap multidb_config = configmaps::ConfigMap::fromYamlFile(multidb_config_path);
-                    std::cout << "multidb config after finish: \n"
-                            << multidb_config.toYamlString() << std::endl;
-                    env["dbType"] = "MultiDbClient";
-                    env["multiDBConfig"] = multidb_config.toJsonString();
-                    db.reset(ioLibrary->getDB(env));
-                    if (multidb_config["main_server"]["type"] == "Client" or
-                        std::any_of(multidb_config["import_servers"].begin(), multidb_config["import_servers"].end(), [](ConfigItem &is)
-                                    { return is["type"] == "Client"; }))
+                    ConfigureDialog cd(&basicModel, env, "Basic Model", true, true);
+                    cd.resize(400, 400);
+                    cd.exec();
+                }
+                model->setModelInfo(basicModel);
+                break;
+            }
+            case MenuActions::CREATE_BAGEL_MOTION_CONTROL_TASK:
+            {
+                // 20221102 MS: Why is this here? Has nothing todo with XROCK.
+                ModelInterface *model = bagelGui->getCurrentModel();
+                if (model)
+                {
+                    ConfigMap localMap = model->getModelInfo();
+                    std::string domain = "SOFTWARE";
+                    std::string type = "system_modelling::task_graph::Task";
+                    std::string name = "behavior_graph::MotionControlTask.yml";
+                    std::string version = localMap["name"];
+                    std::string graphPath = "tmp/bagel/" + version;
+                    std::string graphFile;
+                    handleFilenamePrefix(&graphPath, env["wsd"].getString());
+                    createDirectory(graphPath);
+                    graphFile = graphPath + "/" + version + ".yml";
+                    bagelGui->setLoadPath(graphPath);
+                    if (pathExists(graphFile))
                     {
-                        std::string msg = "MultiDB is requesting a client server! Please run server using command:\njsondb -d YOUR_DB_PATH";
+                        bagelGui->load(graphFile);
+                    }
+                    else
+                    {
+                        bagelGui->createView("bagel", version);
+                    }
+                    std::string smurfPath = "tmp/models/assembly/";
+                    handleFilenamePrefix(&smurfPath, env["wsd"].getString());
+                    smurfPath += version + "/" + localMap["versions"][0]["name"].getString() + "/smurf/" + version + ".smurf";
+                    BagelModel *bagelModel = dynamic_cast<BagelModel *>(bagelGui->getCurrentModel());
+                    if (bagelModel)
+                    {
+                        bagelModel->importSmurf(smurfPath);
+                        ConfigMap map;
+                        map["domain"] = domain;
+                        map["name"] = name;
+                        map["type"] = type;
+                        map["versions"][0]["name"] = version;
+                        map["versions"][0]["maturity"] = "INPROGRESS";
+                        handleFilenamePrefix(&graphFile, getCurrentWorkingDir());
+
+                        map["graphFile"] = graphFile;
+                        ConfigMap interfaces;
+                        interfaces["i"][0]["direction"] = "OUTGOING";
+                        interfaces["i"][0]["name"] = "joint_commands";
+                        interfaces["i"][0]["type"] = "::base::samples::Joints";
+                        map["interfaces"] = interfaces["i"].toYamlString();
+
+                        map["versions"][0]["defaultConfiguration"]["data"]["config"]["graphFilename"] = graphFile;
+                        model->setModelInfo(map);
+                    }
+                }
+                break;
+            }
+            case MenuActions::CREATE_BAGEL_MODEL:
+            {
+                // 20221102 MS: Why is this here? Has nothing todo with XROCK.
+                createBagelModel();
+                break;
+            }
+            case MenuActions::CREATE_BAGEL_TASK:
+            {
+                // 20221102 MS: Why is this here? Has nothing todo with XROCK.
+                createBagelTask();
+                break;
+            }
+            case MenuActions::EDIT_MODEL_DESCRIPTION:
+            {
+                // TODO: Once we have a toplvl property, we would not need this anymore. Then the ComponentModelEditorWidget would have a field for it.
+                break;
+            }
+            case MenuActions::IMPORT_CND:
+            {
+                QString fileName = QFileDialog::getOpenFileName(NULL, QObject::tr("Select Model"),
+                                                                ".", QObject::tr("YAML syntax (*.cnd)"), 0,
+                                                                QFileDialog::DontUseNativeDialog);
+                if (!fileName.isNull())
+                {
+                    importCND(fileName.toStdString());
+                }
+                break;
+            }
+            case MenuActions::SELECT_SERVERLESS: // Serverless
+            {
+                if (ioLibrary)
+                {
+                    env["dbType"] = "Serverless";
+                    env["dbPath"] = toolbarBackend->get_dbPath();
+                    db.reset(ioLibrary->getDB(env));
+                    db->set_dbGraph(toolbarBackend->get_graph());
+                }
+                break;
+            }
+            case MenuActions::SELECT_CLIENT: // Client
+            {
+                if (ioLibrary)
+                {
+                    env["dbType"] = "Client";
+                    db.reset(ioLibrary->getDB(env));
+                    db->set_dbGraph(toolbarBackend->get_graph());
+                    db->set_dbAddress(toolbarBackend->get_dbAddress());
+                    if (!db->isConnected())
+                    {
+                        std::string msg = "Server is not running! Please run server using command:\njsondb -d " + toolbarBackend->get_dbPath();
                         QMessageBox::warning(nullptr, "Warning", msg.c_str(), QMessageBox::Ok);
                     }
                 }
+                break;
             }
-            break;
-        
-        }
-        case MenuActions::SELECT_FILEDB: // FileDB
-        {
-            if (!ioLibrary)
-            {
-               db.reset(new FileDB());
-            }
-            break;
-        }
-        case MenuActions::RELOAD_MODEL_FROM_DB: // Reload
-        {
-            if (ModelInterface* m = bagelGui->getCurrentModel())
-            {
-                ConfigMap currentModel = m->getModelInfo();
-                bagelGui->closeCurrentTab();
 
-                if (currentModel.hasKey("name"))
+            case MenuActions::SELECT_MULTIDB: // MultiDbClient
+            {
+                if (ioLibrary)
                 {
-                    // Reload component model from DB (creating a new TAB)
-                    loadComponentModel(currentModel["domain"], currentModel["name"], currentModel["versions"][0]["name"]);
+                    std::string multidb_config_path = bagelGui->getConfigDir() + "/MultiDBConfig.yml";
+                    MultiDBConfigDialog dialog(multidb_config_path, ioLibrary);
+                    dialog.exec();
+                    if (mars::utils::pathExists(multidb_config_path))
+                    {
+                        ConfigMap multidb_config = configmaps::ConfigMap::fromYamlFile(multidb_config_path);
+                        std::cout << "multidb config after finish: \n"
+                                  << multidb_config.toYamlString() << std::endl;
+                        env["dbType"] = "MultiDbClient";
+                        env["multiDBConfig"] = multidb_config.toJsonString();
+                        db.reset(ioLibrary->getDB(env));
+                        if (multidb_config["main_server"]["type"] == "Client" or
+                            std::any_of(multidb_config["import_servers"].begin(), multidb_config["import_servers"].end(), [](ConfigItem &is)
+                                        { return is["type"] == "Client"; }))
+                        {
+                            std::string msg = "MultiDB is requesting a client server! Please run server using command:\njsondb -d YOUR_DB_PATH";
+                            QMessageBox::warning(nullptr, "Warning", msg.c_str(), QMessageBox::Ok);
+                        }
+                    }
                 }
-                else
-                    QMessageBox::warning(nullptr, "Warning", "Nothing to reload.", QMessageBox::Ok);
+                break;
             }
-
-            break;
-        }
-        case MenuActions::EXPORT_CND_TFENHANCE:
-        {
-            QString urdf_file = QFileDialog::getOpenFileName(NULL, QObject::tr("Select urdf_file"),
-                                                             ".", QObject::tr("YAML syntax (*.urdf)"), 0,
-                                                             QFileDialog::DontUseNativeDialog);
-
-            QString fileName = QFileDialog::getSaveFileName(NULL, QObject::tr("Select Model"),
-                                                            "export.cnd", QObject::tr("YAML syntax (*.cnd)"), 0,
-                                                            QFileDialog::DontUseNativeDialog);
-            if (!urdf_file.isNull())
+            case MenuActions::SELECT_FILEDB: // FileDB
             {
-                ConfigMap map = bagelGui->createConfigMap();
-                exportCnd(map, fileName.toStdString(), urdf_file.toStdString());
+                if (!ioLibrary)
+                {
+                    db.reset(new FileDB());
+                }
+                break;
             }
-            break;
+            case MenuActions::RELOAD_MODEL_FROM_DB: // Reload
+            {
+                if (ModelInterface *m = bagelGui->getCurrentModel())
+                {
+                    ConfigMap currentModel = m->getModelInfo();
+                    bagelGui->closeCurrentTab();
+
+                    if (currentModel.hasKey("name"))
+                    {
+                        // Reload component model from DB (creating a new TAB)
+                        loadComponentModel(currentModel["domain"], currentModel["name"], currentModel["versions"][0]["name"]);
+                    }
+                    else
+                        QMessageBox::warning(nullptr, "Warning", "Nothing to reload.", QMessageBox::Ok);
+                }
+
+                break;
+            }
+            case MenuActions::EXPORT_CND_TFENHANCE:
+            {
+                QString urdf_file = QFileDialog::getOpenFileName(NULL, QObject::tr("Select urdf_file"),
+                                                                 ".", QObject::tr("YAML syntax (*.urdf)"), 0,
+                                                                 QFileDialog::DontUseNativeDialog);
+
+                QString fileName = QFileDialog::getSaveFileName(NULL, QObject::tr("Select Model"),
+                                                                "export.cnd", QObject::tr("YAML syntax (*.cnd)"), 0,
+                                                                QFileDialog::DontUseNativeDialog);
+                if (!urdf_file.isNull())
+                {
+                    ConfigMap map = bagelGui->createConfigMap();
+                    exportCnd(map, fileName.toStdString(), urdf_file.toStdString());
+                }
+                break;
+            }
+            default:
+            {
+                throw std::out_of_range("Cannot handle action " + std::to_string(action));
+            }
+            }
         }
-        default:
+        catch (const std::exception &e)
         {
-            throw std::out_of_range("Cannot handle action " + std::to_string(action));
-        }
+            QMessageBox::critical(nullptr, "Error", QString::fromStdString(e.what()), QMessageBox::Ok);
         }
     }
-
     void XRockGUI::createBagelTask()
     {
         ModelInterface *model = bagelGui->getCurrentModel();

@@ -88,6 +88,12 @@ ToolbarBackend::ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface 
     widgetActionGraphC = toolbar->addWidget(le_c_graph);
     connect(le_s_graph, SIGNAL(textChanged(const QString &)), this, SLOT(on_graph_changed(const QString &)));
     connect(le_c_graph, SIGNAL(textChanged(const QString &)), this, SLOT(on_graph_changed(const QString &)));
+    //multidb config dialog icon 
+    configDialogAction = toolbar->addAction("Open MultiDbClient Config");
+    const std::string icon = mars::utils::pathJoin(XROCK_DEFAULT_RESOURCES_PATH, "xrock_gui_model/resources/images/");
+    configDialogAction->setIcon(QIcon(QString::fromStdString(icon + "config.png")));
+    toolbar->addAction(configDialogAction);
+    connect(configDialogAction, SIGNAL(triggered()), this, SLOT(popUpConfigDialog()));
 
 
     // Load default values to toolbar widgets if any bundle was selected
@@ -138,13 +144,18 @@ void ToolbarBackend::hide_toolbar_widgets(const QString &backend)
         widgetActionPort->setVisible(false);
         ActionLabelPort->setVisible(false);
         widgetActionGraphC->setVisible(false);
+        configDialogAction->setVisible(false);
     }
     else if (backend == "Serverless")
     {
         widgetActionPath->setVisible(false);
         ActionLabelPath->setVisible(false);
         widgetActionGraphS->setVisible(false);
-
+        configDialogAction->setVisible(false);
+    }
+    else if(backend == "MultiDbClient")
+    {
+        configDialogAction->setVisible(false);
     }
 }
 void ToolbarBackend::show_toolbar_widgets(const QString &backend)
@@ -173,6 +184,7 @@ void ToolbarBackend::show_toolbar_widgets(const QString &backend)
         widgetActionGraphS->setVisible(false);
         widgetActionGraphC->setVisible(false);
         ActionLabelGraph->setVisible(false);
+        configDialogAction->setVisible(true);
     }
 }
 
@@ -244,4 +256,7 @@ std::string ToolbarBackend::get_graph()
         return le_c_graph->text().toStdString();
     else
         throw std::runtime_error("could not get graph for selected backend: "+cb_backends->currentText().toStdString());
+void ToolbarBackend::popUpConfigDialog()
+{
+    xrockGui->menuAction(static_cast<int>(MenuActions::SELECT_MULTIDB));
 }

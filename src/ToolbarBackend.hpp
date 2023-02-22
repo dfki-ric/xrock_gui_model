@@ -49,6 +49,7 @@ namespace xrock_gui_model
         void on_url_changed(const QString &url);
         void on_port_changed(const QString &port);
         void on_graph_changed(const QString &graph);
+        void popUpConfigDialog();
 
     private:
         XRockGUI *xrockGui;
@@ -68,6 +69,8 @@ namespace xrock_gui_model
         QAction* ActionLabelPath;
         QAction* ActionLabelPort;
         QAction* ActionLabelGraph;
+
+        QAction* configDialogAction;
        
     };
 

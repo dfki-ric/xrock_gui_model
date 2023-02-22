@@ -77,12 +77,18 @@ ToolbarBackend::ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface 
 
     // Graph
     label = new QLabel(" Graph: ");
-    le_graph = new QLineEdit;
-    le_graph->setText("graph_test");
-    le_graph->setFixedWidth(120);
+    le_s_graph = new QLineEdit;
+    le_s_graph->setText("graph_test");
+    le_s_graph->setFixedWidth(120);
+    le_c_graph = new QLineEdit;
+    le_c_graph->setText("graph_test");
+    le_c_graph->setFixedWidth(120);
     ActionLabelGraph = toolbar->addWidget(label);
-    widgetActionGraph = toolbar->addWidget(le_graph);
-    connect(le_graph, SIGNAL(textChanged(const QString &)), this, SLOT(on_graph_changed(const QString &)));
+    widgetActionGraphS = toolbar->addWidget(le_s_graph);
+    widgetActionGraphC = toolbar->addWidget(le_c_graph);
+    connect(le_s_graph, SIGNAL(textChanged(const QString &)), this, SLOT(on_graph_changed(const QString &)));
+    connect(le_c_graph, SIGNAL(textChanged(const QString &)), this, SLOT(on_graph_changed(const QString &)));
+
 
     // Load default values to toolbar widgets if any bundle was selected
     if (xrockGui->ioLibrary)
@@ -90,11 +96,7 @@ ToolbarBackend::ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface 
         auto default_config = xrockGui->ioLibrary->getDefaultConfig();
         if (!default_config.empty())
         {
-            if (default_config.hasKey("Serverless"))
-            {
-                le_db_path->setText(QString::fromStdString((std::string)default_config["Serverless"]["path"]));
-                le_graph->setText(QString::fromStdString((std::string)default_config["Serverless"]["graph"]));
-            }
+
             if (default_config.hasKey("Client"))
             {
                 std::string full_url = (std::string)default_config["Client"]["url"];
@@ -102,14 +104,19 @@ ToolbarBackend::ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface 
                 std::string port = full_url.substr(url.size() + 1);
                 le_url->setText(QString::fromStdString(url));
                 le_port->setText(QString::fromStdString(port));
-                le_graph->setText(QString::fromStdString((std::string)default_config["Client"]["graph"]));
+                le_c_graph->setText(QString::fromStdString((std::string)default_config["Client"]["graph"]));
+            }
+
+            if (default_config.hasKey("Serverless"))
+            {
+                le_db_path->setText(QString::fromStdString((std::string)default_config["Serverless"]["path"]));
+                le_s_graph->setText(QString::fromStdString((std::string)default_config["Serverless"]["graph"]));
             }
         }
     }
 
     // switch initial visibility
     show_toolbar_widgets(QString::fromStdString(xrockGui->getBackend()));
-
 }
 
 ToolbarBackend::~ToolbarBackend()
@@ -118,7 +125,8 @@ ToolbarBackend::~ToolbarBackend()
     delete le_db_path;
     delete le_url;
     delete le_port;
-    delete le_graph;
+    delete le_c_graph;
+    delete le_s_graph;
 }
 
 void ToolbarBackend::hide_toolbar_widgets(const QString &backend)
@@ -129,11 +137,14 @@ void ToolbarBackend::hide_toolbar_widgets(const QString &backend)
         ActionLabelUrl->setVisible(false);
         widgetActionPort->setVisible(false);
         ActionLabelPort->setVisible(false);
+        widgetActionGraphC->setVisible(false);
     }
     else if (backend == "Serverless")
     {
         widgetActionPath->setVisible(false);
         ActionLabelPath->setVisible(false);
+        widgetActionGraphS->setVisible(false);
+
     }
 }
 void ToolbarBackend::show_toolbar_widgets(const QString &backend)
@@ -144,22 +155,23 @@ void ToolbarBackend::show_toolbar_widgets(const QString &backend)
         ActionLabelUrl->setVisible(true);
         widgetActionPort->setVisible(true);
         ActionLabelPort->setVisible(true);
-        widgetActionGraph->setVisible(true);
+        widgetActionGraphC->setVisible(true);
         ActionLabelGraph->setVisible(true);
         hide_toolbar_widgets("Serverless");
     }
     else if (backend == "Serverless")
     {
-        widgetActionGraph->setVisible(true);
-        ActionLabelGraph->setVisible(true);
         widgetActionPath->setVisible(true);
         ActionLabelPath->setVisible(true);
+        widgetActionGraphS->setVisible(true);
+        ActionLabelGraph->setVisible(true);
         hide_toolbar_widgets("Client");
     }
     else if (backend == "MultiDbClient"){
         hide_toolbar_widgets("Serverless");
         hide_toolbar_widgets("Client");
-        widgetActionGraph->setVisible(false);
+        widgetActionGraphS->setVisible(false);
+        widgetActionGraphC->setVisible(false);
         ActionLabelGraph->setVisible(false);
     }
 }
@@ -215,7 +227,6 @@ void ToolbarBackend::on_graph_changed(const QString &graph)
 
 std::string ToolbarBackend::get_dbPath()
 {
-    std::cout << le_db_path->text().toStdString() << std::endl;
     return le_db_path->text().toStdString();
 }
 
@@ -227,5 +238,10 @@ std::string ToolbarBackend::get_dbAddress()
 
 std::string ToolbarBackend::get_graph()
 {
-    return le_graph->text().toStdString();
+    if(cb_backends->currentText() == "Serverless")
+        return le_s_graph->text().toStdString();
+    else if (cb_backends->currentText() == "Client")
+        return le_c_graph->text().toStdString();
+    else
+        throw std::runtime_error("could not get graph for selected backend: "+cb_backends->currentText().toStdString());
 }

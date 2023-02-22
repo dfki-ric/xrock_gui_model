@@ -679,6 +679,7 @@ namespace xrock_gui_model
     {
         // NOTE: bagelInfo holds the data which might have been altered.
         ConfigMap mi(basicModel);
+        BasicModelHelper::clearExportedInterfacesInModel(mi);
 
         // NOTE: The toplevel properties have already been updated at this point (see ComponentModelEditorWidget)
         // Update inner components & configuration based on nodeMap

@@ -33,9 +33,9 @@ namespace xrock_gui_model
                                                    const std::string &version,
                                                    const bool limit = false) = 0;
         virtual bool storeModel(const configmaps::ConfigMap &map) = 0;
-        virtual void set_dbGraph(const std::string &_dbGraph){};
-        virtual void set_dbAddress(const std::string &_dbAddress){};
-        virtual void set_dbPath(const fs::path&_dbPath){};
+        virtual void setDbGraph(const std::string &_dbGraph){};
+        virtual void setDbAddress(const std::string &_dbAddress){};
+        virtual void setDbPath(const fs::path&_dbPath){};
         virtual bool isConnected() { return false; };
 
         virtual configmaps::ConfigMap getPropertiesOfComponentModel() = 0;

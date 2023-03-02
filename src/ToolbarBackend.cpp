@@ -216,25 +216,25 @@ void ToolbarBackend::onBackendChanged(const QString &newBackend)
 void ToolbarBackend::onDbPathChanged(const QString &Path)
 {
     std::string dbPath = mars::utils::pathJoin(std::getenv("AUTOPROJ_CURRENT_ROOT"), Path.toStdString());
-    xrockGui->db->set_dbPath(dbPath);
+    xrockGui->db->setDbPath(dbPath);
 }
 
 void ToolbarBackend::onUrlChanged(const QString &url)
 {
     std::string dbAddress = url.toStdString() + ':' + lePort->text().toStdString();
-    xrockGui->db->set_dbAddress(dbAddress);
+    xrockGui->db->setDbAddress(dbAddress);
 }
 
 void ToolbarBackend::onPortChanged(const QString &port)
 {
     std::string dbAddress = leUrl->text().toStdString() + ':' + port.toStdString();
-    xrockGui->db->set_dbAddress(dbAddress);
+    xrockGui->db->setDbAddress(dbAddress);
 }
 
 void ToolbarBackend::onGraphChanged(const QString &graph)
 {
     std::string _graph_name = graph.toStdString();
-    xrockGui->db->set_dbGraph(_graph_name);
+    xrockGui->db->setDbGraph(_graph_name);
 }
 
 std::string ToolbarBackend::getDbPath()
@@ -242,7 +242,7 @@ std::string ToolbarBackend::getDbPath()
     return leDbPath->text().toStdString();
 }
 
-std::string ToolbarBackend::getdbAddress()
+std::string ToolbarBackend::getDbAddress()
 {
     std::string dbAddress = leUrl->text().toStdString() + ':' + lePort->text().toStdString();
     return dbAddress;

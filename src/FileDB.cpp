@@ -210,7 +210,7 @@ namespace xrock_gui_model
         return true;
     }
 
-    void FileDB::set_dbAddress(const std::string &db_Address)
+    void FileDB::setDbAddress(const std::string &db_Address)
     {
         dbAddress = db_Address;
     }

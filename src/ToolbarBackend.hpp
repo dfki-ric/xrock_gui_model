@@ -36,7 +36,7 @@ namespace xrock_gui_model
         virtual ~ToolbarBackend();
         /** \brief getters */
         std::string getDbPath();
-        std::string getdbAddress();
+        std::string getDbAddress();
         std::string getGraph();
 
     private:

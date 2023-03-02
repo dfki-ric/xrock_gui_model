@@ -137,7 +137,7 @@ namespace xrock_gui_model
                     {
                         env["dbType"] = "Client";
                         db.reset(ioLibrary->getDB(env));
-                        db->set_dbAddress(config["url"]);
+                        db->setDbAddress(config["url"]);
                     }
                     else if(dbType == "MultiDbClient")
                     {
@@ -166,7 +166,7 @@ namespace xrock_gui_model
             if(env["dbType"] == "FileDB")
             {
                 prop_dbAddress.sValue = mars::utils::pathJoin(confDir, prop_dbAddress.sValue);
-                db->set_dbAddress(prop_dbAddress.sValue);
+                db->setDbAddress(prop_dbAddress.sValue);
                 dbAddress_paramId = prop_dbAddress.paramId;
             }
         }
@@ -556,7 +556,7 @@ namespace xrock_gui_model
                     env["dbType"] = "Serverless";
                     env["dbPath"] = toolbarBackend->getDbPath();
                     db.reset(ioLibrary->getDB(env));
-                    db->set_dbGraph(toolbarBackend->getGraph());
+                    db->setDbGraph(toolbarBackend->getGraph());
                 }
                 break;
             }
@@ -566,8 +566,8 @@ namespace xrock_gui_model
                 {
                     env["dbType"] = "Client";
                     db.reset(ioLibrary->getDB(env));
-                    db->set_dbGraph(toolbarBackend->getGraph());
-                    db->set_dbAddress(toolbarBackend->getdbAddress());
+                    db->setDbGraph(toolbarBackend->getGraph());
+                    db->setDbAddress(toolbarBackend->getDbAddress());
                     if (!db->isConnected())
                     {
                         std::string msg = "Server is not running! Please run server using command:\njsondb -d " + toolbarBackend->getDbPath();
@@ -1528,7 +1528,7 @@ namespace xrock_gui_model
     {
         if (property.paramId == dbAddress_paramId)
         {
-            db->set_dbAddress(property.sValue);
+            db->setDbAddress(property.sValue);
         }
         else if (property.paramId == dbUser_paramId)
         {

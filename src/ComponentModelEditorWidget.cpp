@@ -326,7 +326,15 @@ namespace xrock_gui_model
             it.second = get_prop_widget_value(key);
         }
         // Special property 'data'
-        updatedMap["data"] = ConfigMap::fromYamlString(annotations->toPlainText().toStdString());
+        ConfigMap annoMap = ConfigMap::fromYamlString(annotations->toPlainText().toStdString());
+        if(updatedMap["versions"][0].hasKey("data"))
+        {
+            updatedMap["versions"][0]["data"].updateMap(annoMap);
+        }
+        else
+        {
+            updatedMap["versions"][0]["data"] = annoMap;
+        }
         currentModel->setModelInfo(updatedMap);
     }
 
@@ -443,6 +451,7 @@ namespace xrock_gui_model
         {
             dataStatusLabel->setText("invalid Yaml syntax");
             dataStatusLabel->setStyleSheet("QLabel { background-color: red; color: white;}");
+            return;
         }
         // If the content is valid, we can call updateModel()
         updateModel();

@@ -903,10 +903,14 @@ namespace xrock_gui_model
     {
         ConfigMap node = *(bagelGui->getNodeMap(name));
         ConfigMap config;
-        if (!node.hasKey("configuration"))
-            return;
-        // Preload the current configuration
-        config = node["configuration"]["data"];
+        if(node.hasKey("configuration"))
+        {
+            // Preload the current configuration
+            if(node["configuration"].hasKey("data"))
+            {
+                config = node["configuration"]["data"];
+            }
+        }
         {
             ConfigureDialog cd(&config, env, node["model"]["name"], true, true);
             cd.resize(400, 400);

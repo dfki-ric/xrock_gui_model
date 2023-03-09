@@ -379,6 +379,7 @@ namespace xrock_gui_model
                         const configmaps::ConfigMap &edge)
     {
         ConfigMap map = edge;
+        std::cout << "add edge " << edge.toJsonString() << std::endl;
         return addEdge(edgeId, &map);
     }
 
@@ -474,6 +475,17 @@ namespace xrock_gui_model
             }
             // Update node
             it->second = node;
+            return true;
+        }
+        return false;
+    }
+
+    bool ComponentModelInterface::updateEdge(unsigned long edgeId, configmaps::ConfigMap &edge)
+    {
+        auto it = edgeMap.find(edgeId);
+        if (it != edgeMap.end())
+        {
+            it->second = edge;
             return true;
         }
         return false;
@@ -612,7 +624,7 @@ namespace xrock_gui_model
                     edge["fromNodeOutput"] = it["from"]["interface"];
                     edge["toNode"] = it["to"]["name"];
                     edge["toNodeInput"] = it["to"]["interface"];
-                    if (!edge.hasKey("name"))
+                    if (!it.hasKey("name") or (it.hasKey("name") && it["name"] == "UNKNOWN"))
                     {
                         // If no name exists, we derive a new name
                         edge["name"] = edge["fromNode"].getString()
@@ -620,10 +632,45 @@ namespace xrock_gui_model
                             + "_" + edge["toNode"].getString()
                             + "_" + edge["toNodeInput"].getString();
                     }
-                    if(edge.hasKey("data") && edge["data"].isMap() && edge["data"].hasKey("decouple"))
-                    {
-                        edge["decouple"] = edge["data"]["decouple"];
+                    else {
+                        edge["name"] = it["name"];
                     }
+
+                auto getInterfaceDataType = [&](const std::string& interface_name)->std::string{ 
+
+                    for(auto node : nodes){
+                            ConfigMap currentMap = *bagelGui->getNodeMap(node["name"]);
+                            std::cout << "currentMap json " << currentMap.toJsonString() << std::endl;
+
+                        for(auto output : currentMap["outputs"]){
+                            std::cout << "output name " << output["name"].toYamlString() << std::endl;
+                                if(output["name"] == interface_name){
+                                    return output["type"];
+                                }
+                        }
+                        for(auto input : currentMap["inputs"]){
+                            std::cout << "input name " << input["name"].toYamlString() << std::endl;
+
+                                if(input["name"] == interface_name){
+                                    return input["type"];
+                                }
+                        }
+                    }
+                    throw std::runtime_error("Could not find dataType for interface: " + interface_name);
+                };
+                    if(edge.hasKey("data") && edge["data"].isMap())
+                    {
+                        if(edge["data"].hasKey("decouple"))
+                            edge["decouple"] = edge["data"]["decouple"];
+                        else  
+                            edge["decouple"] = false;
+
+                        if(edge["data"].hasKey("dataType"))
+                            edge["dataType"] = edge["data"]["dataType"];
+                        else  
+                            edge["dataType"] = getInterfaceDataType(edge["from"]["interface"]);//"HERE WE SHOULD GRAB IT FROM NODE";
+                    } 
+                    
                     edge["smooth"] = true;
                     if (hasEdge(edge))
                     {
@@ -738,12 +785,17 @@ namespace xrock_gui_model
             e["from"]["interface"] = edge["fromNodeOutput"];
             e["to"]["name"] = edge["toNode"];
             e["to"]["interface"] = edge["toNodeInput"];
+            if(!e["data"].isMap()) // some models were saved with data: "" malformed
+                e["data"] = ConfigMap();
+            e["data"]["decouple"] = edge["decouple"];
+            e["data"]["dataType"] = edge["dataType"];
+            e["data"]["name"] = edge["name"];
             mi["versions"][0]["components"]["edges"].push_back(e);
             // TODO: Update edge configuration
         }
         // When finished, update basicModel and return it
         // NOTE: There might be leftovers of the bagel specific data which will be ignored by the xtype specific data
-        //std::cout << "ComponentModelInterface::getModelInfo():\n" << mi.toJsonString() << "\n";
+        std::cout << "ComponentModelInterface::getModelInfo():\n" << mi.toJsonString() << "\n";
         basicModel = mi;
 
         // store gui information

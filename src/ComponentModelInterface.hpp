@@ -32,7 +32,7 @@ namespace xrock_gui_model
         bool updateNode(unsigned long nodeId,
                         configmaps::ConfigMap& node);
         bool updateEdge(unsigned long egdeId,
-                        configmaps::ConfigMap& edge) { return true; }
+                        configmaps::ConfigMap& edge);
         bool removeNode(unsigned long nodeId);
         bool removeEdge(unsigned long edgeId);
 

@@ -21,7 +21,7 @@ using namespace mars::utils;
 namespace xrock_gui_model
 {
 
-    ComponentModelInterface::ComponentModelInterface(BagelGui *bagelGui, XRockGUI* xrockGui) : ModelInterface(bagelGui), xrockGui(xrockGui)
+    ComponentModelInterface::ComponentModelInterface(BagelGui *bagelGui, XRockGUI *xrockGui) : ModelInterface(bagelGui), xrockGui(xrockGui)
     {
         simpleTypeGen = false;
         std::string confDir = bagelGui->getConfigDir();
@@ -65,7 +65,6 @@ namespace xrock_gui_model
         info.type = "DES";
         info.map["NodeClass"] = "GUINode";
         nodeInfoMap[info.type] = info;
-
 
         // 20221110 MS: This functionality is not needed and clutters this class. We use orogen_to_xrock for this.
         if (config.hasKey("OrogenFolder"))
@@ -159,9 +158,9 @@ namespace xrock_gui_model
         return;
     }
 
-    std::string ComponentModelInterface::deriveTypeFrom(const std::string& domain, const std::string& name, const std::string& version)
+    std::string ComponentModelInterface::deriveTypeFrom(const std::string &domain, const std::string &name, const std::string &version)
     {
-        if(simpleTypeGen)
+        if (simpleTypeGen)
         {
             return name;
         }
@@ -174,7 +173,7 @@ namespace xrock_gui_model
     }
 
     // This function actually adds the component model information of a node into the nodeInfoMap.
-    bool ComponentModelInterface::addNodeInfo(const std::string& type, configmaps::ConfigMap &model)
+    bool ComponentModelInterface::addNodeInfo(const std::string &type, configmaps::ConfigMap &model)
     {
         // Check if the type is already known. If so, do nothing
         if (nodeInfoMap.find(type) != nodeInfoMap.end())
@@ -201,7 +200,7 @@ namespace xrock_gui_model
             {
                 if (it.hasKey("direction"))
                 {
-                    const std::string& dir(it["direction"].getString());
+                    const std::string &dir(it["direction"].getString());
                     if ((dir == "INCOMING") || (dir == "BIDIRECTIONAL"))
                     {
                         info.map["inputs"].push_back(it);
@@ -310,7 +309,7 @@ namespace xrock_gui_model
     }
 
     bool ComponentModelInterface::addNode(unsigned long nodeId,
-                        const configmaps::ConfigMap &node)
+                                          const configmaps::ConfigMap &node)
     {
         ConfigMap map = node;
         return addNode(nodeId, &map);
@@ -327,22 +326,22 @@ namespace xrock_gui_model
 
         // Check if edge info is valid
         // Check if nodes exist
-        const std::string& fromNodeName(map["fromNode"].getString());
-        const configmaps::ConfigMap* fromNodeMapPtr = bagelGui->getNodeMap(fromNodeName);
+        const std::string &fromNodeName(map["fromNode"].getString());
+        const configmaps::ConfigMap *fromNodeMapPtr = bagelGui->getNodeMap(fromNodeName);
         if (!fromNodeMapPtr)
             return false;
         ConfigMap fromNodeMap = *fromNodeMapPtr;
 
-        const std::string& toNodeName(map["toNode"].getString());
-        const configmaps::ConfigMap* toNodeMapPtr = bagelGui->getNodeMap(toNodeName);
+        const std::string &toNodeName(map["toNode"].getString());
+        const configmaps::ConfigMap *toNodeMapPtr = bagelGui->getNodeMap(toNodeName);
         if (!toNodeMapPtr)
             return false;
         ConfigMap toNodeMap = *toNodeMapPtr;
 
         // Check if interfaces exist
         {
-            const std::string& fromNodeOutputName(map["fromNodeOutput"].getString());
-            ConfigVector& outputs = fromNodeMap["outputs"];
+            const std::string &fromNodeOutputName(map["fromNodeOutput"].getString());
+            ConfigVector &outputs = fromNodeMap["outputs"];
             bool found = false;
             for (size_t i = 0; i < outputs.size(); i++)
             {
@@ -356,8 +355,8 @@ namespace xrock_gui_model
                 return false;
         }
         {
-            const std::string& toNodeInputName(map["toNodeInput"].getString());
-            ConfigVector& inputs = toNodeMap["inputs"];
+            const std::string &toNodeInputName(map["toNodeInput"].getString());
+            ConfigVector &inputs = toNodeMap["inputs"];
             bool found = false;
             for (size_t i = 0; i < inputs.size(); i++)
             {
@@ -376,10 +375,9 @@ namespace xrock_gui_model
     }
 
     bool ComponentModelInterface::addEdge(unsigned long edgeId,
-                        const configmaps::ConfigMap &edge)
+                                          const configmaps::ConfigMap &edge)
     {
         ConfigMap map = edge;
-        std::cout << "add edge " << edge.toJsonString() << std::endl;
         return addEdge(edgeId, &map);
     }
 
@@ -438,7 +436,7 @@ namespace xrock_gui_model
 
     // This function updates an existing node in the nodeMap.
     bool ComponentModelInterface::updateNode(unsigned long nodeId,
-                           configmaps::ConfigMap& node)
+                                             configmaps::ConfigMap &node)
     {
         if (node["type"] == "DES")
             return true;
@@ -455,7 +453,7 @@ namespace xrock_gui_model
             // Do not allow changes to model
             node["model"] = it->second["model"];
             // Do not allow changes to interface names, change their alias instead
-            ConfigVector& inputs = node["inputs"];
+            ConfigVector &inputs = node["inputs"];
             for (size_t i = 0; i < inputs.size(); i++)
             {
                 if (inputs[i]["name"] != it->second["inputs"][i]["name"])
@@ -464,7 +462,7 @@ namespace xrock_gui_model
                 }
                 inputs[i]["name"] = it->second["inputs"][i]["name"];
             }
-            ConfigVector& outputs = node["outputs"];
+            ConfigVector &outputs = node["outputs"];
             for (size_t i = 0; i < outputs.size(); i++)
             {
                 if (outputs[i]["name"] != it->second["outputs"][i]["name"])
@@ -517,9 +515,9 @@ namespace xrock_gui_model
         return ConfigMap();
     }
 
-    bool ComponentModelInterface::registerComponentModel(const std::string& domain, const std::string& name, const std::string& version)
+    bool ComponentModelInterface::registerComponentModel(const std::string &domain, const std::string &name, const std::string &version)
     {
-        const std::string& partType(deriveTypeFrom(domain, name, version));
+        const std::string &partType(deriveTypeFrom(domain, name, version));
         if (hasNodeInfo(partType))
             return true;
         // Get map from DB. For this we need a reference to the XRockGui
@@ -543,14 +541,13 @@ namespace xrock_gui_model
         basicModel = map;
 
         // extract the gui information and store it in seperate map
-        if(basicModel["versions"][0].hasKey("data") && basicModel["versions"][0]["data"].hasKey("gui"))
+        if (basicModel["versions"][0].hasKey("data") && basicModel["versions"][0]["data"].hasKey("gui"))
         {
             guiMap = basicModel["versions"][0]["data"]["gui"];
             ConfigMap &dataMap = basicModel["versions"][0]["data"];
             dataMap.erase("gui");
         }
 
-        //std::cout << "ComponentModelInterface::setModelInfo()\n" << basicModel.toJsonString() << "\n";
         // We now use the basic model to setup the GUI
         if (basicModel["versions"][0].hasKey("components") && basicModel["versions"][0]["components"].hasKey("nodes"))
         {
@@ -558,14 +555,14 @@ namespace xrock_gui_model
             // At first, we have to create the nodes
             for (auto it : nodes)
             {
-                const std::string& name(it["name"].getString());
+                const std::string &name(it["name"].getString());
                 if (bagelGui->getNodeMap(name))
                     continue;
-                const std::string& modelName(it["model"]["name"].getString());
-                const std::string& modelDomain(it["model"]["domain"].getString());
-                const std::string& modelVersion(it["model"]["version"].getString());
+                const std::string &modelName(it["model"]["name"].getString());
+                const std::string &modelDomain(it["model"]["domain"].getString());
+                const std::string &modelVersion(it["model"]["version"].getString());
                 // Unfortunately, the basicModel has no URI, so we have to construct a unique type id ourselves
-                const std::string& partType(deriveTypeFrom(modelDomain, modelName, modelVersion));
+                const std::string &partType(deriveTypeFrom(modelDomain, modelName, modelVersion));
                 // Before we can add a node, we first have to check if the model is already known or
                 // has to be requested from the DB first
                 if (!registerComponentModel(modelDomain, modelName, modelVersion))
@@ -582,10 +579,10 @@ namespace xrock_gui_model
                 // Update interface aliases
                 if (it.hasKey("interface_aliases"))
                 {
-                    ConfigMap& if_aliases = it["interface_aliases"];
-                    for (const auto [original_name,value] : if_aliases)
+                    ConfigMap &if_aliases = it["interface_aliases"];
+                    for (const auto [original_name, value] : if_aliases)
                     {
-                        const std::string& alias(value.getString());
+                        const std::string &alias(value.getString());
                         // Update matching inputs
                         if (currentMap.hasKey("inputs"))
                         {
@@ -632,45 +629,47 @@ namespace xrock_gui_model
                             + "_" + edge["toNode"].getString()
                             + "_" + edge["toNodeInput"].getString();
                     }
-                    else {
+                    else
+                    {
                         edge["name"] = it["name"];
                     }
 
-                auto getInterfaceDataType = [&](const std::string& interface_name)->std::string{ 
-
-                    for(auto node : nodes){
+                    // this lamda function gets the datatype from the input and output interface 
+                    auto getInterfaceDataType = [&](const std::string &interface_name) -> std::string
+                    {
+                        for (auto node : nodes)
+                        {
                             ConfigMap currentMap = *bagelGui->getNodeMap(node["name"]);
-                            std::cout << "currentMap json " << currentMap.toJsonString() << std::endl;
-
-                        for(auto output : currentMap["outputs"]){
-                            std::cout << "output name " << output["name"].toYamlString() << std::endl;
-                                if(output["name"] == interface_name){
+                            for (auto output : currentMap["outputs"])
+                            {
+                                if (output["name"] == interface_name)
+                                {
                                     return output["type"];
                                 }
-                        }
-                        for(auto input : currentMap["inputs"]){
-                            std::cout << "input name " << input["name"].toYamlString() << std::endl;
-
-                                if(input["name"] == interface_name){
+                            }
+                            for (auto input : currentMap["inputs"])
+                            {
+                                if (input["name"] == interface_name)
+                                {
                                     return input["type"];
                                 }
+                            }
                         }
-                    }
-                    throw std::runtime_error("Could not find dataType for interface: " + interface_name);
-                };
-                    if(edge.hasKey("data") && edge["data"].isMap())
+                        throw std::runtime_error("Could not find dataType for interface: " + interface_name);
+                    };
+                    if (edge.hasKey("data") && edge["data"].isMap())
                     {
-                        if(edge["data"].hasKey("decouple"))
+                        if (edge["data"].hasKey("decouple"))
                             edge["decouple"] = edge["data"]["decouple"];
-                        else  
+                        else
                             edge["decouple"] = false;
 
-                        if(edge["data"].hasKey("dataType"))
+                        if (edge["data"].hasKey("dataType"))
                             edge["dataType"] = edge["data"]["dataType"];
-                        else  
-                            edge["dataType"] = getInterfaceDataType(edge["from"]["interface"]);//"HERE WE SHOULD GRAB IT FROM NODE";
-                    } 
-                    
+                        else
+                            edge["dataType"] = getInterfaceDataType(edge["from"]["interface"]); //update it from the node if it is missing 
+                    }
+
                     edge["smooth"] = true;
                     if (hasEdge(edge))
                     {
@@ -688,7 +687,7 @@ namespace xrock_gui_model
                     auto nodeConfig = basicModel["versions"][0]["components"]["configuration"]["nodes"];
                     for (auto it : nodeConfig)
                     {
-                        const std::string& nodeName(it["name"].getString());
+                        const std::string &nodeName(it["name"].getString());
                         ConfigMap currentMap = *bagelGui->getNodeMap(nodeName);
                         if (it.hasKey("data"))
                         {
@@ -716,7 +715,7 @@ namespace xrock_gui_model
             return;
         // Found a layout in the component model data field. Lets apply it.
         std::string defaultLayout = guiMap["defaultLayout"];
-        ConfigMap& layoutMap = guiMap["layouts"];
+        ConfigMap &layoutMap = guiMap["layouts"];
         bagelGui->applyLayout(layoutMap[defaultLayout]);
     }
 
@@ -732,7 +731,7 @@ namespace xrock_gui_model
         // Update inner components & configuration based on nodeMap
         mi["versions"][0]["components"]["nodes"] = ConfigVector();
         mi["versions"][0]["components"]["configuration"]["nodes"] = ConfigVector();
-        for (auto& [id, node_] : nodeMap)
+        for (auto &[id, node_] : nodeMap)
         {
             // Update node entry
             ConfigMap node = *bagelGui->getNodeMap(node_["name"]);
@@ -748,25 +747,25 @@ namespace xrock_gui_model
             BasicModelHelper::updateExportedInterfacesToModel(node, mi);
 
             // Update interface_aliases
-            ConfigVector& inputs = node["inputs"];
+            ConfigVector &inputs = node["inputs"];
             for (auto input : inputs)
             {
-                if(input.hasKey("alias"))
+                if (input.hasKey("alias"))
                 {
                     n["interface_aliases"][input["name"].getString()] = input["alias"];
                 }
             }
-            ConfigVector& outputs = node["outputs"];
+            ConfigVector &outputs = node["outputs"];
             for (auto output : outputs)
             {
-                if(output.hasKey("alias"))
+                if (output.hasKey("alias"))
                 {
                     n["interface_aliases"][output["name"].getString()] = output["alias"];
                 }
             }
             mi["versions"][0]["components"]["nodes"].push_back(n);
             // Update node configuration entry
-            if(node.hasKey("configuration"))
+            if (node.hasKey("configuration"))
             {
                 ConfigMap c(node["configuration"]);
                 c["name"] = n["name"];
@@ -777,7 +776,7 @@ namespace xrock_gui_model
         // Update edges & configuration based on edgeMap
         mi["versions"][0]["components"]["edges"] = ConfigVector();
         mi["versions"][0]["components"]["configuration"]["edges"] = ConfigVector();
-        for (auto& [id, edge] : edgeMap)
+        for (auto &[id, edge] : edgeMap)
         {
             ConfigMap e(edge);
             // Update edge entry
@@ -785,7 +784,7 @@ namespace xrock_gui_model
             e["from"]["interface"] = edge["fromNodeOutput"];
             e["to"]["name"] = edge["toNode"];
             e["to"]["interface"] = edge["toNodeInput"];
-            if(!e["data"].isMap()) // some models were saved with data: "" malformed
+            if (!e["data"].isMap()) // some models were saved with data: "" malformed
                 e["data"] = ConfigMap();
             e["data"]["decouple"] = edge["decouple"];
             e["data"]["dataType"] = edge["dataType"];
@@ -795,7 +794,6 @@ namespace xrock_gui_model
         }
         // When finished, update basicModel and return it
         // NOTE: There might be leftovers of the bagel specific data which will be ignored by the xtype specific data
-        std::cout << "ComponentModelInterface::getModelInfo():\n" << mi.toJsonString() << "\n";
         basicModel = mi;
 
         // store gui information
@@ -813,8 +811,9 @@ namespace xrock_gui_model
         }
     }
 
-    void ComponentModelInterface::updateCurrentLayout() {
-        if(guiMap.hasKey("defaultLayout"))
+    void ComponentModelInterface::updateCurrentLayout()
+    {
+        if (guiMap.hasKey("defaultLayout"))
         {
             std::string currentLayout = guiMap["defaultLayout"];
             guiMap["layouts"][currentLayout] = bagelGui->getLayout();
@@ -825,11 +824,11 @@ namespace xrock_gui_model
     {
         updateCurrentLayout();
         guiMap["defaultLayout"] = layout;
-        if(guiMap.hasKey("layouts"))
+        if (guiMap.hasKey("layouts"))
         {
-            if(guiMap["layouts"].hasKey(layout))
+            if (guiMap["layouts"].hasKey(layout))
             {
-                bagelGui->loadLayout(layout+".yml");
+                bagelGui->loadLayout(layout + ".yml");
                 bagelGui->applyLayout(guiMap["layouts"][layout]);
             }
         }
@@ -837,14 +836,14 @@ namespace xrock_gui_model
 
     void ComponentModelInterface::removeLayout(std::string layout)
     {
-        if(guiMap["defaultLayout"].getString() == layout)
+        if (guiMap["defaultLayout"].getString() == layout)
         {
             guiMap.erase("defaultLayout");
         }
-        if(guiMap.hasKey("layouts"))
+        if (guiMap.hasKey("layouts"))
         {
             ConfigMap &layouts = guiMap["layouts"];
-            if(layouts.hasKey(layout))
+            if (layouts.hasKey(layout))
             {
                 layouts.erase(layout);
             }

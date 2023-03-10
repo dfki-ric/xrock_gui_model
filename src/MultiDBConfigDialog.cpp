@@ -244,7 +244,6 @@ namespace xrock_gui_model
             auto defaultConfig = ioLibrary->getDefaultConfig();
             if (!defaultConfig.empty())
             {
-                //std::cout << "loading" << defaultConfig.toYamlString() << std::endl;
                 defaultConfig["MultiDbClient"].toYamlFile(this->configFilename);
                 loadState();
             }
@@ -310,7 +309,6 @@ namespace xrock_gui_model
     }
     void MultiDBConfigDialog::onTableBackendsCellChange(int row, int column)
     {
-        // std::cout << "updated row: " << row <<", column: "<< column << std::endl;
         switch (column)
         {
         case 0: // backend name

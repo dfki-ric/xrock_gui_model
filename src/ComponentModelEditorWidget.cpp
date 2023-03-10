@@ -304,7 +304,6 @@ namespace xrock_gui_model
     void ComponentModelEditorWidget::updateModel()
     {
         if (!currentModel) return;
-        std::cout << "current" << currentModel->getModelInfo().toYamlString() << std::endl;
         ConfigMap updatedMap(currentModel->getModelInfo());
         // Update toplvl properties
         for (auto &[key, value] : updatedMap)

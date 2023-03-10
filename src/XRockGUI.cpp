@@ -358,7 +358,7 @@ namespace xrock_gui_model
                 cfg->setPropertyValue("XRockGUI", "dbUser", "value", user);
                 cfg->setPropertyValue("XRockGUI", "dbPassword", "value", password);
             }
-            std::cout << "loadSettingsFromFile: settings loaded from file: " << filename << std::endl;
+            
         }
         catch (std::invalid_argument &e)
         {

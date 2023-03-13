@@ -668,6 +668,9 @@ namespace xrock_gui_model
                             edge["dataType"] = edge["data"]["dataType"];
                         else
                             edge["dataType"] = getInterfaceDataType(edge["from"]["interface"]); //update it from the node if it is missing 
+                    } else {
+                        edge["data"] = ConfigMap();
+                        edge["decouple"] = false;
                     }
 
                     edge["smooth"] = true;
@@ -784,11 +787,18 @@ namespace xrock_gui_model
             e["from"]["interface"] = edge["fromNodeOutput"];
             e["to"]["name"] = edge["toNode"];
             e["to"]["interface"] = edge["toNodeInput"];
-            if (!e["data"].isMap()) // some models were saved with data: "" malformed
+        
+            if (!e["data"].isMap()) // some models were saved with data: "" malformed like in hise_db..
                 e["data"] = ConfigMap();
-            e["data"]["decouple"] = edge["decouple"];
-            e["data"]["dataType"] = edge["dataType"];
-            e["data"]["name"] = edge["name"];
+            // build edge_properties.data
+            if(e.hasKey("decouple"))
+                e["data"]["decouple"] = e["decouple"];
+            if(e.hasKey("dataType"))
+                e["data"]["dataType"] = e["dataType"];
+            if(e.hasKey("name"))
+                e["data"]["name"] = e["name"];
+            if(e.hasKey("smooth"))
+                e["data"]["smooth"] = e["smooth"];
             mi["versions"][0]["components"]["edges"].push_back(e);
             // TODO: Update edge configuration
         }

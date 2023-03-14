@@ -66,6 +66,7 @@ namespace xrock_gui_model
         info.map["NodeClass"] = "GUINode";
         nodeInfoMap[info.type] = info;
 
+
         // 20221110 MS: This functionality is not needed and clutters this class. We use orogen_to_xrock for this.
         if (config.hasKey("OrogenFolder"))
         {
@@ -616,7 +617,8 @@ namespace xrock_gui_model
                 auto edges = basicModel["versions"][0]["components"]["edges"];
                 for (auto it : edges)
                 {
-                    ConfigMap edge(it);
+                    ConfigMap edge;
+                    edge["fromNode"] = it["from"]["name"];
                     edge["fromNode"] = it["from"]["name"];
                     edge["fromNodeOutput"] = it["from"]["interface"];
                     edge["toNode"] = it["to"]["name"];
@@ -629,51 +631,22 @@ namespace xrock_gui_model
                             + "_" + edge["toNode"].getString()
                             + "_" + edge["toNodeInput"].getString();
                     }
-                    else
+                    if(it.hasKey("data"))
+                        edge["data"] = it["data"];
+                    if(it.hasKey("data") && it["data"].isMap() && it["data"].hasKey("decouple"))
                     {
-                        edge["name"] = it["name"];
+                        edge["decouple"] = it["data"]["decouple"];
                     }
-
-                    // this lamda function gets the datatype from the input and output interface 
-                    auto getInterfaceDataType = [&](const std::string &interface_name) -> std::string
-                    {
-                        for (auto node : nodes)
-                        {
-                            ConfigMap currentMap = *bagelGui->getNodeMap(node["name"]);
-                            for (auto output : currentMap["outputs"])
-                            {
-                                if (output["name"] == interface_name)
-                                {
-                                    return output["type"];
-                                }
-                            }
-                            for (auto input : currentMap["inputs"])
-                            {
-                                if (input["name"] == interface_name)
-                                {
-                                    return input["type"];
-                                }
-                            }
-                        }
-                        throw std::runtime_error("Could not find dataType for interface: " + interface_name);
-                    };
-                    if (edge.hasKey("data") && edge["data"].isMap())
-                    {
-                        if (edge["data"].hasKey("decouple"))
-                            edge["decouple"] = edge["data"]["decouple"];
-                        else
-                            edge["decouple"] = false;
-
-                        if (edge["data"].hasKey("dataType"))
-                            edge["dataType"] = edge["data"]["dataType"];
-                        else
-                            edge["dataType"] = getInterfaceDataType(edge["from"]["interface"]); //update it from the node if it is missing 
-                    } else {
-                        edge["data"] = ConfigMap();
+                    else 
                         edge["decouple"] = false;
+                    
+                    if(it.hasKey("data") && it["data"].isMap() && it["data"].hasKey("smooth"))
+                    {
+                        edge["smooth"] = it["data"]["smooth"];
                     }
-
-                    edge["smooth"] = true;
+                    else 
+                        edge["smooth"] = true;
+                    
                     if (hasEdge(edge))
                     {
                         continue;
@@ -776,32 +749,76 @@ namespace xrock_gui_model
                 mi["versions"][0]["components"]["configuration"]["nodes"].push_back(c);
             }
         }
+        
         // Update edges & configuration based on edgeMap
         mi["versions"][0]["components"]["edges"] = ConfigVector();
         mi["versions"][0]["components"]["configuration"]["edges"] = ConfigVector();
-        for (auto &[id, edge] : edgeMap)
+
+        // For edges, we build the model info based on the bagel's config map since its an up-to date map for the current tab view.
+        ConfigMap map = bagelGui->createConfigMap();
+        for (auto &it : map["edges"])
         {
-            ConfigMap e(edge);
-            // Update edge entry
-            e["from"]["name"] = edge["fromNode"];
-            e["from"]["interface"] = edge["fromNodeOutput"];
-            e["to"]["name"] = edge["toNode"];
-            e["to"]["interface"] = edge["toNodeInput"];
-        
-            if (!e["data"].isMap()) // some models were saved with data: "" malformed like in hise_db..
-                e["data"] = ConfigMap();
-            // build edge_properties.data
-            if(e.hasKey("decouple"))
-                e["data"]["decouple"] = e["decouple"];
-            if(e.hasKey("dataType"))
-                e["data"]["dataType"] = e["dataType"];
-            if(e.hasKey("name"))
-                e["data"]["name"] = e["name"];
-            if(e.hasKey("smooth"))
-                e["data"]["smooth"] = e["smooth"];
-            mi["versions"][0]["components"]["edges"].push_back(e);
-            // TODO: Update edge configuration
+            ConfigMap edge;
+            std::string fromName = it["fromNode"];
+            std::string toName = it["toNode"];
+            std::string domain = mars::utils::toupper(it["domain"]);
+            if (domain.empty())
+                domain = "SOFTWARE";
+            std::string fromNodeOutput = it["fromNodeOutput"];
+            std::string toNodeInput = it["toNodeInput"];
+            edge["from"]["name"] = fromName;
+            edge["from"]["interface"] = fromNodeOutput;
+            edge["from"]["domain"] = domain;
+            edge["to"]["name"] = toName;
+            edge["to"]["interface"] = toNodeInput;
+            edge["to"]["domain"] = domain;
+
+            std::vector<std::string> unwanted = {
+                "fromNode",
+                "fromNodeOutput",
+                "sourceNode",
+                "toNode",
+                "toNodeInput",
+                "id",
+                "vertices",
+                "decoupleVertices",
+                "data"};
+
+            // Make edge data
+            ConfigMap edgeData;
+            auto it2 = it.beginMap();
+            for (; it2 != it.endMap(); ++it2)
+            {
+                auto &[key, value] = *it2;
+                if (std::find(unwanted.begin(), unwanted.end(), key) == unwanted.end())
+                {
+                    edgeData[key] = value;
+                }
+            }
+
+            if (edgeData.size() > 0)
+            {
+                if (edgeData["domain"].getString().empty())
+                    edgeData["domain"] = domain;
+                edge["data"] = edgeData;
+            }
+
+            if (it.hasKey("name"))
+            {
+                edge["name"] = it["name"].getString();
+            }
+            else
+            {
+                // If no name exists, we derive a new name
+                edge["name"] = fromName + "_" + fromNodeOutput + "_" + toName + "_" + toNodeInput;
+            }
+            if (it.hasKey("direction"))
+            {
+                edge["direction"] = mars::utils::toupper(it["direction"]);
+            }
+            mi["versions"][0]["components"]["edges"].push_back(edge);
         }
+
         // When finished, update basicModel and return it
         // NOTE: There might be leftovers of the bagel specific data which will be ignored by the xtype specific data
         basicModel = mi;

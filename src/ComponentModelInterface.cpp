@@ -444,6 +444,9 @@ namespace xrock_gui_model
         std::map<unsigned long, ConfigMap>::iterator it = nodeMap.find(nodeId);
         if (it != nodeMap.end())
         {
+            // Do not allow changes to uri
+            node["uri"] = it->second["uri"];
+
             // Do not allow changes to name but change the alias instead
             if (node["name"] != it->second["name"])
             {

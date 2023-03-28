@@ -51,7 +51,8 @@ namespace xrock_gui_model
         SELECT_MULTIDB = 23,
         SELECT_FILEDB = 24,
         RELOAD_MODEL_FROM_DB = 30,
-        EXPORT_CND_TFENHANCE = 31
+        REMOVE_MODEL_FROM_DB = 31,
+        EXPORT_CND_TFENHANCE = 32,
     };
 
     class XRockGUI : public lib_manager::LibInterface,

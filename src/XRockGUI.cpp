@@ -362,7 +362,7 @@ namespace xrock_gui_model
                 cfg->setPropertyValue("XRockGUI", "dbUser", "value", user);
                 cfg->setPropertyValue("XRockGUI", "dbPassword", "value", password);
             }
-            std::cout << "loadSettingsFromFile: settings loaded from file: " << filename << std::endl;
+            
         }
         catch (std::invalid_argument &e)
         {
@@ -632,6 +632,31 @@ namespace xrock_gui_model
                         QMessageBox::warning(nullptr, "Warning", "Nothing to reload.", QMessageBox::Ok);
                 }
 
+                break;
+            }
+            case MenuActions::REMOVE_MODEL_FROM_DB: // Remove model
+            {
+                if (QMessageBox::question(nullptr, "Warning", "Are you sure you want to remove the current Model?", QMessageBox::Yes | QMessageBox::Cancel) == QMessageBox::Yes)
+                {
+                    if (ModelInterface *m = bagelGui->getCurrentModel())
+                    {
+                        ConfigMap currentModel = m->getModelInfo();
+                        if (currentModel.hasKey("uri"))
+                        {
+                            bool removed = db->removeModel((std::string)currentModel["uri"]);
+                            if(removed)
+                                {
+                                    bagelGui->closeCurrentTab();
+                                    QMessageBox::information(nullptr, "Success", "Model removed successfully!", QMessageBox::Ok);
+                                }
+                            else
+                                QMessageBox::critical(nullptr, "Error", "Failed to remove model.", QMessageBox::Ok);
+                        }
+                        else
+                            QMessageBox::warning(nullptr, "Warning", "Cannot remove model due missing uri.", QMessageBox::Ok);
+                    }
+
+                }
                 break;
             }
             case MenuActions::EXPORT_CND_TFENHANCE:

@@ -28,6 +28,7 @@ namespace xrock_gui_model
 
         QLabel *label = new QLabel("Main Server:");
         vLayout->addWidget(label);
+        label->setStyleSheet("font-weight: bold; color: black;");
         QHBoxLayout *hLayout = new QHBoxLayout();
 
         label = new QLabel("Type:");
@@ -64,6 +65,7 @@ namespace xrock_gui_model
         vLayout->addLayout(hLayout);
 
         label = new QLabel("Import Servers:");
+        label->setStyleSheet("font-weight: bold; color: black;");
         vLayout->addWidget(label);
 
         tableBackends = new QTableWidget();
@@ -142,7 +144,8 @@ namespace xrock_gui_model
         if (mars::utils::pathExists(configFilename))
         {
             ConfigMap config = ConfigMap::fromYamlFile(configFilename);
-            tfMainServerPath->setText(QString::fromStdString(config["main_server"]["path"]));
+            cbMainServerType->setCurrentIndex(cbMainServerType->findText(QString::fromStdString(config["main_server"]["type"]), Qt::MatchFixedString));
+            tfMainServerPath->setText(QString::fromStdString(config["main_server"]["type"] == "Client" ? config["main_server"]["url"] : config["main_server"]["path"]));
             tfMainServerGraph->setText(QString::fromStdString(config["main_server"]["graph"]));
             lbMainServerPathOrUrl->setText(config["main_server"]["type"] == "Client" ? "URL" : "Path");
 

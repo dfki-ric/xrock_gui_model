@@ -53,6 +53,7 @@ namespace xrock_gui_model
         RELOAD_MODEL_FROM_DB = 30,
         REMOVE_MODEL_FROM_DB = 31,
         EXPORT_CND_TFENHANCE = 32,
+        RUN_ABSTRACT_GUI = 33
     };
 
     class XRockGUI : public lib_manager::LibInterface,
@@ -97,6 +98,7 @@ namespace xrock_gui_model
         void selectVersion(const std::string &version);
         void exportCnd(const configmaps::ConfigMap &map_, const std::string &filename, const std::string &urdf_file = "");
         void importCND(const std::string &fileName);
+        void runAbstractGui();
 
         // drop down menu functions on nodes and node interfaces
         // these are triggered by right-clicking in the GUI

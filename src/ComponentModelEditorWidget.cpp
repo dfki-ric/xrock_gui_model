@@ -40,6 +40,8 @@ namespace xrock_gui_model
             //connect(interfaces, SIGNAL(textChanged()), this, SLOT(updateModel()));
             layout->addWidget(uri, i++, 1);
 
+
+           
             ConfigMap props = xrockGui->db->getPropertiesOfComponentModel();
             for(auto it: props)
             {
@@ -98,12 +100,6 @@ namespace xrock_gui_model
                 connect(annotations, SIGNAL(textChanged()), this, SLOT(validateYamlSyntax()));
             }
 
-            //QLabel *l = new QLabel("interfaces");
-            //layout->addWidget(l, i, 0);
-            //interfaces = new QTextEdit();
-            //interfaces->setReadOnly(true);
-            //connect(interfaces, SIGNAL(textChanged()), this, SLOT(updateModel()));
-            //layout->addWidget(interfaces, i++, 1);
 
             // Finalize layout
             vLayout->addLayout(layout);

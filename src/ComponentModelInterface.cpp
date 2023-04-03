@@ -544,7 +544,7 @@ namespace xrock_gui_model
         // NOTE: basicModel holds the original data. So we just copy over.
         basicModel = map;
 
-        // extract the gui information and store it in seperate map
+        // extract the gui information and store it in separate map
         if (basicModel["versions"][0].hasKey("data") && basicModel["versions"][0]["data"].hasKey("gui"))
         {
             guiMap = basicModel["versions"][0]["data"]["gui"];

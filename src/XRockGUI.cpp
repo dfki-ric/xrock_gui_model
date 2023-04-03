@@ -1375,18 +1375,6 @@ namespace xrock_gui_model
         {
             openConfigFile(contextNodeName);
         }
-        else if (name == "open abstract view")
-        {
-            ConfigMap node = *(bagelGui->getNodeMap(contextNodeName));
-            std::cout << " maps of nunu: " << node["model"]["abstracts"].toJsonString() << std::endl;
-            for (auto& abstract : node["model"]["abstracts"])
-            {
-                std::string domain = abstract["domain"];
-                std::string model_name = abstract["name"];
-                std::string version = abstract["version"];
-                loadComponentModel(domain, model_name, version); 
-            }
-        }
         else if (name == "open model")
         {
             ConfigMap node = *(bagelGui->getNodeMap(contextNodeName));
@@ -1498,10 +1486,6 @@ namespace xrock_gui_model
         }
         
         r.push_back("open model");
-        if(map["model"].hasKey("abstracts") && map["model"]["abstracts"].size()!=0)
-        {
-         r.push_back("open abstract view");
-        }
         r.push_back("show description");
 
         contextNodeName = name;

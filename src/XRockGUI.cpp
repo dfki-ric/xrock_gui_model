@@ -130,7 +130,8 @@ namespace xrock_gui_model
                     if(dbType == "Serverless")
                     {
                         env["dbType"] = "Serverless";
-                        env["dbPath"] = config["path"];
+                        env["dbPath"] = config["dbPath"];
+                        env["dbGraph"] = config["dbGraph"];
                         db.reset(ioLibrary->getDB(env));
                     }
                     else if(dbType == "Client")
@@ -570,6 +571,8 @@ namespace xrock_gui_model
                 if (ioLibrary)
                 {
                     env["dbType"] = "Client";
+                    env["dbAddress"] = toolbarBackend->getDbAddress();
+                    env["dbGraph"] = toolbarBackend->getGraph();
                     db.reset(ioLibrary->getDB(env));
                     db->setDbGraph(toolbarBackend->getGraph());
                     db->setDbAddress(toolbarBackend->getDbAddress());

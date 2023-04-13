@@ -859,6 +859,13 @@ namespace xrock_gui_model
         ComponentModelInterface* model = dynamic_cast<ComponentModelInterface*>(bagelGui->getCurrentModel());
         // Set the model info of the ComponentModelInterface
         ConfigMap emptyModel = db->getEmptyComponentModel();
+        auto t = std::time(nullptr);
+        auto tm = *std::localtime(&t);
+        std::ostringstream oss;
+        oss << std::put_time(&tm, "%d-%m-%Y %H-%M-%S");
+        emptyModel["date"] = oss.str();
+        emptyModel["versions"][0]["date"] = oss.str();
+        model->addLayout("default_layout");
         model->setModelInfo(emptyModel);
         // Afterwards we have to (re-)trigger the currentModelChanged() function
         currentModelChanged(model);

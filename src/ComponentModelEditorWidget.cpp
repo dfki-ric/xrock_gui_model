@@ -33,6 +33,15 @@ namespace xrock_gui_model
             QGridLayout *layout = new QGridLayout();
             QVBoxLayout *vLayout = new QVBoxLayout();
             size_t i = 0;
+            QLabel* lbl = new QLabel("uri");
+            layout->addWidget(lbl, i, 0);
+            uri = new QLineEdit();
+            uri->setReadOnly(true);
+            //connect(interfaces, SIGNAL(textChanged()), this, SLOT(updateModel()));
+            layout->addWidget(uri, i++, 1);
+
+
+           
             ConfigMap props = xrockGui->db->getPropertiesOfComponentModel();
             for(auto it: props)
             {
@@ -91,12 +100,6 @@ namespace xrock_gui_model
                 connect(annotations, SIGNAL(textChanged()), this, SLOT(validateYamlSyntax()));
             }
 
-            //QLabel *l = new QLabel("interfaces");
-            //layout->addWidget(l, i, 0);
-            //interfaces = new QTextEdit();
-            //interfaces->setReadOnly(true);
-            //connect(interfaces, SIGNAL(textChanged()), this, SLOT(updateModel()));
-            //layout->addWidget(interfaces, i++, 1);
 
             // Finalize layout
             vLayout->addLayout(layout);
@@ -245,6 +248,12 @@ namespace xrock_gui_model
         auto info = newModel->getModelInfo();
         currentModel = nullptr;
         this->update_widgets(info);
+             // set uri info to uri text field 
+            std::cout << "info: \n" << info.toJsonString() << std::endl;
+        if(info.hasKey("uri"))
+        {
+          uri->setText(QString::fromStdString(info["uri"]));
+        }
         currentModel = newModel;
     }
 
@@ -304,7 +313,6 @@ namespace xrock_gui_model
     void ComponentModelEditorWidget::updateModel()
     {
         if (!currentModel) return;
-        std::cout << "current" << currentModel->getModelInfo().toYamlString() << std::endl;
         ConfigMap updatedMap(currentModel->getModelInfo());
         // Update toplvl properties
         for (auto &[key, value] : updatedMap)
@@ -428,6 +436,7 @@ namespace xrock_gui_model
         annotations->clear();
         //interfaces->clear();
         layouts->clear();
+        uri->clear();
     }
 
 

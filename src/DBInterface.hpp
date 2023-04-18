@@ -33,6 +33,7 @@ namespace xrock_gui_model
                                                    const std::string &version,
                                                    const bool limit = false) = 0;
         virtual bool storeModel(const configmaps::ConfigMap &map) = 0;
+        virtual bool removeModel(const std::string &uri) = 0;
         virtual void setDbGraph(const std::string &_dbGraph){};
         virtual void setDbAddress(const std::string &_dbAddress){};
         virtual void setDbPath(const fs::path&_dbPath){};

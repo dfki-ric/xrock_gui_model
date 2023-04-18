@@ -236,6 +236,10 @@ namespace xrock_gui_model
                                       icon + "save.png", true);
             gui->addGenericMenuAction("../Actions/Reload", static_cast<int>(MenuActions::RELOAD_MODEL_FROM_DB), this, 0,
                                       icon + "reload.png", true);
+            gui->addGenericMenuAction("../Actions/Remove", static_cast<int>(MenuActions::REMOVE_MODEL_FROM_DB), this, 0,
+                                      icon + "remove.png", true);
+            gui->addGenericMenuAction("../Implements/Abstract_gui", static_cast<int>(MenuActions::RUN_ABSTRACT_GUI), this, 0,
+                                      icon + "abstract.png", true);
 
             mars::main_gui::MainGUI *mainGui = dynamic_cast<mars::main_gui::MainGUI *>(gui);
             mainGui->mainWindow_p()->setWindowIcon(QIcon(":/images/xrock_gui.ico"));
@@ -358,7 +362,7 @@ namespace xrock_gui_model
                 cfg->setPropertyValue("XRockGUI", "dbUser", "value", user);
                 cfg->setPropertyValue("XRockGUI", "dbPassword", "value", password);
             }
-            std::cout << "loadSettingsFromFile: settings loaded from file: " << filename << std::endl;
+            
         }
         catch (std::invalid_argument &e)
         {
@@ -380,6 +384,7 @@ namespace xrock_gui_model
             {
             case MenuActions::LOAD_MODEL:
             {
+               
                 QString fileName = QFileDialog::getOpenFileName(NULL, QObject::tr("Select Model File"),
                                                                 ".", QObject::tr("YAML syntax (*.yml)"), 0,
                                                                 QFileDialog::DontUseNativeDialog);
@@ -629,6 +634,31 @@ namespace xrock_gui_model
 
                 break;
             }
+            case MenuActions::REMOVE_MODEL_FROM_DB: // Remove model
+            {
+                if (QMessageBox::question(nullptr, "Warning", "Are you sure you want to remove the current Model?", QMessageBox::Yes | QMessageBox::Cancel) == QMessageBox::Yes)
+                {
+                    if (ModelInterface *m = bagelGui->getCurrentModel())
+                    {
+                        ConfigMap currentModel = m->getModelInfo();
+                        if (currentModel.hasKey("uri"))
+                        {
+                            bool removed = db->removeModel((std::string)currentModel["uri"]);
+                            if(removed)
+                                {
+                                    bagelGui->closeCurrentTab();
+                                    QMessageBox::information(nullptr, "Success", "Model removed successfully!", QMessageBox::Ok);
+                                }
+                            else
+                                QMessageBox::critical(nullptr, "Error", "Failed to remove model.", QMessageBox::Ok);
+                        }
+                        else
+                            QMessageBox::warning(nullptr, "Warning", "Cannot remove model due missing uri.", QMessageBox::Ok);
+                    }
+
+                }
+                break;
+            }
             case MenuActions::EXPORT_CND_TFENHANCE:
             {
                 QString urdf_file = QFileDialog::getOpenFileName(NULL, QObject::tr("Select urdf_file"),
@@ -645,6 +675,12 @@ namespace xrock_gui_model
                 }
                 break;
             }
+            case MenuActions::RUN_ABSTRACT_GUI:
+            {
+                runAbstractGui();
+                break;
+            }
+
             default:
             {
                 throw std::out_of_range("Cannot handle action " + std::to_string(action));
@@ -875,7 +911,8 @@ namespace xrock_gui_model
         // Get the current model info
         ConfigMap map = model->getModelInfo();
         // Store the returned info to db
-        return db->storeModel(map);
+        bool saved = db->storeModel(map);
+        return saved;
     }
 
     void XRockGUI::currentModelChanged(bagel_gui::ModelInterface *model)
@@ -1226,12 +1263,48 @@ namespace xrock_gui_model
             cnd_export << " -t --tf_enhance -u " << urdf_file;
         }
         cnd_export << " -b " << (std::string)env["dbType"];
+        if (env["dbType"] == "Serverless")
+        {
+            cnd_export << " --path " << toolbarBackend->getDbPath();
+        }
+        else if (env["dbType"] == "Client")
+        {
+            cnd_export << " --url " << toolbarBackend->getDbAddress();  
+        }
+        cnd_export << " --graph " <<  toolbarBackend->getGraph();
       
         int ret = std::system(cnd_export.str().c_str());
         if (ret == EXIT_SUCCESS)
             QMessageBox::information(nullptr, "Export", "Successfully exported", QMessageBox::Ok);
         else
             QMessageBox::critical(nullptr, "Export", QString::fromStdString("Failed to export cnd with code: " + std::to_string(ret)), QMessageBox::Ok);
+    }
+
+    // this function runs the executable of python abstract gui which helps to perform implements relation
+    void XRockGUI::runAbstractGui()
+    {
+        std::stringstream abstract_gui;
+        abstract_gui << "abstract_gui_cli --backend " << (std::string)env["dbType"] ;
+
+        if (env["dbType"] == "Serverless")
+        {
+            abstract_gui << " --path " << toolbarBackend->getDbPath();
+            abstract_gui << " --graph " <<  toolbarBackend->getGraph();
+        }
+        else if (env["dbType"] == "Client")
+        {
+            abstract_gui << " --url " << toolbarBackend->getDbAddress();  
+        abstract_gui << " --graph " <<  toolbarBackend->getGraph();
+        }
+        else if (env["dbType"] == "MultiDbClient")
+        {
+            std::string multidb_config_path = bagelGui->getConfigDir() + "/MultiDBConfig.yml";
+            std::cout << "multipatz" << multidb_config_path << std::endl;
+            abstract_gui << " --multi_db_config_path " <<  multidb_config_path;  
+        }
+        abstract_gui << " &";
+        std::cout << "CMD: " << abstract_gui.str() << std::endl;
+        std::system(abstract_gui.str().c_str());
     }
 
     void XRockGUI::importCND(const std::string &fileName)
@@ -1308,7 +1381,7 @@ namespace xrock_gui_model
             std::string domain = node["model"]["domain"];
             std::string model_name = node["model"]["name"];
             std::string version = node["model"]["versions"][0]["name"];
-            loadComponentModel(domain, model_name, version);
+            loadComponentModel(domain, model_name, version); 
         }
         // TODO: We should add a property called 'description' to the xtypes
         else if (name == "show description")
@@ -1411,6 +1484,7 @@ namespace xrock_gui_model
             r.push_back("open ROCK config file");
             r.push_back("apply configuration");
         }
+        
         r.push_back("open model");
         r.push_back("show description");
 

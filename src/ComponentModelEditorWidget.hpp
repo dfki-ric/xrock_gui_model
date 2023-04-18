@@ -74,9 +74,10 @@ namespace xrock_gui_model
 
         QListWidget *layouts;
         std::map<std::string, QCheckBox *> layoutCheckBoxes;
-        QLineEdit *layoutName;
+        QLineEdit *layoutName, *uri;
         QTextEdit *includes, *annotations, *interfaces;
-        QLabel *dataStatusLabel;
+        QLabel *dataStatusLabel; 
+        
 
         void updateCurrentLayout();
     };

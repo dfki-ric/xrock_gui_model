@@ -78,6 +78,7 @@ namespace xrock_gui_model
                 this, SLOT(versionChanged(const QString &)));
 
         dw = new mars::config_map_gui::DataWidget(NULL, this, true, false);
+
         vLayout->addWidget(dw);
         std::vector<std::string> pattern;
         pattern.push_back("-"); // fake patter to activate check

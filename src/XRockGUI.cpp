@@ -130,7 +130,8 @@ namespace xrock_gui_model
                     if(dbType == "Serverless")
                     {
                         env["dbType"] = "Serverless";
-                        env["dbPath"] = config["path"];
+                        env["dbPath"] = config["dbPath"];
+                        env["dbGraph"] = config["dbGraph"];
                         db.reset(ioLibrary->getDB(env));
                     }
                     else if(dbType == "Client")
@@ -570,6 +571,8 @@ namespace xrock_gui_model
                 if (ioLibrary)
                 {
                     env["dbType"] = "Client";
+                    env["dbAddress"] = toolbarBackend->getDbAddress();
+                    env["dbGraph"] = toolbarBackend->getGraph();
                     db.reset(ioLibrary->getDB(env));
                     db->setDbGraph(toolbarBackend->getGraph());
                     db->setDbAddress(toolbarBackend->getDbAddress());
@@ -859,6 +862,13 @@ namespace xrock_gui_model
         ComponentModelInterface* model = dynamic_cast<ComponentModelInterface*>(bagelGui->getCurrentModel());
         // Set the model info of the ComponentModelInterface
         ConfigMap emptyModel = db->getEmptyComponentModel();
+        auto t = std::time(nullptr);
+        auto tm = *std::localtime(&t);
+        std::ostringstream oss;
+        oss << std::put_time(&tm, "%d-%m-%Y %H-%M-%S");
+        emptyModel["date"] = oss.str();
+        emptyModel["versions"][0]["date"] = oss.str();
+        model->addLayout("default_layout");
         model->setModelInfo(emptyModel);
         // Afterwards we have to (re-)trigger the currentModelChanged() function
         currentModelChanged(model);

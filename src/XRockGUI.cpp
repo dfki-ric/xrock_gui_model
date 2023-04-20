@@ -29,6 +29,7 @@
 #include <QDateTime>
 #include <iostream>
 #include <fstream>
+#include <iomanip> // for std::put_time()
 
 using namespace lib_manager;
 using namespace bagel_gui;

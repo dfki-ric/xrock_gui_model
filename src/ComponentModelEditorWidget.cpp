@@ -245,16 +245,25 @@ namespace xrock_gui_model
     {
         ComponentModelInterface* newModel = dynamic_cast<ComponentModelInterface *>(model);
         if (!newModel) return;
+        fprintf(stderr, "getModelInfo\n");
         auto info = newModel->getModelInfo();
+        for(auto &[k, v]: (ConfigMap)info)
+        {
+            fprintf(stderr, "%s:", k.c_str());
+            fprintf(stderr, " %s\n", v.toYamlString().c_str());
+        }
         currentModel = nullptr;
+        fprintf(stderr, "update widgets\n");
         this->update_widgets(info);
-             // set uri info to uri text field 
-            std::cout << "info: \n" << info.toJsonString() << std::endl;
+        // set uri info to uri text field 
+        fprintf(stderr, "output info\n");
+        std::cout << "info: \n" << info.toJsonString() << std::endl;
         if(info.hasKey("uri"))
         {
           uri->setText(QString::fromStdString(info["uri"]));
         }
         currentModel = newModel;
+        fprintf(stderr, "done\n");
     }
 
     void ComponentModelEditorWidget::update_prop_widget(const std::string &prop_name, configmaps::ConfigAtom &value)

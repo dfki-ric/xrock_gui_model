@@ -7,7 +7,7 @@ using namespace configmaps;
 namespace xrock_gui_model
 {
 
-    void BasicModelHelper::updateExportedInterfacesFromModel(ConfigMap &node, ConfigMap &model)
+    void BasicModelHelper::updateExportedInterfacesFromModel(ConfigMap &node, ConfigMap &model, bool overrideExportName)
     {
         // exposed interfaces are stored in the input data within the bagel_gui
         // so we have to create this information from the model interfaces
@@ -27,7 +27,10 @@ namespace xrock_gui_model
                             if((*input)["name"] == interface["linkToInterface"])
                             {
                                 (*input)["interface"] = 1;
-                                (*input)["interfaceExportName"] = interface["name"];
+                                if(overrideExportName || !input->hasKey("interfaceExportName"))
+                                {
+                                    (*input)["interfaceExportName"] = interface["name"];
+                                }
                             }
                         }
                     } else {
@@ -37,7 +40,10 @@ namespace xrock_gui_model
                             if((*output)["name"] == interface["linkToInterface"])
                             {
                                 (*output)["interface"] = 1;
-                                (*output)["interfaceExportName"] = interface["name"];
+                                if(overrideExportName || !output->hasKey("interfaceExportName"))
+                                {
+                                    (*output)["interfaceExportName"] = interface["name"];
+                                }
                             }
                         }
                     }
@@ -95,9 +101,15 @@ namespace xrock_gui_model
 
                     // The interface does not yet exist, so we create a NEW one
                     ConfigMap interface;
-                    interface["domain"] = port["domain"];
+                    if(port.hasKey("domain"))
+                    {
+                        interface["domain"] = port["domain"];
+                    }
                     interface["direction"] = port["direction"];
-                    interface["multiplicity"] = port["multiplicity"];
+                    if(port.hasKey("multiplicity"))
+                    {
+                        interface["multiplicity"] = port["multiplicity"];
+                    }
                     interface["type"] = port["type"];
                     interface["linkToNode"] = nodeName;
                     interface["linkToInterface"] = portName;
@@ -146,9 +158,15 @@ namespace xrock_gui_model
 
                     // The interface does not yet exist, so we create a NEW one
                     ConfigMap interface;
-                    interface["domain"] = port["domain"];
+                    if(port.hasKey("domain"))
+                    {
+                        interface["domain"] = port["domain"];
+                    }
                     interface["direction"] = port["direction"];
-                    interface["multiplicity"] = port["multiplicity"];
+                    if(port.hasKey("multiplicity"))
+                    {
+                        interface["multiplicity"] = port["multiplicity"];
+                    }
                     interface["type"] = port["type"];
                     interface["linkToNode"] = node["name"];
                     interface["linkToInterface"] = port["name"];

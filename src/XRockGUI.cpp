@@ -162,6 +162,7 @@ namespace xrock_gui_model
             else
             {
                 env["backend"] = "FileDB";
+                env["dbType"] = "FileDB";
                 // if we don't have a ioLibrary we only support FileDB
                db.reset(new FileDB());
             }
@@ -1624,6 +1625,11 @@ namespace xrock_gui_model
     std::string XRockGUI::getBackend()
     {
         return env["backend"].getString();
+    }
+
+    bool XRockGUI::handleAlias()
+    {
+        return (env["dbType"] != "FileDB");
     }
 
 } // end of namespace xrock_gui_model

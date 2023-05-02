@@ -445,15 +445,21 @@ namespace xrock_gui_model
         if (it != nodeMap.end())
         {
             // Do not allow changes to uri
-            node["uri"] = it->second["uri"];
-
-            // Do not allow changes to name but change the alias instead
-            if (node["name"] != it->second["name"])
+            if(it->second.hasKey("uri"))
             {
-                node["alias"] = node["name"];
+                node["uri"] = it->second["uri"];
             }
-            // TODO: Check that the alias is unique across the whole node map
-            node["name"] = it->second["name"];
+            // Do not allow changes to name but change the alias instead
+            if(xrockGui->handleAlias())
+            {
+                if (node["name"] != it->second["name"])
+                {
+                    node["alias"] = node["name"];
+                }
+                // TODO: Check that the alias is unique across the whole node map
+                node["name"] = it->second["name"];
+            }
+
             // Do not allow changes to model
             node["model"] = it->second["model"];
             // Do not allow changes to interface names, change their alias instead
@@ -552,6 +558,7 @@ namespace xrock_gui_model
             dataMap.erase("gui");
         }
 
+        fprintf(stderr, "load nodes...\n");
         // We now use the basic model to setup the GUI
         if (basicModel["versions"][0].hasKey("components") && basicModel["versions"][0]["components"].hasKey("nodes"))
         {
@@ -607,14 +614,12 @@ namespace xrock_gui_model
                         }
                     }
                 }
-
-                BasicModelHelper::updateExportedInterfacesFromModel(currentMap, basicModel);
-
+                BasicModelHelper::updateExportedInterfacesFromModel(currentMap, basicModel, xrockGui->handleAlias());
                 bagelGui->updateNodeMap(name, currentMap);
             }
 
             // After we have done the nodes, we can wire their interfaces together
-
+            fprintf(stderr, "load edges...\n");        
             if (basicModel["versions"][0]["components"].hasKey("edges"))
             {
                 auto edges = basicModel["versions"][0]["components"]["edges"];
@@ -658,6 +663,7 @@ namespace xrock_gui_model
                 }
             }
 
+            fprintf(stderr, "load configuration...\n");
             // Add configuration update to nodes and edges
             if (basicModel["versions"][0]["components"].hasKey("configuration"))
             {
@@ -682,8 +688,11 @@ namespace xrock_gui_model
                 // TODO: Handle edge configuration
             }
         }
+
+        fprintf(stderr, "apply part layout...\n");
         // Once we are done creating the nodes, we update their layout
         applyPartLayout(basicModel);
+        fprintf(stderr, "...done\n");
     }
 
     void ComponentModelInterface::applyPartLayout(configmaps::ConfigMap &map)

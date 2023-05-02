@@ -133,6 +133,7 @@ namespace xrock_gui_model
         std::unique_ptr<DBInterface> db;
         XRockIOLibrary *ioLibrary;
         std::string getBackend();
+        bool handleAlias();
 
     private:
         mars::main_gui::GuiInterface *gui;

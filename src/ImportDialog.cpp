@@ -29,7 +29,7 @@ namespace xrock_gui_model
     std::string ImportDialog::lastDomain = "SOFTWARE";
     std::string ImportDialog::lastFilter = "";
 
-    ImportDialog::ImportDialog(XRockGUI *xrockGui, bool load) : xrockGui(xrockGui), load(load),
+    ImportDialog::ImportDialog(XRockGUI *xrockGui, Intention intent) : xrockGui(xrockGui), intent(intent),
                                                                 selectedDomain(""),
                                                                 selectedModel(""),
                                                                 selectedVersion("")
@@ -88,14 +88,24 @@ namespace xrock_gui_model
         dw->setBlackFilterPattern(pattern);
 
         QPushButton *button = new QPushButton("add component");
-        if (load)
+
+        switch (intent)
         {
+        case Intention::LOAD_CM:
             this->setWindowTitle("Load Model/Component");
             button->setText("load model");
-        }
-        else
-        {
+            break;
+        case Intention::ADD_CM:
             this->setWindowTitle("Add Model/Component");
+            button->setText("add model");
+            break;
+        case Intention::ADD_TYPE:
+            this->setWindowTitle("Add Type");
+            button->setText("add type");
+            break;
+        
+        default:
+            break;
         }
 
         vLayout->addWidget(button);
@@ -167,6 +177,7 @@ namespace xrock_gui_model
         selectedVersion = versionName.toStdString();
         dw->clearGUI();
         ConfigMap map = xrockGui->db->requestModel(selectedDomain, selectedModel, selectedVersion, true);
+        if(intent == Intention::ADD_TYPE){ model = map;}
         doc->setHtml("");
         if (map["versions"][0].hasKey("data"))
         {
@@ -195,13 +206,21 @@ namespace xrock_gui_model
             selectedModel != std::string("") &&
             selectedVersion != std::string(""))
         {
-            if (load)
+
+            switch (intent)
+            {
+            case Intention::LOAD_CM:
             {
                 xrockGui->loadComponentModel(selectedDomain, selectedModel, selectedVersion);
+                break;
             }
-            else
+            case Intention::ADD_CM:
             {
                 xrockGui->addComponent(selectedDomain, selectedModel, selectedVersion);
+                break;
+            }
+            default:
+                break;
             }
             done(0);
         }

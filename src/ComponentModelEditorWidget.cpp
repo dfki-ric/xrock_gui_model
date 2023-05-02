@@ -2,6 +2,7 @@
 #include "XRockGUI.hpp"
 #include "ConfigureDialog.hpp"
 #include "ConfigMapHelper.hpp"
+#include "ImportDialog.hpp"
 
 #include <QVBoxLayout>
 #include <QLabel>
@@ -84,9 +85,23 @@ namespace xrock_gui_model
 
                 }
             }
+            QLabel* l = new QLabel("types");
+            layout->addWidget(l, i, 0);
+            types = new QListWidget();
+            layout->addWidget(types, i++, 1);
+            QPushButton* minusBtn =new QPushButton("-"); 
+            connect(minusBtn,  SIGNAL(clicked(bool)), this, SLOT(removeSelectedType()));
+
+            QPushButton* plusBtn =new QPushButton("+"); 
+            connect(plusBtn,  SIGNAL(clicked(bool)), this, SLOT(addType()));
+ 
+            QHBoxLayout* hbox  = new QHBoxLayout();
+            hbox->addWidget(minusBtn);
+            hbox->addWidget(plusBtn);
+            layout->addLayout(hbox, i++, 1);
 
             // Special property landing in the infamous 'data' property
-            QLabel* l = new QLabel("annotations");
+            l = new QLabel("annotations");
             layout->addWidget(l, i, 0);
             annotations = new QTextEdit();
             layout->addWidget(annotations, i++, 1);
@@ -254,6 +269,17 @@ namespace xrock_gui_model
         {
           uri->setText(QString::fromStdString(info["uri"]));
         }
+        // FILL TYPES list
+        for(auto type : info["types"])
+        {
+            std::string name = type["name"];
+            std::string version = type["version"];
+            QListWidgetItem* item = new QListWidgetItem(QString::fromStdString(name + " " + version));
+            QVariant tag; 
+            tag.setValue(QString::fromStdString(type.toJsonString()));
+            item->setData(Qt::UserRole, tag);
+            types->addItem(item);
+        } 
         currentModel = newModel;
     }
 
@@ -342,6 +368,14 @@ namespace xrock_gui_model
         else
         {
             updatedMap["versions"][0]["data"] = annoMap;
+        }
+        // Sync types list with basic model
+        updatedMap["types"] = ConfigVector();
+        for(int i = 0; i < types->count(); ++i)
+        {
+            QListWidgetItem* item = types->item(i);
+            ConfigMap type = ConfigMap::fromJsonString(item->data(Qt::UserRole).value<QString>().toStdString());
+            updatedMap["types"].push_back(type);
         }
         currentModel->setModelInfo(updatedMap);
     }
@@ -437,6 +471,7 @@ namespace xrock_gui_model
         //interfaces->clear();
         layouts->clear();
         uri->clear();
+        types->clear();
     }
 
 
@@ -466,4 +501,40 @@ namespace xrock_gui_model
         updateModel();
     }
 
+    void ComponentModelEditorWidget::removeSelectedType()
+    {
+        QListWidgetItem *item = types->currentItem();
+        if(item)
+        {
+            delete item;
+            updateModel();
+        }
+    }
+
+    void ComponentModelEditorWidget::addType(){
+        // Pick cm from db 
+        ImportDialog id(xrockGui, ImportDialog::Intention::ADD_TYPE);
+        id.exec();
+    
+        auto model  = id.getModel();
+        ConfigMap type;
+        type["name"] = model["name"];
+        type["version"] = model["versions"][0]["name"];
+        std::string name = type["name"];
+        std::string version = type["version"];
+
+        ConfigMap currentMap(currentModel->getModelInfo());
+        if(std::any_of(currentMap["types"].begin(), currentMap["types"].end(), 
+        [&name, &version](auto& type){ return type["name"] == name && type["version"] == version;})){
+            QMessageBox::warning(nullptr, "Warning", QString::fromStdString("Type " + name + " is already added!"), QMessageBox::Ok);
+        } else {
+            QListWidgetItem* item = new QListWidgetItem(QString::fromStdString(name + " " + version));
+            QVariant tag; 
+            tag.setValue(QString::fromStdString(type.toJsonString()));
+            item->setData(Qt::UserRole, tag);
+            types->addItem(item);
+
+            updateModel(); 
+        }
+    }
 } // end of namespace xrock_gui_model

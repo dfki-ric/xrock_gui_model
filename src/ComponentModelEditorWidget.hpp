@@ -65,12 +65,16 @@ namespace xrock_gui_model
         void update_prop_widget(const std::string &prop_name, configmaps::ConfigAtom &value);
         // update widget with thr properties and as well as fact information
         void update_widgets(configmaps::ConfigMap &info);
+        void removeSelectedType();
+        void addType();
 
     private:
         std::map<QLabel *, QWidget *> widgets; // Generic list of label:
         bagel_gui::BagelGui *bagelGui;
         XRockGUI *xrockGui;
         bagel_gui::ModelInterface* currentModel = nullptr;
+
+        QListWidget* types;
 
         QListWidget *layouts;
         std::map<std::string, QCheckBox *> layoutCheckBoxes;

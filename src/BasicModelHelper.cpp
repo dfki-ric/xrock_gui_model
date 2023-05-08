@@ -229,6 +229,30 @@ namespace xrock_gui_model
                     }
                 }
             }
+
+            // todo: convert to legacy
+            if(model["versions"][0]["components"].hasKey("configuration"))
+            {
+                if(model["versions"][0]["components"]["configuration"].hasKey("nodes"))
+                {
+                    ConfigVector &nodes = model["versions"][0]["components"]["configuration"]["nodes"];
+                    for(ConfigVector::iterator node = nodes.begin(); node != nodes.end(); ++node)
+                        if(node->hasKey("data") && !(*node)["data"].isMap())
+                    {
+                        (*node)["data"] = ConfigMap::fromYamlString((*node)["data"]);
+                    }
+                }
+            }
+        }
+
+        // todo: convert to legacy
+        if(model["versions"][0].hasKey("defaultConfiguration"))
+        {
+            ConfigMap &map1 = model["versions"][0]["defaultConfiguration"];
+            if(map1.hasKey("data") and !map1["data"].isMap())
+            {
+                map1["data"] = ConfigMap::fromYamlString(map1["data"]);
+            }
         }
     }
 

@@ -1051,7 +1051,7 @@ namespace xrock_gui_model
         }
         ConfigMap node = *(bagelGui->getNodeMap(nodeName));
         ConfigMap config;
-        std::string type = node["type"];
+        std::string type = node["model"]["type"];
         bool bagelType = matchPattern("bagel::*", type);
         ConfigVector::iterator it = node[portType].begin();
         ConfigItem *subMap = NULL;
@@ -1065,7 +1065,7 @@ namespace xrock_gui_model
                     if (bagelType)
                     {
                         std::cerr << "configure bagel port" << std::endl;
-                        std::vector<std::string> keys = {"data", "configuration", "interfaces", contextPortName};
+                        std::vector<std::string> keys = {"configuration", "data", "interfaces", contextPortName};
                         subMap = ConfigMapHelper::getSubItem(node, keys);
                         if (portType == "inputs" and subMap and subMap->isMap())
                         {
@@ -1087,7 +1087,21 @@ namespace xrock_gui_model
                     else
                     {
                         // TODO: This is not correct. Where does this come from? The basic model does not have such a property?
-                        config = ConfigMap::fromYamlString((*it)["defaultConfig"].getString());
+                        if(node["model"]["versions"][0].hasKey("defaultConfiguration"))
+                        {
+                            ConfigMap &defaultConfig = node["model"]["versions"][0]["defaultConfiguration"];
+                            if(defaultConfig.hasKey("data") && defaultConfig["data"].hasKey("interfaces"))
+                            {
+                                for(auto &[key, value]: (ConfigMap)defaultConfig["data"]["interfaces"])
+                                {
+                                    if(key == portName)
+                                    {
+                                        config = value;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
                 catch (...)
@@ -1128,7 +1142,7 @@ namespace xrock_gui_model
             else
             {
                 // TODO: This is not correct. Where does this come from? The basic model does not have such a property?
-                (*it)["defaultConfig"] = config.toYamlString();
+                //(*it)["defaultConfig"] = config.toYamlString();
             }
             bagelGui->updateNodeMap(nodeName, node);
         }

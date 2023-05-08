@@ -26,7 +26,7 @@ namespace xrock_gui_model
 
         // If node ports are configured in the gui to be exposed we have to create a linked interface
         // in the model itself
-        static void updateExportedInterfacesToModel(configmaps::ConfigMap &node, configmaps::ConfigMap &model);
+        static void updateExportedInterfacesToModel(configmaps::ConfigMap &node, configmaps::ConfigMap &model, bool handleAlias);
 
         // Converts from the old basic model to the new representation:
         //  - Store model information in sub-map

@@ -1075,6 +1075,22 @@ namespace xrock_gui_model
                             dropdown["merge"][3] = "MAX";
                             config = *subMap;
                         }
+                        else if(node["model"]["versions"][0].hasKey("defaultConfiguration"))
+                        {
+                            ConfigMap &defaultConfig = node["model"]["versions"][0]["defaultConfiguration"];
+                            if(defaultConfig.hasKey("data") && defaultConfig["data"].hasKey("interfaces"))
+                            {
+                                for(auto &[key, value]: (ConfigMap)defaultConfig["data"]["interfaces"])
+                                {
+                                    if(key == portName)
+                                    {
+                                        config = value;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
                         if (it->hasKey("interfaceExportName"))
                         {
                             config["interfaceExportName"] = (*it)["interfaceExportName"];

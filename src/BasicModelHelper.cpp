@@ -70,7 +70,7 @@ namespace xrock_gui_model
         model["versions"][0]["interfaces"] = interfaces;
     }
 
-    void BasicModelHelper::updateExportedInterfacesToModel(ConfigMap &node, ConfigMap &model)
+    void BasicModelHelper::updateExportedInterfacesToModel(ConfigMap &node, ConfigMap &model, bool handleAlias)
     {
         // add exported interfaces of node to interface list
         const std::string& nodeName(node["name"].getString());
@@ -114,7 +114,15 @@ namespace xrock_gui_model
                     interface["linkToNode"] = nodeName;
                     interface["linkToInterface"] = portName;
                     interface["name"] = nodeName + std::string(":") + portName;
-                    interface["alias"] = (nodeAlias.empty() ? nodeName : nodeAlias) + std::string(":") + (portAlias.empty() ? portName : portAlias);
+                    if(handleAlias)
+                    {
+                        interface["alias"] = (nodeAlias.empty() ? nodeName : nodeAlias) + std::string(":") + (portAlias.empty() ? portName : portAlias);
+                        // todo: should we also have an option to define the export name in the GUI?
+                    }
+                    else
+                    {
+                        interface["name"] = port["interfaceExportName"];
+                    }
                     model["versions"][0]["interfaces"].push_back(interface);
                 }
                 else if (interfaceId == 0)
@@ -171,7 +179,15 @@ namespace xrock_gui_model
                     interface["linkToNode"] = node["name"];
                     interface["linkToInterface"] = port["name"];
                     interface["name"] = nodeName + std::string(":") + portName;
-                    interface["alias"] = (nodeAlias.empty() ? nodeName : nodeAlias) + std::string(":") + (portAlias.empty() ? portName : portAlias);
+                    if(handleAlias)
+                    {
+                        interface["alias"] = (nodeAlias.empty() ? nodeName : nodeAlias) + std::string(":") + (portAlias.empty() ? portName : portAlias);
+                        // todo: should we also have an option to define the export name in the GUI?
+                    }
+                    else
+                    {
+                        interface["name"] = port["interfaceExportName"];
+                    }
                     model["versions"][0]["interfaces"].push_back(interface);
                 }
                 else if (interfaceId == 0)
@@ -246,6 +262,12 @@ namespace xrock_gui_model
         }
 
         // todo: convert to legacy
+        if(model["versions"][0].hasKey("defaultConfig"))
+        {
+            model["versions"][0]["defaultConfiguration"] = model["versions"][0]["defaultConfig"];
+            ((ConfigMap)(model["versions"][0])).erase("defaultConfig");
+        }
+
         if(model["versions"][0].hasKey("defaultConfiguration"))
         {
             ConfigMap &map1 = model["versions"][0]["defaultConfiguration"];

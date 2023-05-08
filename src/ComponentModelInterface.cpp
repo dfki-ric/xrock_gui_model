@@ -732,7 +732,7 @@ namespace xrock_gui_model
             n["model"]["version"] = node["model"]["versions"][0]["name"];
 
             // update exported interfaces
-            BasicModelHelper::updateExportedInterfacesToModel(node, mi);
+            BasicModelHelper::updateExportedInterfacesToModel(node, mi, xrockGui->handleAlias());
 
             // Update interface_aliases
             ConfigVector &inputs = node["inputs"];

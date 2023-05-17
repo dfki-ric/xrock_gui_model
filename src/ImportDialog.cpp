@@ -108,6 +108,7 @@ namespace xrock_gui_model
         mainLayout->addWidget(doc);
         setLayout(mainLayout);
         doc->setHtml("");
+        doc->setStyleSheet("background-color:#eeeeee;");
         if ((int)indexMap[lastDomain] == 0)
         {
             changeDomain(lastDomain.c_str());

@@ -655,6 +655,11 @@ namespace xrock_gui_model
                     else 
                         edge["smooth"] = true;
                     
+                    if(it.hasKey("data") && it["data"].isMap() && it["data"].hasKey("weight"))
+                    {
+                        edge["weight"] = it["data"]["weight"];
+                    }
+
                     if (hasEdge(edge))
                     {
                         continue;
@@ -797,7 +802,7 @@ namespace xrock_gui_model
                 "data"};
 
             // Make edge data
-            ConfigMap edgeData;
+            ConfigMap edgeData = it["data"];
             auto it2 = it.beginMap();
             for (; it2 != it.endMap(); ++it2)
             {
@@ -813,6 +818,13 @@ namespace xrock_gui_model
                 if (edgeData["domain"].getString().empty())
                     edgeData["domain"] = domain;
                 edge["data"] = edgeData;
+            }
+            if(edge.hasKey("data"))
+            {
+                if(edge["data"].hasKey("weight"))
+                {
+                    edge["weight"] = edge["data"]["weight"];
+                }
             }
 
             if (it.hasKey("name"))

@@ -239,9 +239,16 @@ namespace xrock_gui_model
                 ConfigVector &edges = model["versions"][0]["components"]["edges"];
                 for(ConfigVector::iterator edge = edges.begin(); edge != edges.end(); ++edge)
                 {
-                    if(edge->hasKey("data") && !(*edge)["data"].isMap())
+                    if(edge->hasKey("data"))
                     {
-                        (*edge)["data"] = ConfigMap::fromYamlString((*edge)["data"]);
+                        if(!(*edge)["data"].isMap())
+                        {
+                            (*edge)["data"] = ConfigMap::fromYamlString((*edge)["data"]);
+                        }
+                        if((*edge)["data"].hasKey("weight"))
+                        {
+                            (*edge)["weight"] = (*edge)["data"]["weight"];
+                        }
                     }
                 }
             }
@@ -316,6 +323,24 @@ namespace xrock_gui_model
                         ConfigMap &e = *edge;
                         e.erase("data");
                         e["data"] = dataString;
+                    }
+                }
+            }
+        }
+
+        if(model["versions"][0]["components"].hasKey("configuration"))
+        {
+            if(model["versions"][0]["components"]["configuration"].hasKey("nodes"))
+            {
+                ConfigVector &nodes = model["versions"][0]["components"]["configuration"]["nodes"];
+                for(ConfigVector::iterator node = nodes.begin(); node != nodes.end(); ++node)
+                {
+                    if(node->hasKey("data") && (*node)["data"].isMap())
+                    {
+                        std::string dataString = (*node)["data"].toYamlString();
+                        ConfigMap &n = *node;
+                        n.erase("data");
+                        n["data"] = dataString;
                     }
                 }
             }

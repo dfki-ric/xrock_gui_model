@@ -447,8 +447,7 @@ namespace xrock_gui_model
             }
             case MenuActions::ADD_COMPONENT_FROM_DB: // add component from database
             {
-                ImportDialog id(this, false);
-                id.exec();
+                addComponent();
                 break;
             }
             case MenuActions::NEW_MODEL: // create new, empty model
@@ -847,12 +846,12 @@ namespace xrock_gui_model
 
     void XRockGUI::requestModel()
     {
-        ImportDialog id(this, true);
+        ImportDialog id(this, ImportDialog::Intention::LOAD_CM);
         id.exec();
     }
     void XRockGUI::addComponent()
     {
-        ImportDialog id(this, false);
+        ImportDialog id(this, ImportDialog::Intention::ADD_CM);
         id.exec();
     }
 

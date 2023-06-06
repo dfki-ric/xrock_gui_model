@@ -31,10 +31,19 @@ namespace xrock_gui_model
         Q_OBJECT
 
     public:
-        explicit ImportDialog(XRockGUI *xrockGui, bool load = false);
+        enum Intention {
+            LOAD_CM,
+            ADD_CM,
+            ADD_TYPE
+        };
+        explicit ImportDialog(XRockGUI *xrockGui, Intention intent = Intention::ADD_CM);
         ~ImportDialog();
-
+        
         static std::string lastDomain, lastFilter;
+
+        configmaps::ConfigMap getModel(){
+            return model;
+        }
 
     public slots:
         void addModel();
@@ -49,13 +58,15 @@ namespace xrock_gui_model
         void sigAddComponent(std::string domain, std::string model, std::string version);
 
     private:
+        Intention intent;
         XRockGUI *xrockGui;
-        bool load, ignoreUpdate;
+        bool ignoreUpdate;
         std::string selectedDomain;
         std::string selectedModel;
         std::string selectedVersion;
         std::vector<std::pair<std::string, std::string>> modelList;
         configmaps::ConfigMap indexMap;
+        configmaps::ConfigMap model;
 
         QListWidget *models;
         QLineEdit *filterPattern;

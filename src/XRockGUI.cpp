@@ -1275,13 +1275,13 @@ namespace xrock_gui_model
         cnd_export << " -b " << (std::string)env["dbType"];
         if (env["dbType"] == "Serverless")
         {
-            cnd_export << " --path " << toolbarBackend->getDbPath();
+            cnd_export << " --db_address " << toolbarBackend->getDbPath();
         }
         else if (env["dbType"] == "Client")
         {
-            cnd_export << " --url " << toolbarBackend->getDbAddress();  
+            cnd_export << " --db_address " << toolbarBackend->getDbAddress();  
         }
-        cnd_export << " --graph " <<  toolbarBackend->getGraph();
+        cnd_export << " --db_graph " <<  toolbarBackend->getGraph();
       
         int ret = std::system(cnd_export.str().c_str());
         if (ret == EXIT_SUCCESS)

@@ -58,8 +58,8 @@ namespace xrock_gui_model
         void sigAddComponent(std::string domain, std::string model, std::string version);
 
     private:
-        Intention intent;
         XRockGUI *xrockGui;
+        Intention intent;
         bool ignoreUpdate;
         std::string selectedDomain;
         std::string selectedModel;

@@ -16,6 +16,8 @@
 #include "ConfigureDialog.hpp"
 #include "ConfigMapHelper.hpp"
 
+#include "plugins/MARSIMUConfig.hpp"
+
 #include <lib_manager/LibManager.hpp>
 #include <bagel_gui/BagelGui.hpp>
 #include <bagel_gui/BagelModel.hpp>
@@ -30,6 +32,8 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip> // for std::put_time()
+
+#include <smurf_parser/SMURFParser.h>
 
 using namespace lib_manager;
 using namespace bagel_gui;
@@ -59,6 +63,10 @@ namespace xrock_gui_model
         initConfig();
         initBagelGui();
         initMainGui();
+
+        // register config plugins
+        ConfigureDialogLoader *l = new MARSIMUConfigLoader();
+        configPlugins["mars::IMU"] = l;
 
         loadSettingsFromFile("generalsettings.yml");
         loadModelFromParameter();
@@ -242,6 +250,13 @@ namespace xrock_gui_model
                                       icon + "remove.png", true);
             gui->addGenericMenuAction("../Implements/Abstract_gui", static_cast<int>(MenuActions::RUN_ABSTRACT_GUI), this, 0,
                                       icon + "abstract.png", true);
+            gui->addGenericMenuAction("../Edit/Global Variabls/Edit", static_cast<int>(MenuActions::EDIT_GLOBAL_VARIABLES), this, 0, "", true);
+            gui->addGenericMenuAction("../Edit/Global Variabls/Load from Model", static_cast<int>(MenuActions::EDIT_LOAD_GLOBAL_VARIABLES), this, 0, "", true);
+            gui->addGenericMenuAction("../Edit/Global Variabls/Store to Model", static_cast<int>(MenuActions::EDIT_STORE_GLOBAL_VARIABLES), this, 0, "", true);
+            gui->addGenericMenuAction("../Edit/Frames/Edit", static_cast<int>(MenuActions::EDIT_FRAMES), this, 0, "", true);
+            gui->addGenericMenuAction("../Edit/Frames/Load from Smurf", static_cast<int>(MenuActions::EDIT_LOAD_FRAMES_FROM_SMURF), this, 0, "", true);
+            gui->addGenericMenuAction("../Edit/Frames/Load from Model", static_cast<int>(MenuActions::EDIT_LOAD_FRAMES), this, 0, "", true);
+            gui->addGenericMenuAction("../Edit/Frames/Store to Model", static_cast<int>(MenuActions::EDIT_STORE_FRAMES), this, 0, "", true);
 
             mars::main_gui::MainGUI *mainGui = dynamic_cast<mars::main_gui::MainGUI *>(gui);
             mainGui->mainWindow_p()->setWindowIcon(QIcon(":/images/xrock_gui.ico"));
@@ -474,6 +489,153 @@ namespace xrock_gui_model
                 model->setModelInfo(basicModel);
                 break;
             }
+
+            // Edit->Global Variables
+            case MenuActions::EDIT_GLOBAL_VARIABLES:
+            {
+                ConfigMap globalMap = bagelGui->getGlobalConfig();
+                ConfigMap map;
+                if(globalMap.hasKey("globalVariables"))
+                {
+                    map = globalMap["globalVariables"];
+                }
+                {
+                    ConfigureDialog cd(&map, env, "Global Variables", true, true);
+                    cd.resize(400, 400);
+                    cd.exec();
+                }
+                globalMap["globalVariables"] = map;
+                bagelGui->setGlobalConfig(globalMap);
+                break;
+            }
+            case MenuActions::EDIT_LOAD_GLOBAL_VARIABLES:
+            {
+
+                ModelInterface *model = bagelGui->getCurrentModel();
+                if (model)
+                {
+                    ConfigMap basicModel = model->getModelInfo();
+                    if(basicModel["versions"][0].hasKey("data") &&
+                       basicModel["versions"][0]["data"].hasKey("globalVariables"))
+                    {
+                        ConfigMap globalConfig = bagelGui->getGlobalConfig();
+                        globalConfig["globalVariables"] = basicModel["versions"][0]["data"]["globalVariables"];
+                        bagelGui->setGlobalConfig(globalConfig);
+                    }
+
+                }
+                break;
+            }
+            case MenuActions::EDIT_STORE_GLOBAL_VARIABLES:
+            {
+
+                ModelInterface *model = bagelGui->getCurrentModel();
+                if (model)
+                {
+                    ConfigMap basicModel = model->getModelInfo();
+                    ConfigMap globalMap = bagelGui->getGlobalConfig();
+                    basicModel["versions"][0]["data"]["globalVariables"] = globalMap["globalVariables"];
+                    model->setModelInfo(basicModel);
+                }
+                break;
+            }
+
+            // Edit->Frames
+            case MenuActions::EDIT_FRAMES:
+            {
+                ConfigMap globalMap = bagelGui->getGlobalConfig();
+                ConfigMap map;
+                map["frames"] = ConfigVector();
+                if(globalMap.hasKey("frameNames"))
+                {
+                    map["frames"] = globalMap["frameNames"];
+                }
+                {
+                    ConfigureDialog cd(&map, env, "Frames", true, true);
+                    cd.resize(400, 400);
+                    cd.exec();
+                }
+                if(map.hasKey("frames"))
+                {
+                    globalMap["frameNames"] = map["frames"];
+                }
+                bagelGui->setGlobalConfig(globalMap);
+                break;
+            }
+            case MenuActions::EDIT_LOAD_FRAMES_FROM_SMURF:
+            {
+                ConfigMap map;
+                map["prefix"] = "";
+                map["filename"] = "";
+                ConfigMap pattern;
+                pattern["pattern"][0] = "../filename";
+                {
+                    ConfigureDialog cd(&map, env, "Load Frames From Smurf", true, false, NULL, &pattern);
+                    cd.resize(400, 400);
+                    cd.exec();
+                }
+                urdf::ModelInterfaceSharedPtr model;
+                ConfigMap entityconfig;
+                std::string filename = map["filename"];
+                std::string path = getPathOfFile(filename);
+                path = pathJoin(getCurrentWorkingDir(), path);
+                removeFilenamePrefix(&filename);
+                fprintf(stderr, "load frames from: %s - %s\n", path.c_str(), filename.c_str());
+                model = smurf_parser::parseFile(&entityconfig, path, filename, true);
+                std::map<std::string, urdf::LinkSharedPtr >::iterator it;
+                ConfigMap frames;
+                std::string prefix = map["prefix"];
+                std::string frame;
+                for(it = model->links_.begin(); it != model->links_.end(); ++it)
+                {
+                    if(prefix != "")
+                    {
+                        frame = prefix + "." + it->first;
+                    }
+                    else
+                    {
+                        frame = it->first;
+                    }
+                    frames["frameNames"].push_back(frame);
+                }
+                //fprintf(stderr, "frames:\n%s\n", frames.toYamlString().c_str());
+                ConfigMap globalConfig = bagelGui->getGlobalConfig();
+                globalConfig["frameNames"] = frames["frameNames"];
+                bagelGui->setGlobalConfig(globalConfig);                
+                break;
+            }
+            case MenuActions::EDIT_LOAD_FRAMES:
+            {
+
+                ModelInterface *model = bagelGui->getCurrentModel();
+                if (model)
+                {
+                    ConfigMap basicModel = model->getModelInfo();
+                    if(basicModel["versions"][0].hasKey("data") &&
+                       basicModel["versions"][0]["data"].hasKey("frameNames"))
+                    {
+                        ConfigMap globalConfig = bagelGui->getGlobalConfig();
+                        globalConfig["frameNames"] = basicModel["versions"][0]["data"]["frameNames"];
+                        bagelGui->setGlobalConfig(globalConfig);
+                    }
+
+                }
+                break;
+            }
+            case MenuActions::EDIT_STORE_FRAMES:
+            {
+
+                ModelInterface *model = bagelGui->getCurrentModel();
+                if (model)
+                {
+                    ConfigMap basicModel = model->getModelInfo();
+                    ConfigMap globalMap = bagelGui->getGlobalConfig();
+                    basicModel["versions"][0]["data"]["frameNames"] = globalMap["frameNames"];
+                    model->setModelInfo(basicModel);
+                }
+                break;
+            }
+
             case MenuActions::CREATE_BAGEL_MOTION_CONTROL_TASK:
             {
                 // 20221102 MS: Why is this here? Has nothing todo with XROCK.
@@ -959,9 +1121,22 @@ namespace xrock_gui_model
             }
         }
         {
-            ConfigureDialog cd(&config, env, node["model"]["name"], true, true);
-            cd.resize(400, 400);
-            cd.exec();
+            std::string type = node["model"]["name"];
+            std::map<std::string, ConfigureDialogLoader*>::iterator it;
+            it = configPlugins.find(type);
+            if(it != configPlugins.end())
+            {
+                ConfigMap globalConfig = bagelGui->getGlobalConfig();
+                QDialog *d = it->second->createDialog(&config, env, globalConfig);
+                d->exec();
+                delete d;
+            }
+            else
+            {
+                ConfigureDialog cd(&config, env, node["model"]["name"], true, true);
+                cd.resize(400, 400);
+                cd.exec();
+            }
         }
         // Update the node configuration
         node["configuration"]["data"] = config;
@@ -992,7 +1167,7 @@ namespace xrock_gui_model
                 if (mars::utils::pathExists(path))
                 {
                     printf("found config file: %s\n", path.c_str());
-                    ConfigureDialog cd(NULL, env, node["modelName"], true, true, NULL, path);
+                    ConfigureDialog cd(NULL, env, node["modelName"], true, true, NULL, NULL, path);
                     cd.resize(400, 400);
                     cd.exec();
                 }
@@ -1012,8 +1187,14 @@ namespace xrock_gui_model
     {
         ConfigMap node = *(bagelGui->getNodeMap(name));
         ConfigMap config;
-        if (!node.hasKey("configuration"))
-            return;
+        if(!node.hasKey("configuration"))
+        {
+            node["configuration"] = ConfigMap();
+        }
+        if(!node["configuration"].hasKey("submodel"))
+        {
+            node["configuration"]["submodel"] = ConfigVector();
+        }
         // Since the data fields in there are strings, we have convert them to ConfigMaps
         ConfigMapHelper::unpackSubmodel(config, node["configuration"]["submodel"]);
         {

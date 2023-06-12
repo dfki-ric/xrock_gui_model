@@ -7,7 +7,7 @@ using namespace configmaps;
 namespace xrock_gui_model
 {
 
-    void BasicModelHelper::updateExportedInterfacesFromModel(ConfigMap &node, ConfigMap &model)
+    void BasicModelHelper::updateExportedInterfacesFromModel(ConfigMap &node, ConfigMap &model, bool overrideExportName)
     {
         // exposed interfaces are stored in the input data within the bagel_gui
         // so we have to create this information from the model interfaces
@@ -27,7 +27,10 @@ namespace xrock_gui_model
                             if((*input)["name"] == interface["linkToInterface"])
                             {
                                 (*input)["interface"] = 1;
-                                (*input)["interfaceExportName"] = interface["name"];
+                                if(overrideExportName || !input->hasKey("interfaceExportName"))
+                                {
+                                    (*input)["interfaceExportName"] = interface["name"];
+                                }
                             }
                         }
                     } else {
@@ -37,7 +40,10 @@ namespace xrock_gui_model
                             if((*output)["name"] == interface["linkToInterface"])
                             {
                                 (*output)["interface"] = 1;
-                                (*output)["interfaceExportName"] = interface["name"];
+                                if(overrideExportName || !output->hasKey("interfaceExportName"))
+                                {
+                                    (*output)["interfaceExportName"] = interface["name"];
+                                }
                             }
                         }
                     }
@@ -64,7 +70,7 @@ namespace xrock_gui_model
         model["versions"][0]["interfaces"] = interfaces;
     }
 
-    void BasicModelHelper::updateExportedInterfacesToModel(ConfigMap &node, ConfigMap &model)
+    void BasicModelHelper::updateExportedInterfacesToModel(ConfigMap &node, ConfigMap &model, bool handleAlias)
     {
         // add exported interfaces of node to interface list
         const std::string& nodeName(node["name"].getString());
@@ -95,14 +101,28 @@ namespace xrock_gui_model
 
                     // The interface does not yet exist, so we create a NEW one
                     ConfigMap interface;
-                    interface["domain"] = port["domain"];
+                    if(port.hasKey("domain"))
+                    {
+                        interface["domain"] = port["domain"];
+                    }
                     interface["direction"] = port["direction"];
-                    interface["multiplicity"] = port["multiplicity"];
+                    if(port.hasKey("multiplicity"))
+                    {
+                        interface["multiplicity"] = port["multiplicity"];
+                    }
                     interface["type"] = port["type"];
                     interface["linkToNode"] = nodeName;
                     interface["linkToInterface"] = portName;
                     interface["name"] = nodeName + std::string(":") + portName;
-                    interface["alias"] = (nodeAlias.empty() ? nodeName : nodeAlias) + std::string(":") + (portAlias.empty() ? portName : portAlias);
+                    if(handleAlias)
+                    {
+                        interface["alias"] = (nodeAlias.empty() ? nodeName : nodeAlias) + std::string(":") + (portAlias.empty() ? portName : portAlias);
+                        // todo: should we also have an option to define the export name in the GUI?
+                    }
+                    else
+                    {
+                        interface["name"] = port["interfaceExportName"];
+                    }
                     model["versions"][0]["interfaces"].push_back(interface);
                 }
                 else if (interfaceId == 0)
@@ -146,14 +166,28 @@ namespace xrock_gui_model
 
                     // The interface does not yet exist, so we create a NEW one
                     ConfigMap interface;
-                    interface["domain"] = port["domain"];
+                    if(port.hasKey("domain"))
+                    {
+                        interface["domain"] = port["domain"];
+                    }
                     interface["direction"] = port["direction"];
-                    interface["multiplicity"] = port["multiplicity"];
+                    if(port.hasKey("multiplicity"))
+                    {
+                        interface["multiplicity"] = port["multiplicity"];
+                    }
                     interface["type"] = port["type"];
                     interface["linkToNode"] = node["name"];
                     interface["linkToInterface"] = port["name"];
                     interface["name"] = nodeName + std::string(":") + portName;
-                    interface["alias"] = (nodeAlias.empty() ? nodeName : nodeAlias) + std::string(":") + (portAlias.empty() ? portName : portAlias);
+                    if(handleAlias)
+                    {
+                        interface["alias"] = (nodeAlias.empty() ? nodeName : nodeAlias) + std::string(":") + (portAlias.empty() ? portName : portAlias);
+                        // todo: should we also have an option to define the export name in the GUI?
+                    }
+                    else
+                    {
+                        interface["name"] = port["interfaceExportName"];
+                    }
                     model["versions"][0]["interfaces"].push_back(interface);
                 }
                 else if (interfaceId == 0)
@@ -205,11 +239,48 @@ namespace xrock_gui_model
                 ConfigVector &edges = model["versions"][0]["components"]["edges"];
                 for(ConfigVector::iterator edge = edges.begin(); edge != edges.end(); ++edge)
                 {
-                    if(edge->hasKey("data") && !(*edge)["data"].isMap())
+                    if(edge->hasKey("data"))
                     {
-                        (*edge)["data"] = ConfigMap::fromYamlString((*edge)["data"]);
+                        if(!(*edge)["data"].isMap())
+                        {
+                            (*edge)["data"] = ConfigMap::fromYamlString((*edge)["data"]);
+                        }
+                        if((*edge)["data"].hasKey("weight"))
+                        {
+                            (*edge)["weight"] = (*edge)["data"]["weight"];
+                        }
                     }
                 }
+            }
+
+            // todo: convert to legacy
+            if(model["versions"][0]["components"].hasKey("configuration"))
+            {
+                if(model["versions"][0]["components"]["configuration"].hasKey("nodes"))
+                {
+                    ConfigVector &nodes = model["versions"][0]["components"]["configuration"]["nodes"];
+                    for(ConfigVector::iterator node = nodes.begin(); node != nodes.end(); ++node)
+                        if(node->hasKey("data") && !(*node)["data"].isMap())
+                    {
+                        (*node)["data"] = ConfigMap::fromYamlString((*node)["data"]);
+                    }
+                }
+            }
+        }
+
+        // todo: convert to legacy
+        if(model["versions"][0].hasKey("defaultConfig"))
+        {
+            model["versions"][0]["defaultConfiguration"] = model["versions"][0]["defaultConfig"];
+            ((ConfigMap)(model["versions"][0])).erase("defaultConfig");
+        }
+
+        if(model["versions"][0].hasKey("defaultConfiguration"))
+        {
+            ConfigMap &map1 = model["versions"][0]["defaultConfiguration"];
+            if(map1.hasKey("data") and !map1["data"].isMap())
+            {
+                map1["data"] = ConfigMap::fromYamlString(map1["data"]);
             }
         }
     }
@@ -252,6 +323,24 @@ namespace xrock_gui_model
                         ConfigMap &e = *edge;
                         e.erase("data");
                         e["data"] = dataString;
+                    }
+                }
+            }
+        }
+
+        if(model["versions"][0]["components"].hasKey("configuration"))
+        {
+            if(model["versions"][0]["components"]["configuration"].hasKey("nodes"))
+            {
+                ConfigVector &nodes = model["versions"][0]["components"]["configuration"]["nodes"];
+                for(ConfigVector::iterator node = nodes.begin(); node != nodes.end(); ++node)
+                {
+                    if(node->hasKey("data") && (*node)["data"].isMap())
+                    {
+                        std::string dataString = (*node)["data"].toYamlString();
+                        ConfigMap &n = *node;
+                        n.erase("data");
+                        n["data"] = dataString;
                     }
                 }
             }

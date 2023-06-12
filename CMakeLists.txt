@@ -71,7 +71,7 @@ set (QT_MOC_HEADER
   src/ConfigureDialog.hpp
   src/MultiDBConfigDialog.hpp
   src/ToolbarBackend.hpp
-  src/plugins/MARSIMUCOnfig.hpp
+  src/plugins/MARSIMUConfig.hpp
 )
 
 if (${USE_QT5})

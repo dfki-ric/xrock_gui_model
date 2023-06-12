@@ -19,7 +19,8 @@ namespace xrock_gui_model
     ConfigureDialog::ConfigureDialog(configmaps::ConfigMap *configuration,
                                      configmaps::ConfigMap &env,
                                      const std::string &type, bool onlyMap,
-                                     bool noTreeEdit, configmaps::ConfigMap *dropdown, std::string fileName) : configuration(configuration), textOnly(false)
+                                     bool noTreeEdit, configmaps::ConfigMap *dropdown,
+                                     configmaps::ConfigMap *urls, std::string fileName) : configuration(configuration), textOnly(false)
     {
 
         // get data from database
@@ -51,7 +52,7 @@ namespace xrock_gui_model
         }
         else
         {
-            dw = new mars::config_map_gui::DataWidget(NULL, this, true, onlyMap);
+            dw = new mars::config_map_gui::DataWidget(NULL, this, true, false);
 
             std::vector<std::string> pattern;
             std::vector<std::vector<std::string>> values;
@@ -81,6 +82,15 @@ namespace xrock_gui_model
                 values[1].push_back("STOPPED");
             }
             dw->setDropDownPattern(pattern, values);
+            if(urls)
+            {
+                pattern.clear();
+                for(auto it: (*urls)["pattern"])
+                {
+                    pattern.push_back(it);
+                }
+                dw->setFilePattern(pattern);
+            }
             dw->setConfigMap("", *configuration);
         }
 

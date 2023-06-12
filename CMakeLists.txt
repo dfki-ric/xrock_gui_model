@@ -30,6 +30,7 @@ pkg_check_modules(mars_utils REQUIRED IMPORTED_TARGET mars_utils)
 pkg_check_modules(main_gui REQUIRED IMPORTED_TARGET main_gui)
 pkg_check_modules(config_map_gui REQUIRED IMPORTED_TARGET config_map_gui)
 pkg_check_modules(cfg_manager REQUIRED IMPORTED_TARGET cfg_manager)
+pkg_check_modules(smurf_parser REQUIRED IMPORTED_TARGET smurf_parser)
 
 set(SOURCES 
   src/ComponentModelInterface.cpp
@@ -43,6 +44,7 @@ set(SOURCES
   src/BasicModelHelper.cpp
   src/FileDB.cpp
   src/ToolbarBackend.cpp
+  src/plugins/MARSIMUConfig.cpp
 )
 
 set(HEADERS
@@ -52,6 +54,7 @@ set(HEADERS
   src/ImportDialog.hpp
   src/VersionDialog.hpp
   src/ConfigureDialog.hpp
+  src/ConfigureDialogLoader.hpp
   src/MultiDBConfigDialog.hpp
   src/ConfigMapHelper.hpp
   src/BasicModelHelper.hpp
@@ -68,6 +71,7 @@ set (QT_MOC_HEADER
   src/ConfigureDialog.hpp
   src/MultiDBConfigDialog.hpp
   src/ToolbarBackend.hpp
+  src/plugins/MARSIMUCOnfig.hpp
 )
 
 if (${USE_QT5})
@@ -100,6 +104,7 @@ target_link_libraries(${PROJECT_NAME}
         PkgConfig::main_gui
         PkgConfig::config_map_gui
         PkgConfig::cfg_manager
+        PkgConfig::smurf_parser
         ${QT_LIBRARIES}
 )
 

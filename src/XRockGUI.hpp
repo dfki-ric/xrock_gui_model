@@ -18,6 +18,7 @@
 #include "DBInterface.hpp"
 #include "ToolbarBackend.hpp"
 #include "XRockIOLibrary.hpp"
+#include "ConfigureDialogLoader.hpp"
 
 namespace bagel_gui
 {
@@ -53,7 +54,14 @@ namespace xrock_gui_model
         RELOAD_MODEL_FROM_DB = 30,
         REMOVE_MODEL_FROM_DB = 31,
         EXPORT_CND_TFENHANCE = 32,
-        RUN_ABSTRACT_GUI = 33
+        RUN_ABSTRACT_GUI = 33,
+        EDIT_GLOBAL_VARIABLES = 34,
+        EDIT_LOAD_GLOBAL_VARIABLES = 35,
+        EDIT_STORE_GLOBAL_VARIABLES = 36,
+        EDIT_FRAMES = 37,
+        EDIT_LOAD_FRAMES = 38,
+        EDIT_LOAD_FRAMES_FROM_SMURF = 39,
+        EDIT_STORE_FRAMES = 40,
     };
 
     class XRockGUI : public lib_manager::LibInterface,
@@ -147,6 +155,7 @@ namespace xrock_gui_model
         mars::cfg_manager::cfgParamId dbPassword_paramId;
         std::string resourcesPath;
         ToolbarBackend *toolbarBackend;
+        std::map<std::string, ConfigureDialogLoader*> configPlugins;
 
         void loadStartModel();
         void loadModelFromParameter();

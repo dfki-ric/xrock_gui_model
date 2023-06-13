@@ -89,7 +89,13 @@ namespace xrock_gui_model
                 resourcesPath = resourcesPathConfig;
             }
             cfg->getPropertyValue("Config", "config_path", "value", &confDir);
-
+            bool noXRockIOLib = false;
+            std::string arg3;
+            cfg->getPropertyValue("Config", "arg3", "value", &arg3);
+            if(arg3 == "--no-xrock")
+            {
+                noXRockIOLib = true;
+            }
             env = ConfigMap::fromYamlFile(confDir + "/config_default.yml", true);
             env["AUTOPROJ_CURRENT_ROOT"] = getenv("AUTOPROJ_CURRENT_ROOT");
             // try to load environment
@@ -126,7 +132,11 @@ namespace xrock_gui_model
             prop_dbAddress = cfg->getOrCreateProperty("XRockGUI", "dbAddress",
                                                       defaultAddress, this);
             env["backend"] = env["dbType"];
-            ioLibrary = libManager->getLibraryAs<XRockIOLibrary>("xrock_io_library", true);
+	    ioLibrary = NULL;
+	    if(!noXRockIOLib)
+	    {
+	        ioLibrary = libManager->getLibraryAs<XRockIOLibrary>("xrock_io_library", true);
+	    }
             if(ioLibrary)
             {
                 ConfigMap dbConfig = ioLibrary->getDefaultConfig();
@@ -1755,8 +1765,16 @@ namespace xrock_gui_model
         ComponentModelInterface *model = dynamic_cast<ComponentModelInterface *>(bagelGui->getCurrentModel());
         if (!model)
             return;
+        ConfigMap modelMap = model->getModelInfo();
+        std::string modelName = modelMap["name"].getString() + "_" + modelMap["versions"][0]["name"].getString();
+
+        versionChangeName << map["name"];
+        if(map.hasKey("alias") and map["alias"] != "")
+        {
+            versionChangeName << map["alias"];
+        }
         std::string configFile = "temp_task_config.yml";
-        std::string modelFile = "temp_task_model.yml";
+        std::string modelFile = map["model"]["name"].getString()+".yml";
         // 1. get configuration from map
         // 2. store configuration in temp yaml file
         std::string cmd = "xrock-resolve-ports";
@@ -1805,11 +1823,14 @@ namespace xrock_gui_model
             printf("ERROR: executing rock-instantiate\n");
             return;
         }
-        std::string new_version = map["model"]["name"].getString() + "_" + map["model"]["versions"][0]["name"].getString() + "_" + versionChangeName;
-        cmd = "orogen_to_xrock --modelname " + map["model"]["name"].getString() + " --model_file " + modelFile + " --version_name " + new_version;
+        std::string new_version = map["model"]["versions"][0]["name"].getString() + "_" + modelName;
+        std::string c = getenv("AUTOPROJ_CURRENT_ROOT");
+        ConfigMap dbConfig = ConfigMap::fromYamlString(env["multiDBConfig"]);
+        std::string dbPath = pathJoin(c, dbConfig["main_server"]["path"].getString());
+        std::string dbGraph = dbConfig["main_server"]["graph"];
+        cmd = "xrock-orogen-to-xrock --model_name " + map["model"]["name"].getString() + " --model_file " + modelFile + " --model_version " + new_version + " -a " + dbPath + " -g " + dbGraph;
 #ifdef __APPLE__
         {
-            std::string c = getenv("AUTOPROJ_CURRENT_ROOT");
             c += "/install/bin/";
             cmd = "DYLD_LIBRARY_PATH=$MYLD_LIBRARY_PATH python " + c + cmd;
         }

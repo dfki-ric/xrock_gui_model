@@ -13,7 +13,7 @@ namespace xrock_gui_model
         // so we have to create this information from the model interfaces
         if(model["versions"][0].hasKey("interfaces"))
         {
-            ConfigVector interfaces = model["versions"][0]["interfaces"];
+            //ConfigVector interfaces = model["versions"][0]["interfaces"];
             for(auto interface: model["versions"][0]["interfaces"])
             {
                 if(interface.hasKey("linkToNode") && interface["linkToNode"] == node["name"])
@@ -30,6 +30,20 @@ namespace xrock_gui_model
                                 if(overrideExportName || !input->hasKey("interfaceExportName"))
                                 {
                                     (*input)["interfaceExportName"] = interface["name"];
+                                }
+                                if(interface.hasKey("data"))
+                                {
+                                    ConfigMap dataMap;
+                                    if(interface["data"].isMap())
+                                    {
+                                        dataMap = interface["data"];
+                                    }
+                                    else
+                                    {
+                                        dataMap = ConfigMap::fromYamlString(interface["data"].getString());
+                                    }
+                                    ConfigMap &inputMap = *input;
+                                    inputMap.append(dataMap);
                                 }
                             }
                         }
@@ -93,6 +107,12 @@ namespace xrock_gui_model
                             // Interface already exists. Just update alias!
                             interface["alias"] = (nodeAlias.empty() ? nodeName : nodeAlias) + std::string(":") + (portAlias.empty() ? portName : portAlias);
                             found = true;
+                            if(port.hasKey("initValue"))
+                            {
+                                ConfigMap data;
+                                data["initValue"] = port["initValue"];
+                                interface["data"] = data.toYamlString();
+                            }
                             break;
                         }
                     }
@@ -122,6 +142,12 @@ namespace xrock_gui_model
                     else
                     {
                         interface["name"] = port["interfaceExportName"];
+                    }
+                    if(port.hasKey("initValue"))
+                    {
+                        ConfigMap data;
+                        data["initValue"] = port["initValue"];
+                        interface["data"] = data.toYamlString();
                     }
                     model["versions"][0]["interfaces"].push_back(interface);
                 }

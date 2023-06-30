@@ -619,7 +619,7 @@ namespace xrock_gui_model
             }
 
             // After we have done the nodes, we can wire their interfaces together
-            fprintf(stderr, "load edges...\n");        
+            fprintf(stderr, "load edges...\n");
             if (basicModel["versions"][0]["components"].hasKey("edges"))
             {
                 auto edges = basicModel["versions"][0]["components"]["edges"];
@@ -645,16 +645,16 @@ namespace xrock_gui_model
                     {
                         edge["decouple"] = it["data"]["decouple"];
                     }
-                    else 
+                    else
                         edge["decouple"] = false;
-                    
+
                     if(it.hasKey("data") && it["data"].isMap() && it["data"].hasKey("smooth"))
                     {
                         edge["smooth"] = it["data"]["smooth"];
                     }
-                    else 
+                    else
                         edge["smooth"] = true;
-                    
+
                     if(it.hasKey("data") && it["data"].isMap() && it["data"].hasKey("weight"))
                     {
                         edge["weight"] = it["data"]["weight"];
@@ -766,11 +766,10 @@ namespace xrock_gui_model
                 mi["versions"][0]["components"]["configuration"]["nodes"].push_back(c);
             }
         }
-        
+
         // Update edges & configuration based on edgeMap
         mi["versions"][0]["components"]["edges"] = ConfigVector();
         mi["versions"][0]["components"]["configuration"]["edges"] = ConfigVector();
-
         // For edges, we build the model info based on the bagel's config map since its an up-to date map for the current tab view.
         ConfigMap map = bagelGui->createConfigMap();
         for (auto &it : map["edges"])
@@ -802,45 +801,49 @@ namespace xrock_gui_model
                 "data"};
 
             // Make edge data
-            ConfigMap edgeData = it["data"];
-            auto it2 = it.beginMap();
-            for (; it2 != it.endMap(); ++it2)
+            // todo: from somewhere the edge data can become an empty string; check for the source
+            if(it["data"].isMap())
             {
-                auto &[key, value] = *it2;
-                if (std::find(unwanted.begin(), unwanted.end(), key) == unwanted.end())
+                ConfigMap edgeData = it["data"];
+                auto it2 = it.beginMap();
+                for (; it2 != it.endMap(); ++it2)
                 {
-                    edgeData[key] = value;
+                    auto &[key, value] = *it2;
+                    if (std::find(unwanted.begin(), unwanted.end(), key) == unwanted.end())
+                    {
+                        edgeData[key] = value;
+                    }
                 }
-            }
 
-            if (edgeData.size() > 0)
-            {
-                if (edgeData["domain"].getString().empty())
-                    edgeData["domain"] = domain;
-                edge["data"] = edgeData;
-            }
-            if(edge.hasKey("data"))
-            {
-                if(edge["data"].hasKey("weight"))
+                if (edgeData.size() > 0)
                 {
-                    edge["weight"] = edge["data"]["weight"];
+                    if (edgeData["domain"].getString().empty())
+                        edgeData["domain"] = domain;
+                    edge["data"] = edgeData;
                 }
-            }
+                if(edge.hasKey("data") and edge["data"].isMap())
+                {
+                    if(edge["data"].hasKey("weight"))
+                    {
+                        edge["weight"] = edge["data"]["weight"];
+                    }
+                }
 
-            if (it.hasKey("name"))
-            {
-                edge["name"] = it["name"].getString();
+                if (it.hasKey("name"))
+                {
+                    edge["name"] = it["name"].getString();
+                }
+                else
+                {
+                    // If no name exists, we derive a new name
+                    edge["name"] = fromName + "_" + fromNodeOutput + "_" + toName + "_" + toNodeInput;
+                }
+                if (it.hasKey("direction"))
+                {
+                    edge["direction"] = mars::utils::toupper(it["direction"]);
+                }
+                mi["versions"][0]["components"]["edges"].push_back(edge);
             }
-            else
-            {
-                // If no name exists, we derive a new name
-                edge["name"] = fromName + "_" + fromNodeOutput + "_" + toName + "_" + toNodeInput;
-            }
-            if (it.hasKey("direction"))
-            {
-                edge["direction"] = mars::utils::toupper(it["direction"]);
-            }
-            mi["versions"][0]["components"]["edges"].push_back(edge);
         }
 
         // When finished, update basicModel and return it

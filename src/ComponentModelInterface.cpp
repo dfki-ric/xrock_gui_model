@@ -802,6 +802,10 @@ namespace xrock_gui_model
 
             // Make edge data
             // todo: from somewhere the edge data can become an empty string; check for the source
+            if(!it.hasKey("data"))
+            {
+                it["data"] = ConfigMap();
+            }
             if(it["data"].isMap())
             {
                 ConfigMap edgeData = it["data"];

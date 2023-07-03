@@ -269,8 +269,19 @@ namespace xrock_gui_model
                     {
                         if(!(*edge)["data"].isMap())
                         {
-                            (*edge)["data"] = ConfigMap::fromYamlString((*edge)["data"]);
+                            if((*edge)["data"] == "")
+                            {
+                                ((ConfigMap)*edge).erase("data");
+                            }
+                            else
+                            {
+                                (*edge)["data"] = ConfigMap::fromYamlString((*edge)["data"]);
+                            }
                         }
+                    }
+
+                    if(edge->hasKey("data"))
+                    {
                         if((*edge)["data"].hasKey("weight"))
                         {
                             (*edge)["weight"] = (*edge)["data"]["weight"];

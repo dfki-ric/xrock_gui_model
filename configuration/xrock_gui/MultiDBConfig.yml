@@ -4,8 +4,8 @@ main_server:
   graph: graph_test
 import_servers:
   - type: Serverless
-    path: database/atomic_component_db
-    graph: graph_test
-  - type: Client
-    url: http://localhost:8183
-    graph: graph_production
+    path: database/atomic_component_db 
+    graph: orogen_tasks
+  - type: Serverless
+    path: database/backbone_reference_db
+    graph: master

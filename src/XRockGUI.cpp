@@ -33,6 +33,7 @@
 #include <fstream>
 #include <iomanip> // for std::put_time()
 
+#include "utils/WaitCursorRAII.hpp"
 #include <smurf_parser/SMURFParser.h>
 
 using namespace lib_manager;
@@ -819,19 +820,22 @@ namespace xrock_gui_model
                         ConfigMap currentModel = m->getModelInfo();
                         if (currentModel.hasKey("uri"))
                         {
-                            bool removed = db->removeModel((std::string)currentModel["uri"]);
-                            if(removed)
-                                {
-                                    bagelGui->closeCurrentTab();
-                                    QMessageBox::information(nullptr, "Success", "Model removed successfully!", QMessageBox::Ok);
-                                }
+                            bool removed;
+                            {
+                                WaitCursorRAII _;
+                                removed = db->removeModel((std::string)currentModel["uri"]);
+                            }
+                            if (removed)
+                            {
+                                bagelGui->closeCurrentTab();
+                                QMessageBox::information(nullptr, "Success", "Model removed successfully!", QMessageBox::Ok);
+                            }
                             else
                                 QMessageBox::critical(nullptr, "Error", "Failed to remove model.", QMessageBox::Ok);
                         }
                         else
                             QMessageBox::warning(nullptr, "Warning", "Cannot remove model due missing uri.", QMessageBox::Ok);
                     }
-
                 }
                 break;
             }
@@ -1079,9 +1083,13 @@ namespace xrock_gui_model
     }
 
     // This function loads a component model from DB
-    void XRockGUI::loadComponentModel(const std::string& domain, const std::string& modelName, const std::string& version)
+    void XRockGUI::loadComponentModel(const std::string &domain, const std::string &modelName, const std::string &version)
     {
-        ConfigMap map = db->requestModel(domain, modelName, version, !version.empty());
+        ConfigMap map;
+        {
+            WaitCursorRAII _;
+            map = db->requestModel(domain, modelName, version, !version.empty());
+        }
         loadComponentModelFrom(map);
     }
 
@@ -1094,7 +1102,11 @@ namespace xrock_gui_model
         // Get the current model info
         ConfigMap map = model->getModelInfo();
         // Store the returned info to db
-        bool saved = db->storeModel(map);
+        bool saved;
+        {
+            WaitCursorRAII _;
+            saved = db->storeModel(map);
+        }
         return saved;
     }
 
@@ -1625,7 +1637,11 @@ namespace xrock_gui_model
             QWebView *doc = new QWebView();
             doc->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
             widget->connect(doc, SIGNAL(linkClicked(const QUrl &)), widget, SLOT(openUrl(const QUrl &)));
-            ConfigMap modelMap = db->requestModel(domain, model_name, version, true);
+            ConfigMap modelMap;
+            {
+                WaitCursorRAII _;
+                modelMap = db->requestModel(domain, model_name, version, true);
+            }
             if (modelMap["versions"][0].hasKey("data"))
             {
                 {

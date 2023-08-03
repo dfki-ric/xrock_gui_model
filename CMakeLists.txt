@@ -62,6 +62,7 @@ set(HEADERS
   src/ToolbarBackend.hpp
   src/DBInterface.hpp
   src/XRockIOLibrary.hpp
+  src/utils/WaitCursorRAII.hpp
 )
 
 set (QT_MOC_HEADER
@@ -72,6 +73,7 @@ set (QT_MOC_HEADER
   src/MultiDBConfigDialog.hpp
   src/ToolbarBackend.hpp
   src/plugins/MARSIMUConfig.hpp
+  src/utils/WaitCursorRAII.hpp
 )
 
 if (${USE_QT5})

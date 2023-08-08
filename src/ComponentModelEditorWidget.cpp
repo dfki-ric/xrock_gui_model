@@ -289,6 +289,7 @@ namespace xrock_gui_model
             types->addItem(item);
         } 
         currentModel = newModel;
+        updateModel();
         fprintf(stderr, "done\n");
     }
 

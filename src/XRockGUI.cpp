@@ -13,6 +13,7 @@
 
 #include "MultiDBConfigDialog.hpp"
 #include "VersionDialog.hpp"
+#include "BuildModuleDialog.hpp"
 #include "ConfigureDialog.hpp"
 #include "ConfigMapHelper.hpp"
 
@@ -260,6 +261,8 @@ namespace xrock_gui_model
                                       icon + "reload.png", true);
             gui->addGenericMenuAction("../Actions/Remove", static_cast<int>(MenuActions::REMOVE_MODEL_FROM_DB), this, 0,
                                       icon + "remove.png", true);
+            gui->addGenericMenuAction("../Actions/Build", static_cast<int>(MenuActions::BUILD_MODULE_TO_DB), this, 0,
+                                      icon + "build.png", true);
             gui->addGenericMenuAction("../Implements/Abstract_gui", static_cast<int>(MenuActions::RUN_ABSTRACT_GUI), this, 0,
                                       icon + "abstract.png", true);
             gui->addGenericMenuAction("../Edit/Global Variabls/Edit", static_cast<int>(MenuActions::EDIT_GLOBAL_VARIABLES), this, 0, "", true);
@@ -460,6 +463,14 @@ namespace xrock_gui_model
                 QMessageBox::information(nullptr, "Success", "Component model has been successfully stored into database", QMessageBox::Ok);
                 break;
             }
+            case MenuActions::BUILD_MODULE_TO_DB: // save and build module
+            {
+                ComponentModelInterface *model = dynamic_cast<ComponentModelInterface *>(bagelGui->getCurrentModel());
+                if (!model)
+                    return;
+                BuildModuleDialog dialog(this);
+                dialog.exec();
+                break;
             case MenuActions::EXPORT_CND:
             {
                 QString fileName = QFileDialog::getSaveFileName(NULL, QObject::tr("Select Model"),

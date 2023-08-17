@@ -62,6 +62,7 @@ namespace xrock_gui_model
         EDIT_LOAD_FRAMES = 38,
         EDIT_LOAD_FRAMES_FROM_SMURF = 39,
         EDIT_STORE_FRAMES = 40,
+        BUILD_MODULE_TO_DB = 51,
     };
 
     class XRockGUI : public lib_manager::LibInterface,

@@ -42,6 +42,8 @@ namespace xrock_gui_model
         virtual configmaps::ConfigMap getPropertiesOfComponentModel() = 0;
         virtual std::vector<std::string> getDomains() = 0;
         virtual configmaps::ConfigMap getEmptyComponentModel() = 0;
+        virtual bool buildModule(const std::string &uri, const std::string &moduleName, const std::map <std::string,std::string>& selectedImplementations) = 0;
+        virtual configmaps::ConfigMap getUnresolvedAbstracts(const std::string& uri) = 0; 
     };
 } // end of namespace xrock_gui_model
 

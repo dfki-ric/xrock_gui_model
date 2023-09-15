@@ -627,7 +627,6 @@ namespace xrock_gui_model
                 {
                     ConfigMap edge;
                     edge["fromNode"] = it["from"]["name"];
-                    edge["fromNode"] = it["from"]["name"];
                     edge["fromNodeOutput"] = it["from"]["interface"];
                     edge["toNode"] = it["to"]["name"];
                     edge["toNodeInput"] = it["to"]["interface"];

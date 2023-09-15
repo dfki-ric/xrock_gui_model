@@ -471,6 +471,7 @@ namespace xrock_gui_model
                 BuildModuleDialog dialog(this);
                 dialog.exec();
                 break;
+            }
             case MenuActions::EXPORT_CND:
             {
                 QString fileName = QFileDialog::getSaveFileName(NULL, QObject::tr("Select Model"),
@@ -1141,6 +1142,25 @@ namespace xrock_gui_model
         vd.requestComponent(domain, type);
         vd.exec();
     }
+    // void XRockGUI::showImplementationsDialog()
+    // {
+    //     ConfigMap node = *(bagelGui->getNodeMap(contextNodeName)); // abstract one
+    //     ConfigMap implementations;
+    //     implementations["models"] = node["model"]["implementations"];
+    //     std::cout << "imple_abstract" << node["model"].toJsonString() << std::endl;
+    //     implementations["edges"] = node["model"]["versions"][0]["components"]["edges"];
+
+
+        
+    //     // std::string uri = node["model"]["uri"];
+    //     //  std::string domain = node["model"]["domain"];
+    //     //  std::string model_name = node["model"]["name"];
+    //     //  std::string version = node["model"]["versions"][0]["name"];
+
+    //     AbstractImplementerList d(this, node["model"]["name"] , implementations);
+    //     //d.showNamesDialog(); // insert list items
+    //     d.exec();
+    // }
 
     void XRockGUI::configureNode(const std::string &name)
     {
@@ -1678,6 +1698,10 @@ namespace xrock_gui_model
             ConfigMap node = *(bagelGui->getNodeMap(contextNodeName));
             applyConfiguration(node);
         }
+        // else if (name == "select implementation...")
+        // {
+        //     showImplementationsDialog();
+        // }
     }
 
     void XRockGUI::inPortContextClicked(const std::string name)

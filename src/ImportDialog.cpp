@@ -5,6 +5,7 @@
 #include <QPushButton>
 #include <QDesktopServices>
 #include <array>
+#include "utils/WaitCursorRAII.hpp"
 
 using namespace configmaps;
 namespace xrock_gui_model
@@ -150,6 +151,7 @@ namespace xrock_gui_model
         QVariant v = models->model()->data(index, 0);
         if (v.isValid())
         {
+            WaitCursorRAII _;
             selectedModel = v.toString().toStdString();
             selectedVersion = std::string("");
             dw->clearGUI();
@@ -177,7 +179,11 @@ namespace xrock_gui_model
             return;
         selectedVersion = versionName.toStdString();
         dw->clearGUI();
-        ConfigMap map = xrockGui->db->requestModel(selectedDomain, selectedModel, selectedVersion, true);
+        ConfigMap map;
+        {
+                WaitCursorRAII _;
+                map = xrockGui->db->requestModel(selectedDomain, selectedModel, selectedVersion, true);
+        }
         if(intent == Intention::ADD_TYPE){ model = map;}
         doc->setHtml("");
         if (map["versions"][0].hasKey("data"))
@@ -245,6 +251,7 @@ namespace xrock_gui_model
 
     void ImportDialog::changeDomain(const QString &domain)
     {
+        WaitCursorRAII _;
         models->clear();
         versionSelect->clear();
         dw->clearGUI();

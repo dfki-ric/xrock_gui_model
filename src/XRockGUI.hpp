@@ -62,6 +62,7 @@ namespace xrock_gui_model
         EDIT_LOAD_FRAMES = 38,
         EDIT_LOAD_FRAMES_FROM_SMURF = 39,
         EDIT_STORE_FRAMES = 40,
+        BUILD_MODULE_TO_DB = 51,
     };
 
     class XRockGUI : public lib_manager::LibInterface,
@@ -123,12 +124,13 @@ namespace xrock_gui_model
         // This function opens a new, empty component model to be edited
         void newComponentModel();
         // This function adds a new component to the current component model (possibly asking the DB for it's model)
-        void addComponent(const std::string& domain, const std::string& modelName, const std::string& version, std::string nodeName = "");
+        void addComponent(const std::string &domain, const std::string &modelName, const std::string &version, std::string nodeName = "");
         // These function load a component model from DB or from a ConfigMap
-        void loadComponentModel(const std::string& domain, const std::string& modelName, const std::string& version);
+        void loadComponentModel(const std::string &domain, const std::string &modelName, const std::string &version);
         void loadComponentModelFrom(configmaps::ConfigMap &map);
         // This function stores the current component model
         bool storeComponentModel();
+
         // This function applies a ROCK configuration to a ROCK Task with dynamic ports to create a new model
         // TODO: Since the XTypes now know the notion of an dynamic interface, we could remove this and create such functionality
         // in ComponentModelInterface without creating a new model in the database
@@ -142,10 +144,21 @@ namespace xrock_gui_model
         XRockIOLibrary *ioLibrary;
         std::string getBackend();
         bool handleAlias();
+        configmaps::ConfigMap getXrockEnv(){
+            return env;
+        };
+        bagel_gui::BagelGui* getBagelGui() const
+        {
+            return bagelGui;
+        }
+        ToolbarBackend* getToolbar()
+        {
+            return toolbarBackend;
+        }
 
     private:
-        mars::main_gui::GuiInterface *gui;
         bagel_gui::BagelGui *bagelGui;
+        mars::main_gui::GuiInterface *gui;
         ComponentModelEditorWidget *widget;
         std::string versionChangeName, configureNodeName, contextNodeName, contextPortName;
         mars::cfg_manager::CFGManagerInterface *cfg;
@@ -155,7 +168,7 @@ namespace xrock_gui_model
         mars::cfg_manager::cfgParamId dbPassword_paramId;
         std::string resourcesPath;
         ToolbarBackend *toolbarBackend;
-        std::map<std::string, ConfigureDialogLoader*> configPlugins;
+        std::map<std::string, ConfigureDialogLoader *> configPlugins;
 
         void loadStartModel();
         void loadModelFromParameter();
@@ -175,4 +188,3 @@ namespace xrock_gui_model
     };
 
 } // end of namespace xrock_gui_model
-

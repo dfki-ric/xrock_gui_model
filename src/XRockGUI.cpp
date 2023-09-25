@@ -13,6 +13,7 @@
 
 #include "MultiDBConfigDialog.hpp"
 #include "VersionDialog.hpp"
+#include "BuildModuleDialog.hpp"
 #include "ConfigureDialog.hpp"
 #include "ConfigMapHelper.hpp"
 
@@ -260,6 +261,8 @@ namespace xrock_gui_model
                                       icon + "reload.png", true);
             gui->addGenericMenuAction("../Actions/Remove", static_cast<int>(MenuActions::REMOVE_MODEL_FROM_DB), this, 0,
                                       icon + "remove.png", true);
+            gui->addGenericMenuAction("../Actions/Build", static_cast<int>(MenuActions::BUILD_MODULE_TO_DB), this, 0,
+                                      icon + "build.png", true);
             gui->addGenericMenuAction("../Implements/Abstract_gui", static_cast<int>(MenuActions::RUN_ABSTRACT_GUI), this, 0,
                                       icon + "abstract.png", true);
             gui->addGenericMenuAction("../Edit/Global Variabls/Edit", static_cast<int>(MenuActions::EDIT_GLOBAL_VARIABLES), this, 0, "", true);
@@ -458,6 +461,15 @@ namespace xrock_gui_model
                     break;
                 }
                 QMessageBox::information(nullptr, "Success", "Component model has been successfully stored into database", QMessageBox::Ok);
+                break;
+            }
+            case MenuActions::BUILD_MODULE_TO_DB: // save and build module
+            {
+                ComponentModelInterface *model = dynamic_cast<ComponentModelInterface *>(bagelGui->getCurrentModel());
+                if (!model)
+                    return;
+                BuildModuleDialog dialog(this);
+                dialog.exec();
                 break;
             }
             case MenuActions::EXPORT_CND:
@@ -1130,6 +1142,25 @@ namespace xrock_gui_model
         vd.requestComponent(domain, type);
         vd.exec();
     }
+    // void XRockGUI::showImplementationsDialog()
+    // {
+    //     ConfigMap node = *(bagelGui->getNodeMap(contextNodeName)); // abstract one
+    //     ConfigMap implementations;
+    //     implementations["models"] = node["model"]["implementations"];
+    //     std::cout << "imple_abstract" << node["model"].toJsonString() << std::endl;
+    //     implementations["edges"] = node["model"]["versions"][0]["components"]["edges"];
+
+
+        
+    //     // std::string uri = node["model"]["uri"];
+    //     //  std::string domain = node["model"]["domain"];
+    //     //  std::string model_name = node["model"]["name"];
+    //     //  std::string version = node["model"]["versions"][0]["name"];
+
+    //     AbstractImplementerList d(this, node["model"]["name"] , implementations);
+    //     //d.showNamesDialog(); // insert list items
+    //     d.exec();
+    // }
 
     void XRockGUI::configureNode(const std::string &name)
     {
@@ -1667,6 +1698,10 @@ namespace xrock_gui_model
             ConfigMap node = *(bagelGui->getNodeMap(contextNodeName));
             applyConfiguration(node);
         }
+        // else if (name == "select implementation...")
+        // {
+        //     showImplementationsDialog();
+        // }
     }
 
     void XRockGUI::inPortContextClicked(const std::string name)

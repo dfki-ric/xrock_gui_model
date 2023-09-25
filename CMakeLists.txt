@@ -45,6 +45,7 @@ set(SOURCES
   src/FileDB.cpp
   src/ToolbarBackend.cpp
   src/plugins/MARSIMUConfig.cpp
+  src/BuildModuleDialog.cpp
 )
 
 set(HEADERS
@@ -62,6 +63,7 @@ set(HEADERS
   src/ToolbarBackend.hpp
   src/DBInterface.hpp
   src/XRockIOLibrary.hpp
+  src/BuildModuleDialog.hpp
   src/utils/WaitCursorRAII.hpp
 )
 
@@ -73,6 +75,7 @@ set (QT_MOC_HEADER
   src/MultiDBConfigDialog.hpp
   src/ToolbarBackend.hpp
   src/plugins/MARSIMUConfig.hpp
+  src/BuildModuleDialog.hpp
   src/utils/WaitCursorRAII.hpp
 )
 

@@ -76,7 +76,6 @@ set (QT_MOC_HEADER
   src/ToolbarBackend.hpp
   src/plugins/MARSIMUConfig.hpp
   src/BuildModuleDialog.hpp
-  src/utils/WaitCursorRAII.hpp
 )
 
 if (${USE_QT5})

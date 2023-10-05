@@ -1530,7 +1530,7 @@ namespace xrock_gui_model
 
         ConfigMap map = bagelGui->getCurrentModel()->getModelInfo();
         std::stringstream cnd_export;
-        cnd_export << "export_cnd -m " << map["name"].getString()
+        cnd_export << "xrock-export-cnd -m " << map["name"].getString()
                    << " -v " << map["versions"][0]["name"].getString()
                    << " -o " << filename;
         if (!urdf_file.empty())

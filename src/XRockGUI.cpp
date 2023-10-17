@@ -810,10 +810,10 @@ namespace xrock_gui_model
                 if (ModelInterface *m = bagelGui->getCurrentModel())
                 {
                     ConfigMap currentModel = m->getModelInfo();
-                    bagelGui->closeCurrentTab();
 
                     if (currentModel.hasKey("name"))
                     {
+                        bagelGui->closeCurrentTab();
                         // Reload component model from DB (creating a new TAB)
                         loadComponentModel(currentModel["domain"], currentModel["name"], currentModel["versions"][0]["name"]);
                     }

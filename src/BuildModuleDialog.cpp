@@ -52,8 +52,6 @@ namespace xrock_gui_model
             layout->addWidget(header);
             listWidget = new QListWidget(this);
 
-            std::cout << " unsolved" << data["unresolved_abstracts"].toJsonString() << std::endl;
-
             // Unresolved abstracts:
             for (auto& unresolved_abstract : data["unresolved_abstracts"])
             {

@@ -272,7 +272,6 @@ namespace xrock_gui_model
         this->update_widgets(info);
         // set uri info to uri text field 
         fprintf(stderr, "output info\n");
-        std::cout << "info: \n" << info.toJsonString() << std::endl;
         if(info.hasKey("uri"))
         {
           uri->setText(QString::fromStdString(info["uri"]));

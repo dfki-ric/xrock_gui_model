@@ -1085,7 +1085,13 @@ namespace xrock_gui_model
     {
         // Create view will setup a NEW instance of a component model interface
         bagelGui->createView("xrock", map["name"]);
-        ComponentModelInterface* model = dynamic_cast<ComponentModelInterface*>(bagelGui->getCurrentModel());
+        ComponentModelInterface *model = dynamic_cast<ComponentModelInterface *>(bagelGui->getCurrentModel());
+
+        if (!map["versions"][0]["data"].hasKey("gui"))
+            map["versions"][0]["data"]["gui"] = ConfigMap();
+        if (!map["versions"][0]["data"]["gui"].hasKey("defaultLayout"))
+            map["versions"][0]["data"]["gui"]["defaultLayout"] = "software";
+
         // Set the model info of the ComponentModelInterface
         model->setModelInfo(map);
         // Afterwards we have to (re-)trigger the currentModelChanged() function
@@ -1576,22 +1582,71 @@ namespace xrock_gui_model
         map["versions"][0]["date"] = QDateTime::currentDateTime().toString(Qt::ISODate).toStdString();
         map["versions"][0]["components"]["nodes"] = ConfigVector();
         map["versions"][0]["components"]["edges"] = ConfigVector();
-        if (cnd.hasKey("tasks"))
+        map["versions"][0]["data"]["gui"] = ConfigMap();
+
+        std::map<std::string, std::pair<int, int>> nodePositions;
+        int minX = 0;
+        int minY = 0;
+        int maxX = 2000;
+        int maxY = 2000;
+        for (auto it : (ConfigMap)cnd["tasks"])
         {
-            for (auto it : (ConfigMap)cnd["tasks"])
+            int x = rand() % (maxX - minX) + minX;
+            int y = rand() % (maxY - minY) + minY;
+            nodePositions[it.first.c_str()] = std::make_pair(x, y);
+
+            std::cerr << "task name: " << it.first.c_str() << std::endl;
+            ConfigMap node;
+            node["name"] = it.first.c_str();
+            node["model"]["domain"] = "SOFTWARE";
+            node["model"]["version"] = "v0.0.1";
+            node["model"]["name"] = it.second["type"];
+            map["versions"][0]["components"]["nodes"].push_back(node);
+            ConfigMap config;
+            config["data"] = it.second.toYamlString();
+            config["name"] = node["name"];
+            map["versions"][0]["components"]["configuration"]["nodes"].push_back(config);
+        }
+        if (cnd.hasKey("connections"))
+        {
+            // Iterate through the connections and create edges
+            for (auto &connection : (ConfigMap)cnd["connections"])
             {
-                std::cerr << "task name: " << it.first.c_str() << std::endl;
-                ConfigMap node;
-                node["name"] = it.first.c_str();
-                node["model"]["domain"] = "SOFTWARE";
-                node["model"]["version"] = "v0.0.1";
-                node["model"]["name"] = it.second["type"];
-                map["versions"][0]["components"]["nodes"].push_back(node);
-                ConfigMap config;
-                config["data"] = it.second.toYamlString();
-                config["name"] = node["name"];
-                map["versions"][0]["components"]["configuration"]["nodes"].push_back(config);
+                ConfigMap edge;
+                ConfigMap newFromSection;
+                ConfigMap fromSection = connection.second["from"];
+                newFromSection["domain"] = "SOFTWARE";
+                newFromSection["interface"] = fromSection["port_name"];
+                newFromSection["name"] = fromSection["task_id"];
+                edge["from"] = newFromSection;
+                edge["data"] = connection.second["data"];
+                edge["name"] = connection.first;
+                ConfigMap newToSection;
+                ConfigMap toSection = connection.second["to"];
+                newToSection["domain"] = "SOFTWARE";
+                newToSection["interface"] = toSection["port_name"];
+                newToSection["name"] = toSection["task_id"];
+                edge["to"] = newToSection;
+                // Push the edge into the "edges" array
+                map["versions"][0]["components"]["edges"].push_back(edge);
             }
+        }
+
+        ConfigMap &guiData = map["versions"][0]["data"]["gui"];
+        for (const auto &it : nodePositions)
+        {
+            const std::string &nodeName = it.first;
+            int x = it.second.first;
+            int y = it.second.second;
+
+            if (!guiData["layouts"]["software"].hasKey(nodeName))
+            {
+                // Create a layout entry if it doesn't exist
+                guiData["layouts"]["software"][nodeName] = ConfigMap();
+            }
+
+            guiData["layouts"]["software"][nodeName]["x"] = std::to_string(x);
+            guiData["layouts"]["software"][nodeName]["y"] = std::to_string(y);
         }
         // TODO: The next lines have to be refactored
         map["modelPath"] = mars::utils::getPathOfFile(fileName);

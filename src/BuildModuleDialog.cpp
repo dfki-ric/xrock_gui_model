@@ -8,6 +8,7 @@
 #include <QPushButton>
 #include <QSplitter>
 #include <QFrame>
+#include <QMessageBox>
 #include "utils/WaitCursorRAII.hpp"
 
 using namespace configmaps;

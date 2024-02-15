@@ -1,11 +1,11 @@
 main_server:
   type: Serverless
-  path: modkom/component_db
-  graph: graph_test
+  graph: master
+  path: database/backbone_reference_db
+  readonly: true
 import_servers:
-  - type: Serverless
-    path: database/atomic_component_db 
+  - name: my_import_server
+    type: Serverless
+    path: database/atomic_component_db
     graph: orogen_tasks
-  - type: Serverless
-    path: database/backbone_reference_db
-    graph: master
+    readonly: false

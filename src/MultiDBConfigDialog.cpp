@@ -34,11 +34,10 @@ namespace xrock_gui_model
         label = new QLabel("Type:");
         hLayout->addWidget(label);
         cbMainServerType = new QComboBox();
-
+    
         std::vector<std::string> backends;
         if (ioLibrary)
         {
-
             backends = ioLibrary->getBackends();
         }
         else
@@ -57,23 +56,28 @@ namespace xrock_gui_model
         connect(cbMainServerType, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(onMainServerBackendChange(const QString &)));
         tfMainServerPath = new QLineEdit();
         hLayout->addWidget(tfMainServerPath);
-        // vLayout->addLayout(hLayout);
         tfMainServerGraph = new QLineEdit();
         QLabel *l_graph = new QLabel("Graph:");
         hLayout->addWidget(l_graph);
         hLayout->addWidget(tfMainServerGraph);
+       
+        cNewReadOnly = new QCheckBox("Read Only");
+        cNewReadOnly->setLayoutDirection(Qt::RightToLeft);
+    
+        hLayout->addWidget(cNewReadOnly);
         vLayout->addLayout(hLayout);
-
+   
         label = new QLabel("Import Servers:");
         label->setStyleSheet("font-weight: bold; color: black;");
         vLayout->addWidget(label);
 
         tableBackends = new QTableWidget();
-        tableBackends->setColumnCount(4);
+        tableBackends->setColumnCount(5);
         tableBackends->setHorizontalHeaderLabels(QStringList() << "Name"
                                                                 << "Backend Type"
                                                                 << "URL/Path"
-                                                                << "Graph");
+                                                                << "Graph"
+                                                                << "Read Only");
 #if QT_VERSION >= 0x050000
         tableBackends->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 #else
@@ -104,6 +108,7 @@ namespace xrock_gui_model
         tfNewUrlOrPath->setPlaceholderText("URL/Path");
         tfNewGraph = new QLineEdit();
         tfNewGraph->setPlaceholderText("Graph");
+       
 
         btnAddNew = new QPushButton();
         btnAddNew->setText("add");
@@ -118,7 +123,7 @@ namespace xrock_gui_model
         btnResetToDefault = new QPushButton("reset to default");
         hbox2->addWidget(btnResetToDefault);
         connect(btnResetToDefault, SIGNAL(clicked()), this, SLOT(onResetToDefaultBtnClicked()));
-
+  
         saveAndClose = new QPushButton("save and close");
         connect(saveAndClose, SIGNAL(clicked()), this, SLOT(onFinishBtnClicked()));
         hbox2->addWidget(saveAndClose);
@@ -127,6 +132,7 @@ namespace xrock_gui_model
         
         mainLayout->addLayout(vLayout);
         setLayout(mainLayout);
+        connect(cNewReadOnly, SIGNAL(stateChanged(int)), this, SLOT(onMainserverReadOnlyCheckboxStateChange()));
 
         // if there is an existing previous saved config state, load it to gui
         if(loadState())
@@ -148,7 +154,13 @@ namespace xrock_gui_model
             tfMainServerPath->setText(QString::fromStdString(config["main_server"]["type"] == "Client" ? config["main_server"]["url"] : config["main_server"]["path"]));
             tfMainServerGraph->setText(QString::fromStdString(config["main_server"]["graph"]));
             lbMainServerPathOrUrl->setText(config["main_server"]["type"] == "Client" ? "URL" : "Path");
+            cNewReadOnly->blockSignals(true);
+            if (config["main_server"].hasKey("readonly"))
 
+                cNewReadOnly->setCheckState(config["main_server"]["readonly"] ? Qt::Checked : Qt::Unchecked);
+            else
+                cNewReadOnly->setCheckState(Qt::Unchecked);
+            cNewReadOnly->blockSignals(false);
             backends.clear();
             for (auto &backend : config["import_servers"])
             {
@@ -157,6 +169,10 @@ namespace xrock_gui_model
                 w.type = QString::fromStdString(backend["type"]);
                 w.urlOrPath = QString::fromStdString(backend["type"] == std::string("Client") ? backend["url"] : backend["path"]);
                 w.graph = QString::fromStdString(backend["graph"]);
+                if(backend.hasKey("readonly"))
+                    w.readOnly = backend["readonly"];
+                else
+                    w.readOnly = true;
                 backends.push_back(std::move(w));
             }
             updateBackendsWidget();
@@ -178,6 +194,14 @@ namespace xrock_gui_model
             tableBackends->setItem(rowPosition, 1, new QTableWidgetItem(w.type));
             tableBackends->setItem(rowPosition, 2, new QTableWidgetItem(w.urlOrPath));
             tableBackends->setItem(rowPosition, 3, new QTableWidgetItem(w.graph));
+
+            // Add readOnly checkbox
+            QTableWidgetItem *readOnlyItem = new QTableWidgetItem();
+            readOnlyItem->setFlags(readOnlyItem->flags() | Qt::ItemIsUserCheckable | Qt::ItemIsSelectable);
+            readOnlyItem->setFlags(readOnlyItem->flags() & ~ Qt::ItemIsEditable);
+            readOnlyItem->setCheckState(w.readOnly ? Qt::Checked : Qt::Unchecked);
+            tableBackends->setItem(rowPosition, 4, readOnlyItem);
+           
         }
     }
 
@@ -194,8 +218,11 @@ namespace xrock_gui_model
                 w.type = index.sibling(index.row(), 1).data().toString();
                 w.urlOrPath = index.sibling(index.row(), 2).data().toString();
                 w.graph = index.sibling(index.row(), 3).data().toString();
+                w.readOnly = index.sibling(index.row(), 4).data().toBool();
 
-                auto it = std::find(backends.begin(), backends.end(), w);
+                 auto it = std::find_if(backends.begin(), backends.end(), [w](const BackendItem& item) {
+                    return item.name == w.name && item.type == w.type && item.urlOrPath == w.urlOrPath && item.graph == w.graph;
+                });
                 if (it != backends.end())
                 {
                     backends.erase(it);
@@ -227,6 +254,7 @@ namespace xrock_gui_model
         b.type = cbNewType->currentText();
         b.urlOrPath = tfNewUrlOrPath->text();
         b.graph = tfNewGraph->text();
+        b.readOnly = true;
 
         // if backend doesn't exists, add it
         auto it = std::find(backends.begin(), backends.end(), b);
@@ -286,12 +314,13 @@ namespace xrock_gui_model
             QMessageBox::warning(this, "Warning", "Import servers are empty!", QMessageBox::Ok);
             return;
         }
-
+      
         ConfigMap config;
         config["main_server"]["type"] = main_server_type.toStdString();
         config["main_server"]["graph"] = main_server_graph.toStdString();
         std::string urlOrPath = config["main_server"]["type"] == "Client" ? "url" : "path";
         config["main_server"][urlOrPath] = main_server_path.toStdString();
+        config["main_server"]["readonly"] = cNewReadOnly->checkState() == Qt::Checked;
 
         for (const BackendItem &w : backends)
         {
@@ -303,6 +332,7 @@ namespace xrock_gui_model
             else
                 backend["path"] = w.urlOrPath.toStdString();
             backend["graph"] = w.graph.toStdString();
+            backend["readonly"] = w.readOnly;
             config["import_servers"].push_back(std::move(backend));
         }
 
@@ -310,8 +340,20 @@ namespace xrock_gui_model
         config.toYamlFile(this->configFilename);
         done(0);
     }
+
     void MultiDBConfigDialog::onTableBackendsCellChange(int row, int column)
     {
+        if (column == 4) // ReadOnly column of the table
+        {
+           if(areAllImportserversReadonly()) {
+             cNewReadOnly->setCheckState(Qt::Unchecked);
+           } else {
+            cNewReadOnly->setCheckState(Qt::Checked);
+                
+           }
+            updateTableCheckboxes(Qt::Checked, row);
+
+        }
         switch (column)
         {
         case 0: // backend name
@@ -326,9 +368,56 @@ namespace xrock_gui_model
         case 3: // graph
             backends[row].graph = tableBackends->item(row, column)->text();
             break;
+        case 4: // readOnly
+            backends[row].readOnly = (tableBackends->item(row, column)->checkState() == Qt::Checked);
+            break;
         default:
             throw std::runtime_error("Invalid table column");
         }
+    }
+    void MultiDBConfigDialog::updateTableCheckboxes(Qt::CheckState state, int excludeRow)
+    {
+        for (int row = 0; row < tableBackends->rowCount(); ++row)
+        {
+            if (row != excludeRow)
+            {
+                QTableWidgetItem *item = tableBackends->item(row, 4); // 4 is the column for ReadOnly
+                if (item)
+                {
+                    item->setCheckState(state);
+                }
+            }
+        }
+    }
+
+    void MultiDBConfigDialog::onMainserverReadOnlyCheckboxStateChange()
+    {
+        if (cNewReadOnly->checkState() == Qt::Checked) {
+            if(areAllImportserversReadonly()) {
+                QMessageBox::warning(this, "Warning", "Please uncheck one of the importserver to make it writeable .", QMessageBox::Ok);
+                cNewReadOnly->setCheckState(Qt::Unchecked);
+            } else {
+                // ok.
+            }
+        } else {
+            updateTableCheckboxes(Qt::Checked, -1); // Check all checkboxes in the table
+    
+        }
+        
+    }
+    
+    bool MultiDBConfigDialog::areAllImportserversReadonly() {
+        bool allChecked = true;
+        for (int row = 0; row < tableBackends->rowCount(); ++row)
+        {
+            QTableWidgetItem *item = tableBackends->item(row, 4); // 4 is the ReadOnly column
+            if (item && item->checkState() != Qt::Checked)
+            {
+                allChecked = false;
+                break;
+            }
+        }
+        return allChecked;
     }
     void MultiDBConfigDialog::onMainServerBackendChange(const QString &newBackend)
     {

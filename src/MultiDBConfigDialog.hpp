@@ -10,6 +10,7 @@
 #include <QListWidget>
 #include <QLineEdit>
 #include <QComboBox>
+#include <QCheckBox>
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QListView>
@@ -57,18 +58,22 @@ namespace xrock_gui_model
                        graph == other.graph;
             }
         };
+
     
         std::vector<BackendItem> backends;
         QTableWidget *tableBackends;
         QComboBox *cbNewType;
+        QComboBox *cbMainServer;
         QLineEdit *tfNewName;
         QLineEdit *tfNewUrlOrPath;
         QLineEdit *tfNewGraph;
         QPushButton *btnAddNew, *btnRemove;
+        QCheckBox *cbLookupInMainDatabase;
         QPushButton *saveAndClose;
         QPushButton *btnResetToDefault;
 
         void updateBackendsWidget();
+        void updateSelectedMainServerCb();
         void closeEvent(QCloseEvent *e);
         
 

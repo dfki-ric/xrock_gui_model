@@ -4,8 +4,6 @@
  * \brief Allows user to configure MultiDB Backend.
  **/
 
-
-
 #include <QDialog>
 #include <QListWidget>
 #include <QLineEdit>
@@ -59,7 +57,6 @@ namespace xrock_gui_model
             }
         };
 
-    
         std::vector<BackendItem> backends;
         QTableWidget *tableBackends;
         QComboBox *cbNewType;
@@ -72,10 +69,10 @@ namespace xrock_gui_model
         QPushButton *saveAndClose;
         QPushButton *btnResetToDefault;
 
+
         void updateBackendsWidget();
         void updateSelectedMainServerCb();
         void closeEvent(QCloseEvent *e);
-        
 
     private slots:
         void onAddBtnClicked();
@@ -84,7 +81,11 @@ namespace xrock_gui_model
         void onResetToDefaultBtnClicked();
         void onMainServerBackendChange(const QString &newBackend);
         void onTableBackendsCellChange(int row, int column);
+        void onMoveUpClicked();
+        void onMoveDownClicked();
+        void oncbLookupInMainDatabaseUnchecked();
 
+    public slots:
+        void highlightMainServer(const QString &mainServerName);
     };
 } // end of namespace xrock_gui_model
-

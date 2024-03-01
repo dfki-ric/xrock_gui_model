@@ -1,6 +1,7 @@
 
 #include "MultiDBConfigDialog.hpp"
 #include <mars/config_map_gui/DataWidget.h>
+#include <QDebug>
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -29,7 +30,6 @@ namespace xrock_gui_model
         std::vector<std::string> backendType;
         if (ioLibrary)
         {
-
             backendType = ioLibrary->getBackends();
         }
         else
@@ -56,7 +56,20 @@ namespace xrock_gui_model
         tableBackends->setSelectionBehavior(QAbstractItemView::SelectRows);
         connect(tableBackends, SIGNAL(cellChanged(int, int)), this, SLOT(onTableBackendsCellChange(int, int)));
 
-        mainLayout->addWidget(tableBackends);
+        // move up and down
+        QVBoxLayout *vboxR = new QVBoxLayout();
+        vboxR->setSpacing(0);
+        vboxR->setAlignment(Qt::AlignCenter);
+
+        QPushButton *btnMoveUp = new QPushButton();
+        QPushButton *btnMoveDown = new QPushButton();
+        vboxR->addWidget(btnMoveUp);
+        vboxR->addWidget(btnMoveDown);
+
+        QHBoxLayout *hcontainer = new QHBoxLayout();
+        hcontainer->addWidget(tableBackends);
+        hcontainer->addLayout(vboxR);
+        mainLayout->addLayout(hcontainer);
 
         QHBoxLayout *hbox = new QHBoxLayout();
 
@@ -77,18 +90,18 @@ namespace xrock_gui_model
         btnAddNew = new QPushButton();
         btnAddNew->setText("add");
         connect(btnAddNew, SIGNAL(clicked()), this, SLOT(onAddBtnClicked()));
+        // remove
+        btnRemove = new QPushButton();
+        btnRemove->setText("remove selected");
+        connect(btnRemove, SIGNAL(clicked()), this, SLOT(onRemoveBtnClicked()));
         hbox->addWidget(tfNewName);
         hbox->addWidget(cbNewType);
         hbox->addWidget(tfNewUrlOrPath);
         hbox->addWidget(tfNewGraph);
         hbox->addWidget(btnAddNew);
+        hbox->addWidget(btnRemove);
         mainLayout->addLayout(hbox);
-        // remove
-        btnRemove = new QPushButton();
-        btnRemove->setText("remove selected");
-        connect(btnRemove, SIGNAL(clicked()), this, SLOT(onRemoveBtnClicked()));
-        mainLayout->addWidget(btnRemove);
- 
+        
         QFrame *separator = new QFrame;
         separator->setFrameShape(QFrame::HLine);
         separator->setFrameShadow(QFrame::Sunken);
@@ -108,7 +121,7 @@ namespace xrock_gui_model
         hbx4->addWidget(lbLookupInMainDatabase);
         hbx4->addWidget(cbLookupInMainDatabase);
         mainLayout->addLayout(hbx4);
-  
+
         separator = new QFrame;
         separator->setFrameShape(QFrame::HLine);
         separator->setFrameShadow(QFrame::Sunken);
@@ -116,7 +129,7 @@ namespace xrock_gui_model
 
         // finish and save
         QHBoxLayout *hbx5 = new QHBoxLayout();
-        btnResetToDefault = new QPushButton("reset to default");
+        btnResetToDefault = new QPushButton("reset to default (from bundle)");
         hbx5->addWidget(btnResetToDefault);
         connect(btnResetToDefault, SIGNAL(clicked()), this, SLOT(onResetToDefaultBtnClicked()));
 
@@ -125,13 +138,26 @@ namespace xrock_gui_model
         hbx5->addWidget(saveAndClose);
         mainLayout->addLayout(hbx5);
 
+        // Set icons for the move buttons
+        QString upIconPath = QString::fromUtf8(XROCK_DEFAULT_RESOURCES_PATH) + "/xrock_gui_model/resources/images/up.png";
+        QString downIconPath = QString::fromUtf8(XROCK_DEFAULT_RESOURCES_PATH) + "/xrock_gui_model/resources/images/down.png";
+        btnMoveUp->setIcon(QIcon(upIconPath));                 
+        btnMoveDown->setIcon(QIcon(downIconPath));
+
+        // Set tooltips for the Up and down buttons
+        btnMoveUp->setToolTip("Move Up");
+        btnMoveDown->setToolTip("Move Down");
+
+        connect(btnMoveUp, SIGNAL(clicked()), this, SLOT(onMoveUpClicked()));
+        connect(btnMoveDown, SIGNAL(clicked()), this, SLOT(onMoveDownClicked()));
+
+        connect(cbLookupInMainDatabase, SIGNAL(stateChanged(int)), this, SLOT(oncbLookupInMainDatabaseUnchecked()));
+        connect(cbMainServer, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(highlightMainServer(const QString &)));
+
         setLayout(mainLayout);
+
         // if there is an existing previous saved config state, load it to gui
-        if (loadState())
-        {
-            std::cout << "Loaded previous MultiDbConfig state successfully" << std::endl;
-        }
-        else
+        if (!loadState())
         {
             // no previous saved state to load! load default config from selected bundle (if any)
             this->resetToDefault();
@@ -161,14 +187,19 @@ namespace xrock_gui_model
                 w.graph = QString::fromStdString(backend["graph"]);
                 backends.push_back(std::move(w));
             }
-
             updateBackendsWidget();
             updateSelectedMainServerCb();
             // set combobox current item to main_server
-            cbMainServer->setCurrentIndex(cbMainServer->findData(main_server.name, Qt::DisplayRole));
-            // set checkbox also_lookup_main_server value from state
-            bool also_lookup_main_server = config.hasKey("also_lookup_main_server") ? config["also_lookup_main_server"] : false;
-            cbLookupInMainDatabase->setChecked(also_lookup_main_server);
+            cbMainServer->setCurrentIndex(cbMainServer->findData(main_server.name, Qt::DisplayRole)); 
+
+            // toggle alsoLookupMainServer if main_server in import_servers
+            cbLookupInMainDatabase->setChecked(std::count_if(backends.begin(), backends.end(),
+                                                             [&](const BackendItem &server)
+                                                             {
+                                                                 return server.type == main_server.type &&
+                                                                        server.graph == main_server.graph &&
+                                                                        server.urlOrPath == main_server.urlOrPath;
+                                                             }) > 1);
             return true;
         }
         else
@@ -176,20 +207,46 @@ namespace xrock_gui_model
             return false;
         }
     }
+
+    void MultiDBConfigDialog::oncbLookupInMainDatabaseUnchecked()
+    {
+        if (!cbLookupInMainDatabase->isChecked())
+        {
+            QString mainServerName = cbMainServer->currentText();
+            const BackendItem &main_server = *std::find_if(backends.begin(), backends.end(), [&](const BackendItem &b)
+                                                        { return b.name == mainServerName; });
+
+            // If the checkbox is unchecked, remove the main server from import_servers
+            const auto it = std::find_if(backends.begin(), backends.end(), [&](const BackendItem &b)
+                                                        { return b.type == main_server.type 
+                                                        && b.urlOrPath == main_server.urlOrPath&&
+                                                        b.graph == main_server.graph &&
+                                                        b.name != mainServerName; });
+            if (it != backends.end())
+            {
+                backends.erase(it);
+                updateBackendsWidget();
+            }
+        }
+    }
+
     void MultiDBConfigDialog::updateBackendsWidget()
     {
-        tableBackends->setRowCount(0);
         tableBackends->blockSignals(true);
+        tableBackends->setRowCount(0);
         for (const BackendItem &w : backends)
         {
             int rowPosition = tableBackends->rowCount();
             tableBackends->insertRow(rowPosition);
 
             tableBackends->setItem(rowPosition, 0, new QTableWidgetItem(w.name));
-            tableBackends->setItem(rowPosition, 1, new QTableWidgetItem(w.type));
+            QTableWidgetItem *item = new QTableWidgetItem(w.type);
+            item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+            tableBackends->setItem(rowPosition, 1, item);
             tableBackends->setItem(rowPosition, 2, new QTableWidgetItem(w.urlOrPath));
             tableBackends->setItem(rowPosition, 3, new QTableWidgetItem(w.graph));
         }
+        highlightMainServer(cbMainServer->currentText());
         tableBackends->blockSignals(false);
     }
 
@@ -240,9 +297,12 @@ namespace xrock_gui_model
         b.type = cbNewType->currentText();
         b.urlOrPath = tfNewUrlOrPath->text();
         b.graph = tfNewGraph->text();
-
+        
         // if backend doesn't exists, add it
-        auto it = std::find(backends.begin(), backends.end(), b);
+        auto it = std::find_if(backends.begin(), backends.end(), [&](const BackendItem &server)
+                                                             {
+                                                                 return server.name == b.name; // name is the unique id for each backend
+                                                             });                                                    
         if (it == backends.end()) // add
         {
             backends.push_back(std::move(b));
@@ -279,6 +339,53 @@ namespace xrock_gui_model
             resetToDefault();
         }
     }
+    void MultiDBConfigDialog::onMoveUpClicked()
+    {
+        int currentIndex = tableBackends->currentRow();
+        if (currentIndex <= 0)
+            return; 
+
+        std::swap(backends[currentIndex], backends[currentIndex - 1]);
+        updateBackendsWidget();
+        tableBackends->selectRow(currentIndex - 1);
+    }
+
+    void MultiDBConfigDialog::onMoveDownClicked()
+    {
+        int currentIndex = tableBackends->currentRow();
+        if (currentIndex < 0 || static_cast<std::size_t>(currentIndex) >= backends.size() - 1)
+            return;
+
+        std::swap(backends[currentIndex], backends[currentIndex + 1]);
+        updateBackendsWidget();
+        tableBackends->selectRow(currentIndex + 1);
+    }
+    void MultiDBConfigDialog::highlightMainServer(const QString &mainServerName)
+    {
+        tableBackends->blockSignals(true);
+        for (int i = 0; i < tableBackends->rowCount(); ++i)
+        {
+            if (tableBackends->item(i, 0)->text() == mainServerName)
+            {
+                // Apply a background color to each cell in the row to highlight the main server.
+                for (int j = 0; j < tableBackends->columnCount(); ++j)
+                {
+                    
+                    QColor color = QColor(Qt::green).lighter(170); // Light green 
+
+                    tableBackends->item(i, j)->setBackground(color); 
+                }
+            }
+            else
+            {
+                for (int j = 0; j < tableBackends->columnCount(); ++j)
+                {
+                    tableBackends->item(i, j)->setBackground(Qt::white); 
+                }
+            }
+        }
+        tableBackends->blockSignals(false);
+    }
 
     void MultiDBConfigDialog::onFinishBtnClicked()
     {
@@ -313,10 +420,34 @@ namespace xrock_gui_model
             backend["graph"] = b.graph.toStdString();
             config["import_servers"].push_back(std::move(backend));
         }
- 
-        config["also_lookup_main_server"] = cbLookupInMainDatabase->isChecked();
-    
-        // user can click finish without adding servers
+
+        // If the checkbox is checked, additionally add the main server to import_servers
+        if (cbLookupInMainDatabase->isChecked())
+        {
+            ConfigMap mainServerConfig;
+            mainServerConfig["name"] = mainServer.name.toStdString() + " (Import)";
+            
+            mainServerConfig["type"] = mainServer.type.toStdString();
+            mainServerConfig[urlOrPath] = mainServer.urlOrPath.toStdString();
+            mainServerConfig["graph"] = mainServer.graph.toStdString();
+   
+            // Add the new main server to import_servers
+            config["import_servers"].push_back(std::move(mainServerConfig));
+        }
+       
+        auto& servers = config["import_servers"];
+        for (auto it = servers.begin(); it != servers.end(); ++it) {
+            auto duplicateIt = std::find_if(std::next(it), servers.end(), [&](ConfigMap& server) {
+                return (*it)["path"].getString() == server["path"].getString() &&
+                    (*it)["type"].getString() == server["type"].getString() &&
+                    (*it)["graph"].getString() == server["graph"].getString();
+            });
+
+            if (duplicateIt != servers.end()) {
+                servers.erase(duplicateIt);
+                it = servers.begin();
+            }
+        }
         config.toYamlFile(this->configFilename);
         done(0);
     }
@@ -373,10 +504,19 @@ namespace xrock_gui_model
 
     void MultiDBConfigDialog::updateSelectedMainServerCb()
     {
+        QString currentMainServer = cbMainServer->currentText();
         cbMainServer->clear();
-
         for (const BackendItem &backend : backends)
+        {
             cbMainServer->addItem(backend.name);
+        }
+        // Restore the selection and update the highlight.
+        int index = cbMainServer->findText(currentMainServer);
+        if (index != -1)
+        {
+            cbMainServer->setCurrentIndex(index);
+            highlightMainServer(cbMainServer->currentText());
+        }
     }
 
     void MultiDBConfigDialog::onMainServerBackendChange(const QString &newBackend)
@@ -392,7 +532,7 @@ namespace xrock_gui_model
     }
     void MultiDBConfigDialog::closeEvent(QCloseEvent *event)
     {
-        int result = QMessageBox::question(this, tr("Confirm Close"), tr("Are you sure you want to close this window?"), QMessageBox::Yes | QMessageBox::No);
+        int result = QMessageBox::question(this, "Confirm Close", "Are you sure you want to close this window?", QMessageBox::Yes | QMessageBox::No);
 
         if (result == QMessageBox::Yes)
         {

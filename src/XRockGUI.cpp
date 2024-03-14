@@ -141,7 +141,7 @@ namespace xrock_gui_model
 	    ioLibrary = NULL;
 	    if(!noXRockIOLib)
 	    {
-	        ioLibrary = libManager->getLibraryAs<XRockIOLibrary>("xrock_io_library", true);
+	        ioLibrary = libManager->getLibraryAs<XRockIOLibrary>("xrock_io_library", false);
 	    }
             if(ioLibrary)
             {

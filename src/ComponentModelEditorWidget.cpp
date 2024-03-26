@@ -148,7 +148,18 @@ namespace xrock_gui_model
             connect(b, SIGNAL(clicked()), this, SLOT(addRemoveLayout()));
             hLayout->addWidget(b);
             vLayout->addLayout(hLayout);
-            setLayout(vLayout);
+
+            QWidget *scrollablewidget = new QWidget();
+            scrollablewidget->setLayout(vLayout);
+
+            QScrollArea *scrollarea = new QScrollArea();
+            scrollarea->setWidget(scrollablewidget);
+            scrollarea->setWidgetResizable(true);
+
+            QVBoxLayout *vLayout2 = new QVBoxLayout();
+            vLayout2->addWidget(scrollarea);
+
+            setLayout(vLayout2);
             this->clear();
         }
         catch (const std::exception &e)

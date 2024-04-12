@@ -40,6 +40,7 @@ set(SOURCES
   src/VersionDialog.cpp
   src/ConfigureDialog.cpp
   src/MultiDBConfigDialog.cpp
+  src/BundleSelectionDialog.cpp
   src/ConfigMapHelper.cpp
   src/BasicModelHelper.cpp
   src/FileDB.cpp
@@ -57,6 +58,7 @@ set(HEADERS
   src/ConfigureDialog.hpp
   src/ConfigureDialogLoader.hpp
   src/MultiDBConfigDialog.hpp
+  src/BundleSelectionDialog.hpp
   src/ConfigMapHelper.hpp
   src/BasicModelHelper.hpp
   src/FileDB.hpp
@@ -73,6 +75,7 @@ set (QT_MOC_HEADER
   src/VersionDialog.hpp
   src/ConfigureDialog.hpp
   src/MultiDBConfigDialog.hpp
+  src/BundleSelectionDialog.hpp
   src/ToolbarBackend.hpp
   src/plugins/MARSIMUConfig.hpp
   src/BuildModuleDialog.hpp

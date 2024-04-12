@@ -12,6 +12,8 @@
 #include "DBInterface.hpp"
 #include "XRockIOLibrary.hpp"
 #include <configmaps/ConfigMap.hpp>
+#include "BundleSelectionDialog.hpp"
+#include "utils/WaitCursorRAII.hpp"
 
 // Needed for version check
 #include <QtGlobal>
@@ -327,7 +329,17 @@ namespace xrock_gui_model
             }
             else
             {
-                QMessageBox::warning(this, "Warning", "Select bundle from where you want to load your default config.", QMessageBox::Ok);
+                BundleSelectionDialog a;
+                a.exec();
+                if (std::string selectedBundle = a.getSelectedBundle().toStdString();
+                  !selectedBundle.empty()) {
+                    WaitCursorRAII _;
+                    setenv("ROCK_BUNDLE", selectedBundle.c_str(), 1);
+                    // std::string cmd = "rock-bundle-sel " + selectedBundle;
+                    // std::system(cmd.c_str());
+                    resetToDefault();
+                }
+                // QMessageBox::warning(this, "Warning", "Select bundle from where you want to load your default config.", QMessageBox::Ok);
             }
         }
     }

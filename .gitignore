@@ -2,3 +2,7 @@ build
 doc/build/
 *~
 *status.yml
+.idea/
+/build/
+**logs
+**.log

@@ -47,6 +47,9 @@ namespace xrock_gui_model
         int index = 0;
         for (const auto &d : domains)
         {
+            if(intent == Intention::SELECT_HARDWARE)
+                if(d != "ASSEMBLY")
+                    continue;
             domainSelect->addItem(QString::fromStdString(d));
             indexMap[d] = index;
             index++;
@@ -104,7 +107,13 @@ namespace xrock_gui_model
             this->setWindowTitle("Add Type");
             button->setText("add type");
             break;
-        
+
+        case Intention::SELECT_HARDWARE:
+            this->setWindowTitle("Add Hardware Model");
+            button->setText("add hardware");
+            changeDomain("ASSEMBLY");
+            break;
+
         default:
             break;
         }
@@ -120,13 +129,15 @@ namespace xrock_gui_model
         setLayout(mainLayout);
         doc->setHtml("");
         doc->setStyleSheet("background-color:#eeeeee;");
-        if ((int)indexMap[lastDomain] == 0)
-        {
-            changeDomain(lastDomain.c_str());
-        }
-        else
-        {
-            domainSelect->setCurrentIndex(indexMap[lastDomain]);
+        if(intent != Intention::SELECT_HARDWARE) {      
+            if ((int)indexMap[lastDomain] == 0)
+            {
+                changeDomain(lastDomain.c_str());
+            }
+            else
+            {
+                domainSelect->setCurrentIndex(indexMap[lastDomain]);
+            }
         }
 
         if (!lastFilter.empty())
@@ -184,28 +195,31 @@ namespace xrock_gui_model
                 WaitCursorRAII _;
                 map = xrockGui->db->requestModel(selectedDomain, selectedModel, selectedVersion, true);
         }
-        if(intent == Intention::ADD_TYPE){ model = map;}
-        doc->setHtml("");
-        if (map["versions"][0].hasKey("data"))
+        if (intent == Intention::ADD_TYPE || intent == Intention::SELECT_HARDWARE)
         {
+            model = map;
+        }
+            doc->setHtml("");
+            if (map["versions"][0].hasKey("data"))
             {
-                ConfigMap dataMap;
-                if (map["versions"][0]["data"].isMap())
-                    dataMap = map["versions"][0]["data"];
-                else
-                    dataMap = ConfigMap::fromYamlString(map["versions"][0]["data"]);
-                if (dataMap.hasKey("description"))
                 {
-                    if (dataMap["description"].hasKey("markdown"))
+                    ConfigMap dataMap;
+                    if (map["versions"][0]["data"].isMap())
+                        dataMap = map["versions"][0]["data"];
+                    else
+                        dataMap = ConfigMap::fromYamlString(map["versions"][0]["data"]);
+                    if (dataMap.hasKey("description"))
                     {
-                        std::string md = dataMap["description"]["markdown"];
-                        doc->setHtml(getHtml(md).c_str());
+                        if (dataMap["description"].hasKey("markdown"))
+                        {
+                            std::string md = dataMap["description"]["markdown"];
+                            doc->setHtml(getHtml(md).c_str());
+                        }
                     }
                 }
             }
+            dw->setConfigMap("", map);
         }
-        dw->setConfigMap("", map);
-    }
 
     void ImportDialog::addModel()
     {

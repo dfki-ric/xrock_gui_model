@@ -47,6 +47,7 @@ set(SOURCES
   src/ToolbarBackend.cpp
   src/plugins/MARSIMUConfig.cpp
   src/BuildModuleDialog.cpp
+  src/LinkHardwareSoftwareDialog.cpp
 )
 
 set(HEADERS
@@ -66,7 +67,9 @@ set(HEADERS
   src/DBInterface.hpp
   src/XRockIOLibrary.hpp
   src/BuildModuleDialog.hpp
+  src/LinkHardwareSoftwareDialog.hpp
   src/utils/WaitCursorRAII.hpp
+  
 )
 
 set (QT_MOC_HEADER
@@ -79,6 +82,7 @@ set (QT_MOC_HEADER
   src/ToolbarBackend.hpp
   src/plugins/MARSIMUConfig.hpp
   src/BuildModuleDialog.hpp
+  src/LinkHardwareSoftwareDialog.hpp
 )
 
 if (${USE_QT5})

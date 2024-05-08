@@ -1,4 +1,5 @@
 #include "ComponentModelEditorWidget.hpp"
+#include "LinkHardwareSoftwareDialog.hpp"
 #include "XRockGUI.hpp"
 #include "ConfigureDialog.hpp"
 #include "ConfigMapHelper.hpp"
@@ -148,6 +149,10 @@ namespace xrock_gui_model
             connect(b, SIGNAL(clicked()), this, SLOT(addRemoveLayout()));
             hLayout->addWidget(b);
             vLayout->addLayout(hLayout);
+            hardwareLinkBtn = new QPushButton("Manage Hardware Links");
+            hardwareLinkBtn->setVisible(false);
+            connect(hardwareLinkBtn, SIGNAL(clicked(bool)), this, SLOT(linkHardware()));
+            vLayout->addWidget(hardwareLinkBtn);
             setLayout(vLayout);
             this->clear();
         }
@@ -289,9 +294,23 @@ namespace xrock_gui_model
         } 
         currentModel = newModel;
         updateModel();
+        updateManageHardwareLinkButtonState();
         fprintf(stderr, "done\n");
     }
 
+    void ComponentModelEditorWidget::updateManageHardwareLinkButtonState()
+    {
+        bool enableHardwareLinkButton = false;
+        if (currentModel)
+        {
+            configmaps::ConfigMap basicModel = currentModel->getModelInfo();
+            std::string domain = basicModel["domain"];
+            if (domain == "SOFTWARE")
+                enableHardwareLinkButton = true;
+        }
+        hardwareLinkBtn->setVisible(enableHardwareLinkButton);
+    }
+    
     void ComponentModelEditorWidget::update_prop_widget(const std::string &prop_name, configmaps::ConfigAtom &value)
     {
         for (auto &[label, widget] : widgets)
@@ -546,4 +565,17 @@ namespace xrock_gui_model
             updateModel(); 
         }
     }
+    void ComponentModelEditorWidget::linkHardware()
+    {
+        if(currentModel) {
+            auto currentModelMap = currentModel->getModelInfo();
+            LinkHardwareSoftwareDialog dialog(xrockGui, currentModelMap);
+            dialog.exec();
+            currentModel->setModelInfo(dialog.getSoftwareMap());
+        }
+     
+    }
+    
+    
+
 } // end of namespace xrock_gui_model

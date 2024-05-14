@@ -1,6 +1,6 @@
 main_server:
   type: Serverless
-  path: modkom/component_db
+  path: database/modkom_db
   graph: master
 import_servers:
   - type: Serverless

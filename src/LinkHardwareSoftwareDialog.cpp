@@ -29,7 +29,7 @@ namespace xrock_gui_model
         auto hbox = new QHBoxLayout();
         minusBtn = new QPushButton("-");
         minusBtn->setToolTip("Remove selected hardware");
-        connect(minusBtn, SIGNAL(clicked(bool)), this, SLOT(removeSelectedConfirgured_model()));
+        connect(minusBtn, SIGNAL(clicked(bool)), this, SLOT(removeSelectedConfiguredModel()));
         hbox->addWidget(minusBtn);
 
         plusBtn = new QPushButton("+");
@@ -64,7 +64,7 @@ namespace xrock_gui_model
         ImportDialog id(xrockGui, ImportDialog::Intention::SELECT_HARDWARE);
         id.exec();
 
-        // what if the user didnot select any thing from impôrt dialg?.
+        // what if the user didnot select any thing from import dialg?.
         auto assemblyModel = id.getModel();
         if(assemblyModel.empty())
             return;
@@ -96,7 +96,7 @@ namespace xrock_gui_model
                                  QMessageBox::Ok);
     }
 
-    void LinkHardwareSoftwareDialog::removeSelectedConfirgured_model()
+    void LinkHardwareSoftwareDialog::removeSelectedConfiguredModel()
     {
         QListWidgetItem *item = listWidget->currentItem();
         if (item)

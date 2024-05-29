@@ -21,7 +21,7 @@ namespace xrock_gui_model
         configmaps::ConfigMap& getSoftwareMap() { return softwareMap; }
 
     private slots:
-        void removeSelectedConfirgured_model();
+        void removeSelectedConfiguredModel();
         void addConfiguredModels();
         void closeEvent(QCloseEvent *event) override;
         

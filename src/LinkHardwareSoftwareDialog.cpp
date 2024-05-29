@@ -73,27 +73,43 @@ namespace xrock_gui_model
         std::string assemblyModelName = assemblyModel["name"];
         std::string version = assemblyModel["versions"][0]["name"];
         std::string deployUri = softwareMap["uri"].getString();
+        bool already_linked = false;
+        for (auto a : softwareMap["configured_for"])
+        {
+            if (a["uri"] == assemblyModel["uri"])
+            {
+                already_linked = true;
+                break;
+            }
+        }
+        if (already_linked)
+        {
+            QMessageBox::warning(nullptr, "Warning", QString("The deployment of '%1' is already linked to  hardware '%2'.")
+                                         .arg(QString::fromStdString(softwareMap["name"].getString()))
+                                         .arg(QString::fromStdString(assemblyModelName), QMessageBox::Ok));
+            return;
+        }
+            // We add it to basic model
+            ConfigMap newConfiguredFor;
+            newConfiguredFor["name"] = assemblyModelName;
+            newConfiguredFor["version"] = version;
+            newConfiguredFor["uri"] = (std::string)assemblyModel["uri"];
+            softwareMap["configured_for"].push_back(newConfiguredFor);
 
-        // We add it to basic model 
-        ConfigMap newConfiguredFor;
-        newConfiguredFor["name"] = assemblyModelName;
-        newConfiguredFor["version"] = version;
-        newConfiguredFor["uri"] = (std::string)assemblyModel["uri"];
-        softwareMap["configured_for"].push_back(newConfiguredFor);
+            // Alles gut, add hw to gui
+            QListWidgetItem *item = new QListWidgetItem(QString::fromStdString(assemblyModelName + " ( " + version + " ) "));
+            QVariant tag;
+            tag.setValue(QString::fromStdString(assemblyModel["uri"]));
+            item->setData(Qt::UserRole, tag);
+            listWidget->addItem(item);
 
-        // Alles gut, add hw to gui
-        QListWidgetItem *item = new QListWidgetItem(QString::fromStdString(assemblyModelName + " ( " + version + " ) "));
-        QVariant tag;
-        tag.setValue(QString::fromStdString(assemblyModel["uri"]));
-        item->setData(Qt::UserRole, tag);
-        listWidget->addItem(item);
-
-        QMessageBox::information(nullptr,
-                                 "Success",
-                                 QString("The deployment of '%1' with hardware '%2' is linked.\n\nDon't forget to save the component model '%1' to the database.")
-                                     .arg(QString::fromStdString(softwareMap["name"].getString()))
-                                     .arg(QString::fromStdString(assemblyModelName)),
-                                 QMessageBox::Ok);
+            QMessageBox::information(nullptr,
+                                     "Success",
+                                     QString("The deployment of '%1' with hardware '%2' is linked.\n\nDon't forget to save the component model '%1' to the database.")
+                                         .arg(QString::fromStdString(softwareMap["name"].getString()))
+                                         .arg(QString::fromStdString(assemblyModelName)),
+                                     QMessageBox::Ok);
+        
     }
 
     void LinkHardwareSoftwareDialog::removeSelectedConfiguredModel()

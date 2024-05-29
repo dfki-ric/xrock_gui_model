@@ -51,7 +51,7 @@ ToolbarBackend::ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface 
     // Db Path
     QLabel *label = new QLabel(" DB Path: ");
     leDbPath = new QLineEdit;
-    leDbPath->setText("modkom/component_db");
+    leDbPath->setText("database/modkom_db");
     leDbPath->setFixedWidth(150);
     ActionLabelPath = toolbar->addWidget(label);
     widgetActionPath = toolbar->addWidget(leDbPath);

@@ -4,6 +4,6 @@ PortFontSize: 8
 PortIconScale: 1.3333
 retinaScale: 1.
 dbType: Serverless # one of [Serverless, Client, MultiDBClient]
-dbPath: modkom/component_db
+dbPath: database/modkom_db
 dbGraph: master
 dbAddress: http://localhost:8183

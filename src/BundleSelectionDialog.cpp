@@ -10,14 +10,22 @@ namespace xrock_gui_model
     BundleSelectionDialog::BundleSelectionDialog(QWidget *parent)
         : QDialog(parent), layout(new QVBoxLayout(this)), selectedBundle("")
     {
-        populateBundles();
+        _hasBundles = populateBundles();
 
-        QPushButton *okButton = new QPushButton("OK", this);
-        connect(okButton, SIGNAL(clicked()), this, SLOT(acceptButtonClicked()));
-        layout->addWidget(okButton);
+        if (!_hasBundles)
+        {
+            QMessageBox::warning(this, "Warning", "No bundles found", QMessageBox::Ok);
+            done(0);
+        }
+        else
+        {
+            QPushButton *okButton = new QPushButton("OK", this);
+            connect(okButton, SIGNAL(clicked()), this, SLOT(acceptButtonClicked()));
+            layout->addWidget(okButton);
+        }
     }
 
-    void BundleSelectionDialog::populateBundles()
+    bool BundleSelectionDialog::populateBundles()
     {
         const char *rockBundlePath = std::getenv("ROCK_BUNDLE_PATH");
         
@@ -27,22 +35,28 @@ namespace xrock_gui_model
 
             QDir dir(QString::fromStdString(bundlesPath));
             QStringList bundles = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+            if(bundles.isEmpty()) {
+                return false;
+            }
             foreach (const QString &bundle, bundles)
             {
                 QRadioButton *radioButton = new QRadioButton(bundle, this);
                 radioButtons.append(radioButton);
                 layout->addWidget(radioButton);
             }
-        } else {
+            return true;
+        }
+        else
+        {
             QMessageBox::warning(this, "Warning", "Missing env ROCK_BUNDLE_PATH", QMessageBox::Ok);
         }
+        return false;
     }
 
     QString BundleSelectionDialog::getSelectedBundle() const
     {
         return selectedBundle;
     }
-
     void BundleSelectionDialog::acceptButtonClicked()
     {
         foreach (QRadioButton *radioButton, radioButtons)
@@ -50,16 +64,10 @@ namespace xrock_gui_model
             if (radioButton->isChecked())
             {
                 selectedBundle = radioButton->text();
-                break;
+                accept(); 
+                return;
             }
         }
-        if (selectedBundle.isEmpty())
-        {
-            QMessageBox::warning(this, "Warning", "Please select a bundle.", QMessageBox::Ok);
-        }
-        else
-        {
-            accept();
-        }
+        QMessageBox::warning(this, "Warning", "Please select a bundle.", QMessageBox::Ok);
     }
 }

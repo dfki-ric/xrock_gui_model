@@ -14,6 +14,7 @@ namespace xrock_gui_model
     public:
         explicit BundleSelectionDialog(QWidget *parent = nullptr);
         QString getSelectedBundle() const;
+        bool hasBundles() const noexcept { return _hasBundles; }
 
     private slots:
         void acceptButtonClicked();
@@ -22,7 +23,8 @@ namespace xrock_gui_model
         QVBoxLayout *layout;
         QList<QRadioButton *> radioButtons;
         QString selectedBundle;
+        bool _hasBundles{};
 
-        void populateBundles();
+        bool populateBundles();
     };
 }

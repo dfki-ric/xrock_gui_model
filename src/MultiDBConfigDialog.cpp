@@ -330,7 +330,10 @@ namespace xrock_gui_model
             else
             {
                 BundleSelectionDialog a;
+                if (!a.hasBundles())
+                    return;
                 a.exec();
+
                 if (std::string selectedBundle = a.getSelectedBundle().toStdString();
                   !selectedBundle.empty()) {
                     WaitCursorRAII _;

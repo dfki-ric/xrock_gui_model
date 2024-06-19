@@ -1,6 +1,6 @@
 #include "ConfigureDialog.hpp"
-#include <mars/config_map_gui/DataWidget.h>
-#include <mars/utils/misc.h>
+#include <config_map_gui/DataWidget.h>
+#include <mars_utils/misc.h>
 
 #include <QVBoxLayout>
 #include <QPushButton>

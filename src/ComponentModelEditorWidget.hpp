@@ -5,7 +5,7 @@
  **/
 
 #pragma once
-#include <mars/main_gui/BaseWidget.h>
+#include <main_gui/BaseWidget.h>
 #include <configmaps/ConfigMap.hpp>
 #include <configmaps/ConfigAtom.hpp>
 #include "ComponentModelInterface.hpp"

@@ -16,7 +16,7 @@
 #include <QDebug>
 #include <bagel_gui/BagelGui.hpp>
 #include <bagel_gui/BagelModel.hpp>
-#include <mars/utils/misc.h>
+#include <mars_utils/misc.h>
 #include <QDesktopServices>
 
 using namespace configmaps;

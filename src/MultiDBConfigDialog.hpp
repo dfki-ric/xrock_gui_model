@@ -14,7 +14,7 @@
 #include <QListView>
 #include <QTableWidget>
 #include <QHeaderView>
-#include <mars/utils/misc.h>
+#include <mars_utils/misc.h>
 #include "XRockIOLibrary.hpp"
 
 namespace xrock_gui_model

@@ -21,7 +21,7 @@
 #include <QComboBox>
 #include <QVBoxLayout>
 #include <cstdlib>
-#include <mars/utils/misc.h>
+#include <mars_utils/misc.h>
 using namespace xrock_gui_model;
 
 ToolbarBackend::ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface *gui)

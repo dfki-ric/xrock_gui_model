@@ -1,6 +1,6 @@
 
 #include "MultiDBConfigDialog.hpp"
-#include <mars/config_map_gui/DataWidget.h>
+#include <config_map_gui/DataWidget.h>
 #include <QDebug>
 
 #include <QVBoxLayout>

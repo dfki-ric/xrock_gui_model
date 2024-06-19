@@ -1,5 +1,5 @@
 #include "ImportDialog.hpp"
-#include <mars/config_map_gui/DataWidget.h>
+#include <config_map_gui/DataWidget.h>
 
 #include <QVBoxLayout>
 #include <QPushButton>

@@ -3,7 +3,7 @@
  */
 #pragma once
 
-#include <mars/main_gui/MenuInterface.h>
+#include <main_gui/MenuInterface.h>
 #include <string>
 #include <functional>
 #include <QString>
@@ -11,9 +11,9 @@
 #include <QToolBar>
 #include <QLabel>
 #include "DBInterface.hpp"
-#include <mars/main_gui/MainGUI.h>
-#include <mars/cfg_manager/CFGManagerInterface.h>
-#include <mars/main_gui/GuiInterface.h>
+#include <main_gui/MainGUI.h>
+#include <cfg_manager/CFGManagerInterface.h>
+#include <main_gui/GuiInterface.h>
 
 class QLineEdit;
 class QWidget;

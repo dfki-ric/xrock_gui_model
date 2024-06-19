@@ -14,7 +14,7 @@
 #include <lib_manager/LibManager.hpp>
 #include <bagel_gui/BagelGui.hpp>
 #include <bagel_gui/BagelModel.hpp>
-#include <mars/main_gui/MainGUI.h>
+#include <main_gui/MainGUI.h>
 #include <QLineEdit>
 #include <QWidget>
 #include <QLabel>

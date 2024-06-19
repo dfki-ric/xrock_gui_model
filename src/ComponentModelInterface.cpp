@@ -11,7 +11,7 @@
 #include <bagel_gui/BagelGui.hpp>
 #include <QMessageBox>
 
-#include <mars/utils/misc.h>
+#include <mars_utils/misc.h>
 #include <dirent.h>
 #include <iostream>
 using namespace bagel_gui;

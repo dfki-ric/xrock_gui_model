@@ -9,13 +9,14 @@
 #include <configmaps/ConfigMap.hpp>
 #include <configmaps/ConfigAtom.hpp>
 #include "ComponentModelInterface.hpp"
-
+#include "LinkHardwareSoftwareDialog.hpp"
 #include <QWidget>
 #include <QListWidget>
 #include <QComboBox>
 #include <QLineEdit>
 #include <QTextEdit>
 #include <QCheckBox>
+#include <QPushButton>
 #include <QLabel>
 
 namespace bagel_gui
@@ -67,21 +68,23 @@ namespace xrock_gui_model
         void update_widgets(configmaps::ConfigMap &info);
         void removeSelectedType();
         void addType();
+        void linkHardware();
+        void updateManageHardwareLinkButtonState();
 
     private:
         std::map<QLabel *, QWidget *> widgets; // Generic list of label:
         bagel_gui::BagelGui *bagelGui;
         XRockGUI *xrockGui;
-        bagel_gui::ModelInterface* currentModel = nullptr;
+        bagel_gui::ModelInterface *currentModel = nullptr;
 
-        QListWidget* types;
+        QListWidget *types;
 
         QListWidget *layouts;
         std::map<std::string, QCheckBox *> layoutCheckBoxes;
         QLineEdit *layoutName, *uri;
         QTextEdit *includes, *annotations, *interfaces;
-        QLabel *dataStatusLabel; 
-        
+        QLabel *dataStatusLabel;
+        QPushButton *hardwareLinkBtn;
 
         void updateCurrentLayout();
     };

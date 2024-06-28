@@ -43,7 +43,18 @@ namespace xrock_gui_model
             {
                 try
                 {
-                    target["submodel"][i]["data"] = it["data"].toYamlString();
+                    // If target already contains a 'data' entry, we have to check if it is a string or a map and then convert the new value to string or directly assign it
+                    if (target.hasKey("submodel") && target["submodel"][i].hasKey("data"))
+                    {
+                        // Assign data depending on type of already existing data entry
+                        if (target["submodel"][i]["data"].isMap())
+                            target["submodel"][i]["data"] = it["data"];
+                        else
+                            target["submodel"][i]["data"] = it["data"].toYamlString();
+                    } else {
+                        // Standard behavior: store map directly
+                        target["submodel"][i]["data"] = it["data"];
+                    }
                 }
                 catch (...)
                 {

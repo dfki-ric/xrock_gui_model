@@ -149,11 +149,22 @@ namespace xrock_gui_model
             connect(b, SIGNAL(clicked()), this, SLOT(addRemoveLayout()));
             hLayout->addWidget(b);
             vLayout->addLayout(hLayout);
+
+            QWidget *scrollablewidget = new QWidget();
+            scrollablewidget->setLayout(vLayout);
+
+            QScrollArea *scrollarea = new QScrollArea();
+            scrollarea->setWidget(scrollablewidget);
+            scrollarea->setWidgetResizable(true);
+
+            QVBoxLayout *vLayout2 = new QVBoxLayout();
+            vLayout2->addWidget(scrollarea);
             hardwareLinkBtn = new QPushButton("Manage Hardware Links");
             hardwareLinkBtn->setVisible(false);
             connect(hardwareLinkBtn, SIGNAL(clicked(bool)), this, SLOT(linkHardware()));
             vLayout->addWidget(hardwareLinkBtn);
-            setLayout(vLayout);
+
+            setLayout(vLayout2);
             this->clear();
         }
         catch (const std::exception &e)
@@ -388,15 +399,8 @@ namespace xrock_gui_model
             it.second = get_prop_widget_value(key);
         }
         // Special property 'data'
-        ConfigMap annoMap = ConfigMap::fromYamlString(annotations->toPlainText().toStdString());
-        if(updatedMap["versions"][0].hasKey("data"))
-        {
-            updatedMap["versions"][0]["data"].updateMap(annoMap);
-        }
-        else
-        {
-            updatedMap["versions"][0]["data"] = annoMap;
-        }
+        updatedMap["versions"][0]["data"] = ConfigMap::fromYamlString(annotations->toPlainText().toStdString());
+        
         // Sync types list with basic model
         updatedMap["types"] = ConfigVector();
         for(int i = 0; i < types->count(); ++i)

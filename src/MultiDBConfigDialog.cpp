@@ -233,10 +233,11 @@ namespace xrock_gui_model
         }
         else
         {
-            // Remove the import version of the main server
+            // Remove the import version of the main server and any previous import server of the previous main server
             backends.erase(std::remove_if(backends.begin(), backends.end(), [&](const BackendItem &b)
-                                          { return (b.type == mainServerIt->type && b.urlOrPath == mainServerIt->urlOrPath && b.graph == mainServerIt->graph && b.name != mainServerIt->name) or
-                                                   (prevMainServer.type == b.type && prevMainServer.urlOrPath == b.urlOrPath && prevMainServer.graph == b.graph && prevMainServer.name != b.name); }),
+                                          { if(b.name == mainServerIt->name) return false;
+                                            return (b.type == mainServerIt->type && b.urlOrPath == mainServerIt->urlOrPath && b.graph == mainServerIt->graph && b.name != mainServerIt->name) ||
+                                                    (prevMainServer.type == b.type && prevMainServer.urlOrPath == b.urlOrPath && prevMainServer.graph == b.graph && prevMainServer.name != b.name); }),
                            backends.end());
         }
 
@@ -295,17 +296,7 @@ namespace xrock_gui_model
             tableBackends->setItem(rowPosition, 2, new QTableWidgetItem(w.urlOrPath));
             tableBackends->setItem(rowPosition, 3, new QTableWidgetItem(w.graph));
 
-            tableBackends->setVerticalHeaderItem(rowPosition, new QTableWidgetItem(rowPosition ? QString::number(rowPosition) : QString("MS"))); // No number for the main server
-
-            // Customizing row headers
-            /*if (w.name == cbMainServer->currentText())
-            {
-                tableBackends->setVerticalHeaderItem(rowPosition, new QTableWidgetItem("")); // No number for the main server
-            }
-            else
-            {
-                tableBackends->setVerticalHeaderItem(rowPosition, new QTableWidgetItem(QString::number(rowPosition))); // Start numbering from 1 for others
-            }*/
+            tableBackends->setVerticalHeaderItem(rowPosition, new QTableWidgetItem(rowPosition ? QString::number(rowPosition) : QString("MS")));
         }
         highlightMainServer(cbMainServer->currentText());
         tableBackends->blockSignals(false);
@@ -331,6 +322,7 @@ namespace xrock_gui_model
                     backends.erase(it);
                     updateBackendsWidget();
                     updateSelectedMainServerCb();
+                    cbLookupInMainDatabase->setChecked(false);
                 }
             }
         }
@@ -402,35 +394,33 @@ namespace xrock_gui_model
     }
     void MultiDBConfigDialog::updateMoveUpAndDownButtonState(int currentIndex)
     {
-        std::cout << "index " << currentIndex << std::endl;
-        std::cout << "ableBackends->rowCount() " << tableBackends->rowCount() << std::endl;
-        btnMoveUp->setEnabled(currentIndex > 0);
-        btnMoveDown->setEnabled(currentIndex >= 0 && currentIndex <= tableBackends->rowCount() - 2);
+        btnMoveUp->setEnabled(currentIndex > 1);
+        btnMoveDown->setEnabled( currentIndex < tableBackends->rowCount() - 1);
     }
     void MultiDBConfigDialog::onMoveUpClicked()
     {
         int currentIndex = tableBackends->currentRow();
-        updateMoveUpAndDownButtonState(currentIndex);
-        if (currentIndex <= 1)
-            return; 
+        if (currentIndex <= 0)
+            return;
 
         std::swap(backends[currentIndex], backends[currentIndex - 1]);
         updateBackendsWidget();
         tableBackends->selectRow(currentIndex - 1);
-       
+        updateMoveUpAndDownButtonState(currentIndex - 1); // Update button state after moving up
     }
 
     void MultiDBConfigDialog::onMoveDownClicked()
     {
         int currentIndex = tableBackends->currentRow();
-        updateMoveUpAndDownButtonState(currentIndex);
-        if (currentIndex < 1 || static_cast<std::size_t>(currentIndex) >= backends.size() - 1)
+        if (currentIndex < 0 || static_cast<std::size_t>(currentIndex) >= backends.size() - 1)
             return;
 
         std::swap(backends[currentIndex], backends[currentIndex + 1]);
         updateBackendsWidget();
         tableBackends->selectRow(currentIndex + 1);
+        updateMoveUpAndDownButtonState(currentIndex + 1); // Update button state after moving down
     }
+
     void MultiDBConfigDialog::highlightMainServer(const QString &mainServerName)
     {
         tableBackends->blockSignals(true);
@@ -492,33 +482,6 @@ namespace xrock_gui_model
             config["import_servers"].push_back(std::move(backend));
         }
 
-        // If the checkbox is checked, additionally add the main server to import_servers
-        if (cbLookupInMainDatabase->isChecked())
-        {
-            ConfigMap mainServerConfig;
-            mainServerConfig["name"] = mainServer.name.toStdString() + " (Import)";
-            
-            mainServerConfig["type"] = mainServer.type.toStdString();
-            mainServerConfig[urlOrPath] = mainServer.urlOrPath.toStdString();
-            mainServerConfig["graph"] = mainServer.graph.toStdString();
-   
-            // Add the new main server to import_servers
-            config["import_servers"].push_back(std::move(mainServerConfig));
-        }
-       
-        auto& servers = config["import_servers"];
-        for (auto it = servers.begin(); it != servers.end(); ++it) {
-            auto duplicateIt = std::find_if(std::next(it), servers.end(), [&](ConfigMap& server) {
-                return (*it)["path"].getString() == server["path"].getString() &&
-                    (*it)["type"].getString() == server["type"].getString() &&
-                    (*it)["graph"].getString() == server["graph"].getString();
-            });
-
-            if (duplicateIt != servers.end()) {
-                servers.erase(duplicateIt);
-                it = servers.begin();
-            }
-        }
         config.toYamlFile(this->configFilename);
         done(0);
     }
@@ -572,8 +535,6 @@ namespace xrock_gui_model
             throw std::runtime_error("Invalid table column");
         }
     }
-
-   
 
     void MultiDBConfigDialog::onMainServerBackendChange(const QString &newBackend)
     {

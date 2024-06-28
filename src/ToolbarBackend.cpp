@@ -78,10 +78,10 @@ ToolbarBackend::ToolbarBackend(XRockGUI *xrockGui, mars::main_gui::GuiInterface 
     // Graph
     label = new QLabel(" Graph: ");
     leSgraph = new QLineEdit;
-    leSgraph->setText("graph_test");
+    leSgraph->setText("master");
     leSgraph->setFixedWidth(120);
     leCgraph = new QLineEdit;
-    leCgraph->setText("graph_test");
+    leCgraph->setText("master");
     leCgraph->setFixedWidth(120);
     ActionLabelGraph = toolbar->addWidget(label);
     widgetActionGraphS = toolbar->addWidget(leSgraph);

@@ -46,6 +46,7 @@ set(SOURCES
   src/FileDB.cpp
   src/ToolbarBackend.cpp
   src/plugins/MARSIMUConfig.cpp
+  src/plugins/ROCKTASKConfig.cpp
   src/BuildModuleDialog.cpp
   src/LinkHardwareSoftwareDialog.cpp
 )
@@ -81,6 +82,7 @@ set (QT_MOC_HEADER
   src/BundleSelectionDialog.hpp
   src/ToolbarBackend.hpp
   src/plugins/MARSIMUConfig.hpp
+  src/plugins/ROCKTASKConfig.hpp
   src/BuildModuleDialog.hpp
   src/LinkHardwareSoftwareDialog.hpp
 )

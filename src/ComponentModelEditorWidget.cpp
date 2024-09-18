@@ -19,6 +19,7 @@
 #include <bagel_gui/BagelModel.hpp>
 #include <mars/utils/misc.h>
 #include <QDesktopServices>
+#include <QScrollArea>
 
 using namespace configmaps;
 

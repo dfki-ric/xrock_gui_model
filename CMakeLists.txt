@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 3.10)
 project(xrock_gui_model VERSION 1.0.0 DESCRIPTION "xrock_gui")
 find_package(PkgConfig REQUIRED)
 find_package(lib_manager)
-
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 lib_defaults()
 define_module_info()
 if(APPLE)
@@ -104,7 +105,6 @@ qt5_use_modules(${PROJECT_NAME} Widgets WebKitWidgets)
 endif (${USE_QT5})
 
 target_compile_options(${PROJECT_NAME} PRIVATE -Wno-inconsistent-missing-override)
-set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 
 target_link_libraries(${PROJECT_NAME}
         PkgConfig::lib_manager

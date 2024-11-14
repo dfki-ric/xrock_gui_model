@@ -1,4 +1,5 @@
 #include "ComponentModelEditorWidget.hpp"
+#include "LinkHardwareSoftwareDialog.hpp"
 #include "XRockGUI.hpp"
 #include "ConfigureDialog.hpp"
 #include "ConfigMapHelper.hpp"
@@ -18,6 +19,7 @@
 #include <bagel_gui/BagelModel.hpp>
 #include <mars_utils/misc.h>
 #include <QDesktopServices>
+#include <QScrollArea>
 
 using namespace configmaps;
 
@@ -148,7 +150,22 @@ namespace xrock_gui_model
             connect(b, SIGNAL(clicked()), this, SLOT(addRemoveLayout()));
             hLayout->addWidget(b);
             vLayout->addLayout(hLayout);
-            setLayout(vLayout);
+
+            QWidget *scrollablewidget = new QWidget();
+            scrollablewidget->setLayout(vLayout);
+
+            QScrollArea *scrollarea = new QScrollArea();
+            scrollarea->setWidget(scrollablewidget);
+            scrollarea->setWidgetResizable(true);
+
+            QVBoxLayout *vLayout2 = new QVBoxLayout();
+            vLayout2->addWidget(scrollarea);
+            hardwareLinkBtn = new QPushButton("Manage Hardware Links");
+            hardwareLinkBtn->setVisible(false);
+            connect(hardwareLinkBtn, SIGNAL(clicked(bool)), this, SLOT(linkHardware()));
+            vLayout->addWidget(hardwareLinkBtn);
+
+            setLayout(vLayout2);
             this->clear();
         }
         catch (const std::exception &e)
@@ -289,9 +306,23 @@ namespace xrock_gui_model
         } 
         currentModel = newModel;
         updateModel();
+        updateManageHardwareLinkButtonState();
         fprintf(stderr, "done\n");
     }
 
+    void ComponentModelEditorWidget::updateManageHardwareLinkButtonState()
+    {
+        bool enableHardwareLinkButton = false;
+        if (currentModel)
+        {
+            configmaps::ConfigMap basicModel = currentModel->getModelInfo();
+            std::string domain = basicModel["domain"];
+            if (domain == "SOFTWARE")
+                enableHardwareLinkButton = true;
+        }
+        hardwareLinkBtn->setVisible(enableHardwareLinkButton);
+    }
+    
     void ComponentModelEditorWidget::update_prop_widget(const std::string &prop_name, configmaps::ConfigAtom &value)
     {
         for (auto &[label, widget] : widgets)
@@ -539,4 +570,17 @@ namespace xrock_gui_model
             updateModel(); 
         }
     }
+    void ComponentModelEditorWidget::linkHardware()
+    {
+        if(currentModel) {
+            auto currentModelMap = currentModel->getModelInfo();
+            LinkHardwareSoftwareDialog dialog(xrockGui, currentModelMap);
+            dialog.exec();
+            currentModel->setModelInfo(dialog.getSoftwareMap());
+        }
+     
+    }
+    
+    
+
 } // end of namespace xrock_gui_model

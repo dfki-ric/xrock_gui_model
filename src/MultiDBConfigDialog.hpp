@@ -30,6 +30,7 @@ namespace xrock_gui_model
 
         bool loadState();
         void resetToDefault();
+
     private:
         std::string configFilename;
         XRockIOLibrary *ioLibrary;
@@ -58,6 +59,7 @@ namespace xrock_gui_model
         };
 
         std::vector<BackendItem> backends;
+        BackendItem prevMainServer;
         QTableWidget *tableBackends;
         QComboBox *cbNewType;
         QComboBox *cbMainServer;
@@ -68,11 +70,15 @@ namespace xrock_gui_model
         QCheckBox *cbLookupInMainDatabase;
         QPushButton *saveAndClose;
         QPushButton *btnResetToDefault;
-
+        QPushButton *btnMoveUp;
+        QPushButton *btnMoveDown;
 
         void updateBackendsWidget();
-        void updateSelectedMainServerCb();
-        void closeEvent(QCloseEvent *e);
+        void updateSelectedMainServerCb(); 
+        void closeEvent(QCloseEvent *e) override;
+        void keyPressEvent(QKeyEvent *event) override;
+        void checkAndUpdateMainServerInImports();
+        void updateMoveUpAndDownButtonState(int currentIndex);
 
     private slots:
         void onAddBtnClicked();
@@ -83,7 +89,8 @@ namespace xrock_gui_model
         void onTableBackendsCellChange(int row, int column);
         void onMoveUpClicked();
         void onMoveDownClicked();
-        void oncbLookupInMainDatabaseUnchecked();
+        void handleMainServerImport(int state);
+        void updateMainServer();
 
     public slots:
         void highlightMainServer(const QString &mainServerName);

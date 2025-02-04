@@ -549,7 +549,6 @@ namespace xrock_gui_model
     {
         // NOTE: basicModel holds the original data. So we just copy over.
         basicModel = map;
-
         // extract the gui information and store it in separate map
         if (basicModel["versions"][0].hasKey("data") && basicModel["versions"][0]["data"].hasKey("gui"))
         {
@@ -630,13 +629,17 @@ namespace xrock_gui_model
                     edge["fromNodeOutput"] = it["from"]["interface"];
                     edge["toNode"] = it["to"]["name"];
                     edge["toNodeInput"] = it["to"]["interface"];
-                    if (!it.hasKey("name") or (it.hasKey("name") && it["name"] == "UNKNOWN"))
+
+                    if (!it.hasKey("name") || (it.hasKey("name") && (((std::string)it["name"]).empty() || (std::string)it["name"] == "UNKNOWN")))
                     {
                         // If no name exists, we derive a new name
                         edge["name"] = edge["fromNode"].getString()
                             + "_" + edge["fromNodeOutput"].getString()
                             + "_" + edge["toNode"].getString()
                             + "_" + edge["toNodeInput"].getString();
+                    } else {
+                        // Name already exist
+                        edge["name"] = it["name"];
                     }
                     if(it.hasKey("data"))
                         edge["data"] = it["data"];
@@ -689,9 +692,24 @@ namespace xrock_gui_model
                         bagelGui->updateNodeMap(nodeName, currentMap);
                     }
                 }
-                // TODO: Handle edge configuration
+                if (basicModel["versions"][0]["components"]["configuration"].hasKey("edges"))
+                {
+                    auto edgeConfig = basicModel["versions"][0]["components"]["configuration"]["edges"];
+                    for (auto it : edgeConfig)
+                    {
+                        const std::string& edgeName(it["name"].getString());
+                        ConfigMap currentMap = *bagelGui->getEdgeMap(edgeName);
+                        if (it.hasKey("data"))
+                        {
+                            currentMap["configuration"]["data"] = it["data"];
+                        }
+                        bagelGui->updateEdgeMap(edgeName, currentMap);
+                    }
+                }
             }
         }
+
+
 
         fprintf(stderr, "apply part layout...\n");
         // Once we are done creating the nodes, we update their layout
@@ -797,10 +815,9 @@ namespace xrock_gui_model
                 "id",
                 "vertices",
                 "decoupleVertices",
+                "configuration",
                 "data"};
-
             // Make edge data
-            // todo: from somewhere the edge data can become an empty string; check for the source
             if(!it.hasKey("data"))
             {
                 it["data"] = ConfigMap();
@@ -845,8 +862,15 @@ namespace xrock_gui_model
                 {
                     edge["direction"] = mars::utils::toupper(it["direction"]);
                 }
+
+                // Handle edge configuration
+                if(it.hasKey("configuration")) {
+                    edge["configuration"] = it["configuration"];
+                }
                 mi["versions"][0]["components"]["edges"].push_back(edge);
             }
+       
+
         }
 
         // When finished, update basicModel and return it

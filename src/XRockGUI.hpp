@@ -101,6 +101,7 @@ namespace xrock_gui_model
         void currentModelChanged(bagel_gui::ModelInterface *model);
         void changeNodeVersion(const std::string &name);
         void configureNode(const std::string &name);
+        void configureEdge(const std::string &name);
         void openConfigFile(const std::string &name);
         void configureInPort(const std::string &nodeName, const std::string &portName);
         void configureOutPort(const std::string &nodeName, const std::string &portName);
@@ -111,10 +112,12 @@ namespace xrock_gui_model
 
         // drop down menu functions on nodes and node interfaces
         // these are triggered by right-clicking in the GUI
-        void nodeContextClicked(const std::string name);
+        void nodeContextClicked(const std::string name) override;
+        void edgeContextClicked(const std::string name) override;
         void inPortContextClicked(const std::string name);
         void outPortContextClicked(const std::string name);
         std::vector<std::string> getNodeContextStrings(const std::string &name);
+        std::vector<std::string> getEdgeContextStrings(const std::string &name);
         std::vector<std::string> getInPortContextStrings(const std::string &nodeName,
                                                          const std::string &portName);
         std::vector<std::string> getOutPortContextStrings(const std::string &nodeName,
@@ -144,14 +147,15 @@ namespace xrock_gui_model
         XRockIOLibrary *ioLibrary;
         std::string getBackend();
         bool handleAlias();
-        configmaps::ConfigMap getXrockEnv(){
+        configmaps::ConfigMap getXrockEnv()
+        {
             return env;
         };
-        bagel_gui::BagelGui* getBagelGui() const
+        bagel_gui::BagelGui *getBagelGui() const
         {
             return bagelGui;
         }
-        ToolbarBackend* getToolbar()
+        ToolbarBackend *getToolbar()
         {
             return toolbarBackend;
         }
@@ -160,7 +164,7 @@ namespace xrock_gui_model
         bagel_gui::BagelGui *bagelGui;
         mars::main_gui::GuiInterface *gui;
         ComponentModelEditorWidget *widget;
-        std::string versionChangeName, configureNodeName, contextNodeName, contextPortName;
+        std::string versionChangeName, configureNodeName, contextNodeName, contextEdgeName, contextPortName;
         mars::cfg_manager::CFGManagerInterface *cfg;
         configmaps::ConfigMap env;
         mars::cfg_manager::cfgParamId dbAddress_paramId;

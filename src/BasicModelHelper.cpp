@@ -304,6 +304,21 @@ namespace xrock_gui_model
                 }
             }
         }
+        if (model["versions"][0]["components"].hasKey("configuration"))
+        {
+            if (model["versions"][0]["components"]["configuration"].hasKey("edges"))
+            {
+                ConfigVector &edges = model["versions"][0]["components"]["configuration"]["edges"];
+                std::cout << "BasicModelHelper edges: " << edges.toJsonString() << std::endl;
+                
+                for (ConfigVector::iterator edge = edges.begin(); edge != edges.end(); ++edge)
+                    if (edge->hasKey("data") && !(*edge)["data"].isMap())
+                    {
+                        (*edge)["data"] = ConfigMap::fromYamlString((*edge)["data"]);
+                    }
+            }
+        }
+    
 
         // todo: convert to legacy
         if(model["versions"][0].hasKey("defaultConfig"))
@@ -376,6 +391,20 @@ namespace xrock_gui_model
                     {
                         std::string dataString = (*node)["data"].toYamlString();
                         ConfigMap &n = *node;
+                        n.erase("data");
+                        n["data"] = dataString;
+                    }
+                }
+            }
+            if (model["versions"][0]["components"]["configuration"].hasKey("edges"))
+            {
+                ConfigVector &edges = model["versions"][0]["components"]["configuration"]["edges"];
+                for (ConfigVector::iterator edge = edges.begin(); edge != edges.end(); ++edge)
+                {
+                    if (edge->hasKey("data") && (*edge)["data"].isMap())
+                    {
+                        std::string dataString = (*edge)["data"].toYamlString();
+                        ConfigMap &n = *edge;
                         n.erase("data");
                         n["data"] = dataString;
                     }

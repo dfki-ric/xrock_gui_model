@@ -1181,6 +1181,28 @@ namespace xrock_gui_model
         node["configuration"]["data"] = config;
         bagelGui->updateNodeMap(name, node);
     }
+    
+    void XRockGUI::configureEdge(const std::string &name)
+    {
+        ConfigMap edge = *(bagelGui->getEdgeMap(name));
+        ConfigMap config;
+        if (edge.hasKey("configuration"))
+        {
+            // Preload the current configuration
+
+                config = edge["configuration"];
+
+        }
+
+        {
+            ConfigureDialog cd(&config, env, name, true, true);
+            cd.resize(400, 400);
+            cd.exec();
+        }
+        // Update the edge configuration
+        edge["configuration"] = config;
+        bagelGui->updateEdgeMap(name, edge);
+    }
 
     void XRockGUI::openConfigFile(const std::string &name)
     {
@@ -1737,6 +1759,14 @@ namespace xrock_gui_model
         // }
     }
 
+    void XRockGUI::edgeContextClicked(const std::string name)
+    {
+        if (name == "configure edge")
+        {
+            configureEdge(contextEdgeName);
+        }
+    }
+
     void XRockGUI::inPortContextClicked(const std::string name)
     {
         if (name == "configure interface")
@@ -1805,6 +1835,15 @@ namespace xrock_gui_model
         r.push_back("show description");
 
         contextNodeName = name;
+        return r;
+    }
+
+    std::vector<std::string> XRockGUI::getEdgeContextStrings(const std::string &name)
+    {
+        // Get the edge map to show context dependent on edge properties
+        contextEdgeName = name;
+        std::vector<std::string> r;
+        r.push_back("configure edge");
         return r;
     }
 

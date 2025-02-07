@@ -1189,10 +1189,9 @@ namespace xrock_gui_model
         if (edge.hasKey("configuration"))
         {
             // Preload the current configuration
-            if (edge["configuration"].hasKey("data"))
-            {
-                config = edge["configuration"]["data"];
-            }
+
+                config = edge["configuration"];
+
         }
 
         {
@@ -1201,7 +1200,7 @@ namespace xrock_gui_model
             cd.exec();
         }
         // Update the edge configuration
-        edge["configuration"]["data"] = config;
+        edge["configuration"] = config;
         bagelGui->updateEdgeMap(name, edge);
     }
 

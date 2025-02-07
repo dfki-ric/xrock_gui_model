@@ -699,10 +699,13 @@ namespace xrock_gui_model
                     {
                         const std::string& edgeName(it["name"].getString());
                         ConfigMap currentMap = *bagelGui->getEdgeMap(edgeName);
-                        if (it.hasKey("data"))
-                        {
-                            currentMap["configuration"]["data"] = it["data"];
-                        }
+
+                        // Workaround: name within edge configuration is exported from xtypes for only one
+                        // purpose: to identify the edge when updating its configuration, so its role is done here.
+                        if (it.hasKey("name"))
+                            ((configmaps::ConfigMap&)it).erase("name");
+
+                        currentMap["configuration"] = it;
                         bagelGui->updateEdgeMap(edgeName, currentMap);
                     }
                 }
@@ -855,8 +858,14 @@ namespace xrock_gui_model
                 }
                 else
                 {
-                    // If no name exists, we derive a new name
-                    edge["name"] = fromName + "_" + fromNodeOutput + "_" + toName + "_" + toNodeInput;
+                    if(it.hasKey("data") && it["data"].hasKey("name"))
+                    {
+                        edge["name"] = it["data"]["name"];
+                    }
+                    else {
+                        // If no name exists, we derive a new name
+                        edge["name"] = fromName + "_" + fromNodeOutput + "_" + toName + "_" + toNodeInput;
+                    }
                 }
                 if (it.hasKey("direction"))
                 {

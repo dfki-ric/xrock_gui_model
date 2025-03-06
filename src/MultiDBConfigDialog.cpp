@@ -40,7 +40,7 @@ namespace xrock_gui_model
         }
         //  Available Databases Label
         QLabel *labelAvailableDatabases = new QLabel("Available Databases:");
-        labelAvailableDatabases->setStyleSheet("font-weight: bold; color: black;");
+        labelAvailableDatabases->setStyleSheet("font-weight: bold;");
         mainLayout->addWidget(labelAvailableDatabases);
 
         // Table for displaying available databases
@@ -57,6 +57,7 @@ namespace xrock_gui_model
 #endif
         tableBackends->setSelectionBehavior(QAbstractItemView::SelectRows);
         connect(tableBackends, SIGNAL(cellChanged(int, int)), this, SLOT(onTableBackendsCellChange(int, int)));
+        connect(tableBackends, SIGNAL(cellClicked(int, int)), this, SLOT(onTableBackendsCellClick(int, int)));
 
         // move up and down
         QVBoxLayout *vboxR = new QVBoxLayout();
@@ -103,7 +104,7 @@ namespace xrock_gui_model
         hbox->addWidget(btnAddNew);
         hbox->addWidget(btnRemove);
         mainLayout->addLayout(hbox);
-        
+
         QFrame *separator = new QFrame;
         separator->setFrameShape(QFrame::HLine);
         separator->setFrameShadow(QFrame::Sunken);
@@ -143,12 +144,12 @@ namespace xrock_gui_model
         // Set icons for the move buttons
         QString upIconPath = QString::fromUtf8(XROCK_DEFAULT_RESOURCES_PATH) + "/xrock_gui_model/resources/images/up.png";
         QString downIconPath = QString::fromUtf8(XROCK_DEFAULT_RESOURCES_PATH) + "/xrock_gui_model/resources/images/down.png";
-        btnMoveUp->setIcon(QIcon(upIconPath));                 
+        btnMoveUp->setIcon(QIcon(upIconPath));
         btnMoveDown->setIcon(QIcon(downIconPath));
 
         // Set tooltips for the Up and down buttons
-        btnMoveUp->setToolTip("Move Up");
-        btnMoveDown->setToolTip("Move Down");
+        btnMoveUp->setToolTip("Move Up - Effects Lookup Order");
+        btnMoveDown->setToolTip("Move Down - Effects Lookup Order");
 
         connect(btnMoveUp, SIGNAL(clicked()), this, SLOT(onMoveUpClicked()));
         connect(btnMoveDown, SIGNAL(clicked()), this, SLOT(onMoveDownClicked()));
@@ -165,6 +166,26 @@ namespace xrock_gui_model
             // no previous saved state to load! load default config from selected bundle (if any)
             this->resetToDefault();
         }
+        btnHelp = new QPushButton("Help");
+        connect(btnHelp, SIGNAL(clicked()), this, SLOT(onHelpButtonClicked()));
+
+        mainLayout->addWidget(btnHelp); 
+    }
+    void MultiDBConfigDialog::onHelpButtonClicked()
+    {
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Table Help");
+        msgBox.setText("Understanding the Table Structure:");
+        msgBox.setInformativeText(
+            "<ul>"
+            "<li><b>MS (Main Server):</b> Represents the Main Server. It cannot be moved or reordered.</li>"
+            "<li><b>Import Servers:</b> List of servers to be imported. They can be reordered to prioritize sequence.</li>"
+            "<li><b>Numbering (1, 2, 3, etc.):</b> Indicates the priority of import servers. Lower numbers mean higher priority.</li>"
+            "<li><b>Move Up/Down:</b> Adjusts the priority of import servers. Disabled for the Main Server.</li>"
+            "</ul>");
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setDefaultButton(QMessageBox::Ok);
+        msgBox.exec();
     }
 
     bool MultiDBConfigDialog::loadState()
@@ -194,7 +215,7 @@ namespace xrock_gui_model
             updateBackendsWidget();
             updateSelectedMainServerCb();
             // set combobox current item to main_server
-            cbMainServer->setCurrentIndex(cbMainServer->findData(main_server.name, Qt::DisplayRole)); 
+            cbMainServer->setCurrentIndex(cbMainServer->findData(main_server.name, Qt::DisplayRole));
 
             // toggle alsoLookupMainServer if main_server in import_servers
             cbLookupInMainDatabase->setChecked(std::count_if(backends.begin(), backends.end(),
@@ -204,6 +225,12 @@ namespace xrock_gui_model
                                                                         server.graph == main_server.graph &&
                                                                         server.urlOrPath == main_server.urlOrPath;
                                                              }) > 1);
+
+            if (tableBackends->rowCount() > 1)
+            {
+                updateMoveUpAndDownButtonState(1);
+                tableBackends->selectRow(1);
+            }
             return true;
         }
         else
@@ -256,7 +283,6 @@ namespace xrock_gui_model
         updateBackendsWidget();
         updateSelectedMainServerCb();
         highlightMainServer(cbMainServer->currentText());
-
 
         prevMainServer = backends.front();
     }
@@ -352,12 +378,12 @@ namespace xrock_gui_model
         b.type = cbNewType->currentText();
         b.urlOrPath = tfNewUrlOrPath->text();
         b.graph = tfNewGraph->text();
-        
+
         // if backend doesn't exists, add it
         auto it = std::find_if(backends.begin(), backends.end(), [&](const BackendItem &server)
-                                                             {
-                                                                 return server.name == b.name; // name is the unique id for each backend
-                                                             });                                                    
+                               {
+                                   return server.name == b.name; // name is the unique id for each backend
+                               });
         if (it == backends.end()) // add
         {
             backends.push_back(std::move(b));
@@ -407,10 +433,19 @@ namespace xrock_gui_model
             resetToDefault();
         }
     }
+
     void MultiDBConfigDialog::updateMoveUpAndDownButtonState(int currentIndex)
     {
-        btnMoveUp->setEnabled(currentIndex > 1);
-        btnMoveDown->setEnabled( currentIndex < tableBackends->rowCount() - 1);
+        if (currentIndex == 0)
+        {
+            btnMoveUp->setEnabled(false);
+            btnMoveDown->setEnabled(false);
+        }
+        else
+        {
+            btnMoveUp->setEnabled(currentIndex > 1);
+            btnMoveDown->setEnabled(currentIndex < tableBackends->rowCount() - 1);
+        }
     }
     void MultiDBConfigDialog::onMoveUpClicked()
     {
@@ -446,17 +481,20 @@ namespace xrock_gui_model
                 // Apply a background color to each cell in the row to highlight the main server.
                 for (int j = 0; j < tableBackends->columnCount(); ++j)
                 {
-                    
-                    QColor color = QColor(Qt::green).lighter(170); // Light green 
 
-                    tableBackends->item(i, j)->setBackground(color); 
+                    QColor color = QColor(Qt::green).lighter(170); // Light green
+
+                    tableBackends->item(i, j)->setBackground(color);
+                    // Adjust text color based on the lightness of the background
+                    QColor textColor = color.lightness() < 128 ? Qt::white : Qt::black; // White text for dark, black text for light
+                    tableBackends->item(i, j)->setForeground(textColor);
                 }
             }
             else
             {
                 for (int j = 0; j < tableBackends->columnCount(); ++j)
                 {
-                    tableBackends->item(i, j)->setBackground(Qt::white); 
+                    tableBackends->item(i, j)->setBackground(qApp->palette().color(QPalette::Base));
                 }
             }
         }
@@ -549,6 +587,11 @@ namespace xrock_gui_model
         default:
             throw std::runtime_error("Invalid table column");
         }
+    }
+
+    void MultiDBConfigDialog::onTableBackendsCellClick(int row, int column)
+    {
+        updateMoveUpAndDownButtonState(row);
     }
 
     void MultiDBConfigDialog::onMainServerBackendChange(const QString &newBackend)

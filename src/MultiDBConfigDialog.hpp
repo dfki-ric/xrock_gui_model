@@ -72,6 +72,7 @@ namespace xrock_gui_model
         QPushButton *btnResetToDefault;
         QPushButton *btnMoveUp;
         QPushButton *btnMoveDown;
+        QPushButton *btnHelp;
 
         void updateBackendsWidget();
         void updateSelectedMainServerCb(); 
@@ -87,10 +88,13 @@ namespace xrock_gui_model
         void onResetToDefaultBtnClicked();
         void onMainServerBackendChange(const QString &newBackend);
         void onTableBackendsCellChange(int row, int column);
-        void onMoveUpClicked();
+        void onTableBackendsCellClick(int row, int column);
+         void onMoveUpClicked();
         void onMoveDownClicked();
         void handleMainServerImport(int state);
         void updateMainServer();
+        void onHelpButtonClicked();
+        
 
     public slots:
         void highlightMainServer(const QString &mainServerName);

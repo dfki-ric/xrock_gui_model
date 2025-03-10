@@ -1167,12 +1167,14 @@ namespace xrock_gui_model
             {
                 ConfigMap globalConfig = bagelGui->getGlobalConfig();
                 QDialog *d = it->second->createDialog(&config, env, globalConfig);
+                d->setWindowTitle(QString::fromStdString("Configure Node " + name));
                 d->exec();
                 delete d;
             }
             else
             {
                 ConfigureDialog cd(&config, env, node["model"]["name"], true, true);
+                cd.setWindowTitle(QString::fromStdString("Configure Node " + name));
                 cd.resize(400, 400);
                 cd.exec();
             }
@@ -1189,13 +1191,13 @@ namespace xrock_gui_model
         if (edge.hasKey("configuration"))
         {
             // Preload the current configuration
-
-                config = edge["configuration"];
+            config = edge["configuration"];
 
         }
 
         {
             ConfigureDialog cd(&config, env, name, true, true);
+            cd.setWindowTitle(QString::fromStdString("Configure Edge " + name));
             cd.resize(400, 400);
             cd.exec();
         }

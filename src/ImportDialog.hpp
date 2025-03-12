@@ -34,7 +34,8 @@ namespace xrock_gui_model
         enum Intention {
             LOAD_CM,
             ADD_CM,
-            ADD_TYPE
+            ADD_TYPE,
+            SELECT_HARDWARE
         };
         explicit ImportDialog(XRockGUI *xrockGui, Intention intent = Intention::ADD_CM);
         ~ImportDialog();

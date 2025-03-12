@@ -18,6 +18,7 @@
 #include "ConfigMapHelper.hpp"
 
 #include "plugins/MARSIMUConfig.hpp"
+#include "plugins/ROCKTASKConfig.hpp"
 
 #include <lib_manager/LibManager.hpp>
 #include <bagel_gui/BagelGui.hpp>
@@ -69,8 +70,11 @@ namespace xrock_gui_model
         // register config plugins
         ConfigureDialogLoader *l = new MARSIMUConfigLoader();
         configPlugins["mars::IMU"] = l;
+        ConfigureDialogLoader *lt = new ROCKTASKConfigLoader(this);
+        configPlugins["Rock::Task"] = lt;
 
         loadSettingsFromFile("generalsettings.yml");
+        
         loadModelFromParameter();
     }
 
@@ -1160,11 +1164,16 @@ namespace xrock_gui_model
             }
         }
         {
-            std::string type = node["model"]["name"];
+            std::string modelName = node["model"]["name"];
             std::string nodeName = node.hasKey("alias") && node["alias"] != "" ? (std::string)node["alias"] : name;
+
+            bool isTask = std::any_of(node["model"]["types"].begin(), node["model"]["types"].end(), [](configmaps::ConfigItem &type)
+                                      { return type["name"] == "Rock::Task"; });
+
             std::map<std::string, ConfigureDialogLoader *>::iterator it;
-            it = configPlugins.find(type);
-            if(it != configPlugins.end())
+            // first check if we find the node type (model name) in the configPlugis
+            it = configPlugins.find(modelName);
+            if (it != configPlugins.end())
             {
                 ConfigMap globalConfig = bagelGui->getGlobalConfig();
                 QDialog *d = it->second->createDialog(&config, env, globalConfig);
@@ -1174,10 +1183,22 @@ namespace xrock_gui_model
             }
             else
             {
-                ConfigureDialog cd(&config, env, node["model"]["name"], true, true);
-                cd.setWindowTitle(QString::fromStdString("Configure Node " + nodeName));
-                cd.resize(400, 400);
-                cd.exec();
+                it = configPlugins.find("Rock::Task");
+                if (isTask && it != configPlugins.end())
+                {
+                    ConfigMap globalConfig = bagelGui->getGlobalConfig();
+                    QDialog *d = it->second->createDialog(&config, env, globalConfig);
+                    d->setWindowTitle(QString::fromStdString("Configure Node " + nodeName));
+                    d->exec();
+                    delete d;
+                }
+                else
+                {
+                    ConfigureDialog cd(&config, env, node["model"]["name"], true, true);
+                    cd.setWindowTitle(QString::fromStdString("Configure Node " + nodeName));
+                    cd.resize(400, 400);
+                    cd.exec();
+                }
             }
         }
         // Update the node configuration

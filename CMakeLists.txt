@@ -19,6 +19,11 @@ else()
   QT4_ADD_RESOURCES(icon_resource resources/resources.qrc)
   set(PUBLIC_DEPENDENCIES "QtCore QtGui")
 endif()
+
+# required by dependencies
+find_package(OpenSceneGraph REQUIRED osgManipulator osgViewer osgFX osgShadow osgParticle osgTerrain osgDB osgGA osgWidget osgText osgUtil)
+include_directories(${OPENSCENEGRAPH_INCLUDE_DIRS})
+
 pkg_check_modules(lib_manager REQUIRED IMPORTED_TARGET lib_manager)
 pkg_check_modules(bagel_gui REQUIRED IMPORTED_TARGET bagel_gui)
 pkg_check_modules(osg_graph_viz REQUIRED IMPORTED_TARGET osg_graph_viz)

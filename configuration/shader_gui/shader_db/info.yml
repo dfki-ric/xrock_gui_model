@@ -103,6 +103,10 @@ models:
     versions:
       - name: v1
     type: fragment
+  - type: fragment
+    name: select_by_zdiff_vec3
+    versions:
+      - name: v1
   - name: pixel_noise
     versions:
       - name: v1

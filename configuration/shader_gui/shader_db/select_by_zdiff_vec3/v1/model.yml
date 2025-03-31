@@ -1,0 +1,15 @@
+domain: SHADER
+name: select_by_zdiff_vec3
+type: fragment
+versions:
+- date: '2025-03-31 10:24:32.254732'
+  interfaces:
+  - {direction: INCOMING, name: vector_a, type: vec3}
+  - {direction: INCOMING, name: vector_b, type: vec3}
+  - {direction: INCOMING, name: th, type: float}
+  - {direction: OUTGOING, name: vector, type: vec3}
+  name: v1
+  defaultConfiguration:
+    data: "data:\n  inputs:\n    vector_a: vec3(0,0,0)\n    vector_b: vec3(0,0,0)\n    th: 0.2\n"
+  softwareData:
+    data: "description:\n  markdown: \"# brief\\n\\nSelect vector_a if abs(z1-z2) < th; otherwise return vector_b\\n\"\n"

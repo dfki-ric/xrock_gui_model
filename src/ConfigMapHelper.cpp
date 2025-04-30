@@ -50,7 +50,9 @@ namespace xrock_gui_model
                         if (target["submodel"][i]["data"].isMap())
                             target["submodel"][i]["data"] = it["data"];
                         else
-                            target["submodel"][i]["data"] = it["data"].toYamlString();
+			{
+			  target["submodel"][i]["data"] = it["data"];
+			}
                     } else {
                         // Standard behavior: store map directly
                         target["submodel"][i]["data"] = it["data"];

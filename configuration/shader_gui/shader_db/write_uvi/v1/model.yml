@@ -1,0 +1,10 @@
+domain: SHADER
+name: write_uvi
+type: fragment
+versions:
+- date: '2025-11-26 11:00:31.927600'
+  interfaces:
+  - {direction: INCOMING, name: texCoord, type: vec2}
+  - {direction: INCOMING, name: intensity, type: float}
+  - {direction: OUTGOING, name: color, type: vec4}
+  name: v1

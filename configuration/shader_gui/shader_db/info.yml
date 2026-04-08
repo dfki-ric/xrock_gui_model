@@ -203,6 +203,10 @@ models:
     type: fragment
     versions:
       - name: v1
+  - name: image2D
+    type: fragment
+    versions:
+      - name: v1
   - name: samplerCube
     type: fragment
     versions:
@@ -336,6 +340,18 @@ models:
     versions:
       - name: " "
   - name: write_uvi
+    type: fragment
+    versions:
+      - name: v1
+  - name: gimage2D
+    type: fragment
+    versions:
+      - name: v1
+  - name: image2DLoad
+    type: fragment
+    versions:
+      - name: v1
+  - name: image2DStore
     type: fragment
     versions:
       - name: v1

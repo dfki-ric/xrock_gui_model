@@ -1,0 +1,11 @@
+domain: SHADER
+name: image2D
+type: fragment
+versions:
+- date: '2026-02-24 10:26:00.000000'
+  interfaces:
+  - {direction: INCOMING, name: export, type: image2D}
+  - {direction: OUTGOING, name: output, type: image2D}
+  name: v1
+  defaultConfiguration:
+    data: "data:\n  type: uniform\n  format: rgba32f\n"

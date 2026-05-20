@@ -390,7 +390,12 @@ namespace xrock_gui_model
                 if (std::string selectedBundle = a.getSelectedBundle().toStdString();
                   !selectedBundle.empty()) {
                     WaitCursorRAII _;
+#ifdef WIN32
+                    std::string envstr = "ROCK_BUNDLE="+selectedBundle;
+                    putenv(envstr.c_str());
+#else
                     setenv("ROCK_BUNDLE", selectedBundle.c_str(), 1);
+#endif
                     // std::string cmd = "rock-bundle-sel " + selectedBundle;
                     // std::system(cmd.c_str());
                     resetToDefault();

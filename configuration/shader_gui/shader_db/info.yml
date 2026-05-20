@@ -355,10 +355,6 @@ models:
     type: fragment
     versions:
       - name: v1
-  - name: gimage2D
-    type: fragment
-    versions:
-      - name: v1
   - name: image2DLoad
     type: fragment
     versions:

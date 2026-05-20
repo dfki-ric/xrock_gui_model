@@ -14,33 +14,33 @@ namespace xrock_gui_model
         if(model["versions"][0].hasKey("interfaces"))
         {
             //ConfigVector interfaces = model["versions"][0]["interfaces"];
-            for(auto interface: model["versions"][0]["interfaces"])
+            for(auto interface_: model["versions"][0]["interfaces"])
             {
-                if(interface.hasKey("linkToNode") && interface["linkToNode"] == node["name"])
+                if(interface_.hasKey("linkToNode") && interface_["linkToNode"] == node["name"])
                 {
                     // search for interface
-                    if(interface["direction"] == "INCOMING" || interface["direction"] == "BIDIRECTIONAL")
+                    if(interface_["direction"] == "INCOMING" || interface_["direction"] == "BIDIRECTIONAL")
                     {
                         for(ConfigVector::iterator input = node["inputs"].begin();
                             input < node["inputs"].end(); ++input)
                         {
-                            if((*input)["name"] == interface["linkToInterface"])
+                            if((*input)["name"] == interface_["linkToInterface"])
                             {
                                 (*input)["interface"] = 1;
                                 if(overrideExportName || !input->hasKey("interfaceExportName"))
                                 {
-                                    (*input)["interfaceExportName"] = interface["name"];
+                                    (*input)["interfaceExportName"] = interface_["name"];
                                 }
-                                if(interface.hasKey("data"))
+                                if(interface_.hasKey("data"))
                                 {
                                     ConfigMap dataMap;
-                                    if(interface["data"].isMap())
+                                    if(interface_["data"].isMap())
                                     {
-                                        dataMap = interface["data"];
+                                        dataMap = interface_["data"];
                                     }
                                     else
                                     {
-                                        dataMap = ConfigMap::fromYamlString(interface["data"].getString());
+                                        dataMap = ConfigMap::fromYamlString(interface_["data"].getString());
                                     }
                                     ConfigMap &inputMap = *input;
                                     inputMap.append(dataMap);
@@ -51,12 +51,12 @@ namespace xrock_gui_model
                         for(ConfigVector::iterator output = node["outputs"].begin();
                             output < node["outputs"].end(); ++output)
                         {
-                            if((*output)["name"] == interface["linkToInterface"])
+                            if((*output)["name"] == interface_["linkToInterface"])
                             {
                                 (*output)["interface"] = 1;
                                 if(overrideExportName || !output->hasKey("interfaceExportName"))
                                 {
-                                    (*output)["interfaceExportName"] = interface["name"];
+                                    (*output)["interfaceExportName"] = interface_["name"];
                                 }
                             }
                         }
@@ -72,13 +72,13 @@ namespace xrock_gui_model
         ConfigVector interfaces;
         if(model["versions"][0].hasKey("interfaces"))
         {
-            for(auto interface: model["versions"][0]["interfaces"])
+            for(auto interface_: model["versions"][0]["interfaces"])
             {
-                if(interface.hasKey("linkToNode"))
+                if(interface_.hasKey("linkToNode"))
                 {
                     continue;
                 }
-                interfaces.push_back(interface);
+                interfaces.push_back(interface_);
             }
         }
         model["versions"][0]["interfaces"] = interfaces;
@@ -100,18 +100,18 @@ namespace xrock_gui_model
                 {
                     // Search for the matching external interface first
                     bool found = false;
-                    for (auto& interface : model["versions"][0]["interfaces"])
+                    for (auto& interface_ : model["versions"][0]["interfaces"])
                     {
-                        if (interface["name"] == port["interfaceExportName"])
+                        if (interface_["name"] == port["interfaceExportName"])
                         {
                             // Interface already exists. Just update alias!
-                            interface["alias"] = (nodeAlias.empty() ? nodeName : nodeAlias) + std::string(":") + (portAlias.empty() ? portName : portAlias);
+                            interface_["alias"] = (nodeAlias.empty() ? nodeName : nodeAlias) + std::string(":") + (portAlias.empty() ? portName : portAlias);
                             found = true;
                             if(port.hasKey("initValue"))
                             {
                                 ConfigMap data;
                                 data["initValue"] = port["initValue"];
-                                interface["data"] = data.toYamlString();
+                                interface_["data"] = data.toYamlString();
                             }
                             break;
                         }
@@ -120,46 +120,46 @@ namespace xrock_gui_model
                     if (found) continue;
 
                     // The interface does not yet exist, so we create a NEW one
-                    ConfigMap interface;
+                    ConfigMap interface_;
                     if(port.hasKey("domain"))
                     {
-                        interface["domain"] = port["domain"];
+                        interface_["domain"] = port["domain"];
                     }
-                    interface["direction"] = port["direction"];
+                    interface_["direction"] = port["direction"];
                     if(port.hasKey("multiplicity"))
                     {
-                        interface["multiplicity"] = port["multiplicity"];
+                        interface_["multiplicity"] = port["multiplicity"];
                     }
-                    interface["type"] = port["type"];
-                    interface["linkToNode"] = nodeName;
-                    interface["linkToInterface"] = portName;
-                    interface["name"] = nodeName + std::string(":") + portName;
+                    interface_["type"] = port["type"];
+                    interface_["linkToNode"] = nodeName;
+                    interface_["linkToInterface"] = portName;
+                    interface_["name"] = nodeName + std::string(":") + portName;
                     if(handleAlias)
                     {
-                        interface["alias"] = (nodeAlias.empty() ? nodeName : nodeAlias) + std::string(":") + (portAlias.empty() ? portName : portAlias);
+                        interface_["alias"] = (nodeAlias.empty() ? nodeName : nodeAlias) + std::string(":") + (portAlias.empty() ? portName : portAlias);
                         // todo: should we also have an option to define the export name in the GUI?
                     }
                     else
                     {
-                        interface["name"] = port["interfaceExportName"];
+                        interface_["name"] = port["interfaceExportName"];
                     }
                     if(port.hasKey("initValue"))
                     {
                         ConfigMap data;
                         data["initValue"] = port["initValue"];
-                        interface["data"] = data.toYamlString();
+                        interface_["data"] = data.toYamlString();
                     }
-                    model["versions"][0]["interfaces"].push_back(interface);
+                    model["versions"][0]["interfaces"].push_back(interface_);
                 }
                 else if (interfaceId == 0)
                 {
                     // In this case the external interface shall be removed. We do this by copiing every interface except for matching ones
                     ConfigVector keep;
-                    for (auto interface : model["versions"][0]["interfaces"])
+                    for (auto interface_ : model["versions"][0]["interfaces"])
                     {
-                        if (interface["name"] == port["interfaceExportName"])
+                        if (interface_["name"] == port["interfaceExportName"])
                             continue;
-                        keep.push_back(interface);
+                        keep.push_back(interface_);
                     }
                     model["versions"][0]["interfaces"] = keep;
                 }
@@ -177,12 +177,12 @@ namespace xrock_gui_model
                 {
                     // Search for the matching external interface first
                     bool found = false;
-                    for (auto& interface : model["versions"][0]["interfaces"])
+                    for (auto& interface_ : model["versions"][0]["interfaces"])
                     {
-                        if (interface["name"] == port["interfaceExportName"])
+                        if (interface_["name"] == port["interfaceExportName"])
                         {
                             // Interface already exists. Just update alias!
-                            interface["alias"] = (nodeAlias.empty() ? nodeName : nodeAlias) + std::string(":") + (portAlias.empty() ? portName : portAlias);
+                            interface_["alias"] = (nodeAlias.empty() ? nodeName : nodeAlias) + std::string(":") + (portAlias.empty() ? portName : portAlias);
                             found = true;
                             break;
                         }
@@ -191,40 +191,40 @@ namespace xrock_gui_model
                     if (found) continue;
 
                     // The interface does not yet exist, so we create a NEW one
-                    ConfigMap interface;
+                    ConfigMap interface_;
                     if(port.hasKey("domain"))
                     {
-                        interface["domain"] = port["domain"];
+                        interface_["domain"] = port["domain"];
                     }
-                    interface["direction"] = port["direction"];
+                    interface_["direction"] = port["direction"];
                     if(port.hasKey("multiplicity"))
                     {
-                        interface["multiplicity"] = port["multiplicity"];
+                        interface_["multiplicity"] = port["multiplicity"];
                     }
-                    interface["type"] = port["type"];
-                    interface["linkToNode"] = node["name"];
-                    interface["linkToInterface"] = port["name"];
-                    interface["name"] = nodeName + std::string(":") + portName;
+                    interface_["type"] = port["type"];
+                    interface_["linkToNode"] = node["name"];
+                    interface_["linkToInterface"] = port["name"];
+                    interface_["name"] = nodeName + std::string(":") + portName;
                     if(handleAlias)
                     {
-                        interface["alias"] = (nodeAlias.empty() ? nodeName : nodeAlias) + std::string(":") + (portAlias.empty() ? portName : portAlias);
+                        interface_["alias"] = (nodeAlias.empty() ? nodeName : nodeAlias) + std::string(":") + (portAlias.empty() ? portName : portAlias);
                         // todo: should we also have an option to define the export name in the GUI?
                     }
                     else
                     {
-                        interface["name"] = port["interfaceExportName"];
+                        interface_["name"] = port["interfaceExportName"];
                     }
-                    model["versions"][0]["interfaces"].push_back(interface);
+                    model["versions"][0]["interfaces"].push_back(interface_);
                 }
                 else if (interfaceId == 0)
                 {
                     // In this case the external interface shall be removed. We do this by copiing every interface except for matching ones
                     ConfigVector keep;
-                    for (auto interface : model["versions"][0]["interfaces"])
+                    for (auto interface_ : model["versions"][0]["interfaces"])
                     {
-                        if (interface["name"] == port["interfaceExportName"])
+                        if (interface_["name"] == port["interfaceExportName"])
                             continue;
-                        keep.push_back(interface);
+                        keep.push_back(interface_);
                     }
                     model["versions"][0]["interfaces"] = keep;
                 }

@@ -55,6 +55,10 @@ models:
       - name: v1
     type: fragment
     name: int_to_float
+  - versions:
+      - name: v1
+    type: fragment
+    name: indexToUV
   - type: fragment
     name: fragInfo
     versions:
@@ -79,6 +83,10 @@ models:
       - name: v1
     type: fragment
     name: math_float
+  - versions:
+      - name: v1
+    type: fragment
+    name: math_range
   - versions:
       - name: v1
     name: math_mod
@@ -204,6 +212,10 @@ models:
     versions:
       - name: v1
   - name: image2D
+    type: fragment
+    versions:
+      - name: v1
+  - name: imageBuffer
     type: fragment
     versions:
       - name: v1
@@ -352,6 +364,14 @@ models:
     versions:
       - name: v1
   - name: image2DStore
+    type: fragment
+    versions:
+      - name: v1
+  - name: imageBufferLoad
+    type: fragment
+    versions:
+      - name: v1
+  - name: imageBufferStore
     type: fragment
     versions:
       - name: v1

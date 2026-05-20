@@ -1,0 +1,10 @@
+domain: SHADER
+name: imageBufferLoad
+type: fragment
+versions:
+- date: '2026-02-24 10:26:00.000000'
+  interfaces:
+  - {direction: INCOMING, name: index, type: int}
+#  - {direction: INCOMING, name: texture, type: image2D}
+  - {direction: OUTGOING, name: color, type: vec4}
+  name: v1

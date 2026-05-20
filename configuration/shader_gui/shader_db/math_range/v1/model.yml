@@ -1,0 +1,15 @@
+domain: SHADER
+name: math_range
+type: fragment
+versions:
+- date: '2026-04-17 12:11:00.000000'
+  interfaces:
+  - {direction: INCOMING, name: start, type: float}
+  - {direction: INCOMING, name: end, type: float}
+  - {direction: INCOMING, name: value, type: float}
+  - {direction: OUTGOING, name: result, type: float}
+  name: v1
+  defaultConfiguration:
+    data: "data:\n  inputs:\n    start: 0.0\n    end: 0.0\n\n"
+  softwareData:
+    data: "description:\n  markdown: \"# brief\\n\\nReturns 1.0 if *value* is within [*start*,*end*], 0.0 otherwise\"\n"

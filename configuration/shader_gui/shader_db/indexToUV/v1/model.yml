@@ -1,0 +1,12 @@
+domain: SHADER
+name: indexToUV
+type: fragment
+versions:
+- date: 2026-04-10 10:26:00.000000
+  interfaces:
+  - {direction: INCOMING, name: index, type: int}
+  - {direction: INCOMING, name: textureSize, type: int}
+  - {direction: OUTGOING, name: uv, type: vec2}
+  name: v1
+  defaultConfiguration:
+    data: "data:\n  inputs:\n    index: 0\n    textureSize: 1024\n"

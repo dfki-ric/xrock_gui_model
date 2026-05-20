@@ -1,0 +1,11 @@
+domain: SHADER
+name: imageBuffer
+type: fragment
+versions:
+- date: '2026-04-08 16:56:00.000000'
+  interfaces:
+  - {direction: INCOMING, name: export, type: imageBuffer}
+  - {direction: OUTGOING, name: output, type: imageBuffer}
+  name: v1
+  defaultConfiguration:
+    data: "data:\n  type: uniform\n  format: rgba32f\n"

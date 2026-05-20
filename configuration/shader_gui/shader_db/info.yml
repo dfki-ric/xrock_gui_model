@@ -330,15 +330,15 @@ models:
   - name: default_fragment_shader
     type: SHADER
     versions:
-      - name: " "
+      - name: v1
   - name: default_diffuseMap_fragment_shader
     type: SHADER
     versions:
-      - name: " "
+      - name: v1
   - name: heightmap_fragment_shader
     type: SHADER
     versions:
-      - name: " "
+      - name: v1
   - name: write_uvi
     type: fragment
     versions:
